@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ダッシュボード | Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* ヘッダー */
+        header {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border-bottom: 3px solid #e63946;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: #e63946;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #e63946;
+        }
+
+        .back-button {
+            background-color: #e63946;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #ff6b6b;
+        }
+
+        /* ページタイトル */
+        .page-title-section {
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-title-section::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .page-title-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            color: #fff;
+        }
+
+        /* コンテナ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        /* サマリーカード */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #e63946;
+        }
+
+        .summary-card:hover {
+            border-color: #e63946;
+            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .summary-value {
+            font-size: 42px;
+            font-weight: 900;
+            color: #e63946;
+            margin-bottom: 10px;
+        }
+
+        .summary-change {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .summary-change.positive {
+            color: #28a745;
+        }
+
+        .summary-change.negative {
+            color: #dc3545;
+        }
+
+        /* セクション */
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 30px;
+            color: #e63946;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-left: 5px solid #e63946;
+            padding-left: 15px;
+        }
+
+        /* チャート */
+        .chart-container {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, rgba(230, 57, 70, 0.05) 0%, rgba(230, 57, 70, 0.02) 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* トレンド */
+        .trends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .trend-card {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .trend-card:hover {
+            border-color: #e63946;
+            box-shadow: 0 6px 20px rgba(230, 57, 70, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .trend-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #e63946;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .trend-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .trend-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .trend-rank {
+            font-size: 24px;
+            font-weight: 900;
+            color: #e63946;
+            width: 40px;
+            text-align: center;
+        }
+
+        .trend-info h4 {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: #000;
+        }
+
+        .trend-info p {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .trend-value {
+            margin-left: auto;
+            font-weight: bold;
+            color: #e63946;
+            font-size: 14px;
+        }
+
+        /* テーブル */
+        .table-container {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stats-table thead {
+            background-color: #f5f5f5;
+            border-bottom: 3px solid #e63946;
+        }
+
+        .stats-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+            color: #e63946;
+        }
+
+        .stats-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stats-table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 1024px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .trends-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .page-title-section {
+                padding: 40px 20px;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-value {
+                font-size: 32px;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+
+            .chart-placeholder {
+                height: 250px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <a href="gegen_press_top.html" class="logo"><img src="logo.png" alt="Gegen Press!" style="height:46px;width:auto;display:block;"></a>
+        <div class="header-nav">
+            <a href="gegen_press_top.html" class="nav-link">ホーム</a>
+            <a href="#" class="nav-link">統計</a>
+            <a href="gegen_press_top.html"><button class="back-button">トップに戻る</button></a>
+        </div>
+    </header>
+
+    <!-- ページタイトル -->
+    <section class="page-title-section">
+        <div class="page-title-content">
+            <h1 class="page-title">ダッシュボード</h1>
+            <p class="page-subtitle">Gegen Press! のリアルタイム統計情報</p>
+        </div>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <div class="container">
+        <!-- サマリーカード -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="summary-label">総記事数</div>
+                <div class="summary-value">2,847</div>
+                <div class="summary-change positive">↑ 今月 +342件</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">登録記者数</div>
+                <div class="summary-value">156</div>
+                <div class="summary-change positive">↑ 今月 +12名</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">総ユーザー数</div>
+                <div class="summary-value">12,540</div>
+                <div class="summary-change positive">↑ 今月 +2,184名</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">平均信ぴょう性スコア</div>
+                <div class="summary-value">82.4</div>
+                <div class="summary-change positive">↑ 先月比 +2.1</div>
+            </div>
+        </div>
+
+        <!-- 信ぴょう性スコア分布 -->
+        <section class="section">
+            <h2 class="section-title">信ぴょう性スコア分布</h2>
+            <div class="chart-container">
+                <div class="chart-placeholder">📊 スコア分布チャート（バックエンド実装予定）</div>
+            </div>
+        </section>
+
+        <!-- 記事投稿トレンド -->
+        <section class="section">
+            <h2 class="section-title">記事投稿トレンド</h2>
+            <div class="chart-container">
+                <div class="chart-placeholder">📈 過去30日間の投稿数推移（バックエンド実装予定）</div>
+            </div>
+        </section>
+
+        <!-- トレンド情報 -->
+        <section class="section">
+            <h2 class="section-title">トレンド情報</h2>
+            <div class="trends-grid">
+                <!-- 人気記者 -->
+                <div class="trend-card">
+                    <div class="trend-title">🏆 人気記者 TOP 5</div>
+                    
+                    <div class="trend-item">
+                        <div class="trend-rank">1</div>
+                        <div class="trend-info">
+                            <h4>Fabrizio Romano</h4>
+                            <p>移籍情報スペシャリスト</p>
+                        </div>
+                        <div class="trend-value">96/100</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-rank">2</div>
+                        <div class="trend-info">
+                            <h4>Sky Sports</h4>
+                            <p>プレミアリーグ</p>
+                        </div>
+                        <div class="trend-value">92/100</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-rank">3</div>
+                        <div class="trend-info">
+                            <h4>Marca Sports</h4>
+                            <p>スペイン情報</p>
+                        </div>
+                        <div class="trend-value">88/100</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-rank">4</div>
+                        <div class="trend-info">
+                            <h4>AS España</h4>
+                            <p>ラリーガ</p>
+                        </div>
+                        <div class="trend-value">85/100</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-rank">5</div>
+                        <div class="trend-info">
+                            <h4>Goal.com</h4>
+                            <p>ヨーロッパ全域</p>
+                        </div>
+                        <div class="trend-value">81/100</div>
+                    </div>
+                </div>
+
+                <!-- 人気記事 -->
+                <div class="trend-card">
+                    <div class="trend-title">📰 人気記事 TOP 5</div>
+                    
+                    <div class="trend-item">
+                        <div class="trend-rank">1</div>
+                        <div class="trend-info">
+                            <h4>マンチェスター・シティが超大型補強を発表</h4>
+                            <p>Fabrizio Romano</p>
+                        </div>
+                        <div class="trend-value">2,450</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-rank">2</div>
+                        <div class="trend-info">
+                            <h4>シティとユナイテッド、プレミアリーグ優勝争いは接戦へ</h4>
+                            <p>Sky Sports</p>
+                        </div>
+                        <div class="trend-value">3,267</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-rank">3</div>
+                        <div class="trend-info">
+                            <h4>ユナイテッド、レアル・マドリーのスター選手を獲得か</h4>
+                            <p>Fabrizio Romano</p>
+                        </div>
+                        <div class="trend-value">1,892</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-rank">4</div>
+                        <div class="trend-info">
+                            <h4>PSG、フランス代表MFの争奪戦に勝利</h4>
+                            <p>Fabrizio Romano</p>
+                        </div>
+                        <div class="trend-value">1,234</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-rank">5</div>
+                        <div class="trend-info">
+                            <h4>レアル・マドリー、日本の若き才能に興味</h4>
+                            <p>Marca Sports</p>
+                        </div>
+                        <div class="trend-value">856</div>
+                    </div>
+                </div>
+
+                <!-- アクティビティ -->
+                <div class="trend-card">
+                    <div class="trend-title">📊 アクティビティ</div>
+                    
+                    <div class="trend-item">
+                        <div class="trend-info">
+                            <h4>本日の投稿記事</h4>
+                        </div>
+                        <div class="trend-value">28</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-info">
+                            <h4>本日の新規ユーザー</h4>
+                        </div>
+                        <div class="trend-value">156</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-info">
+                            <h4>本日の投稿評価</h4>
+                        </div>
+                        <div class="trend-value">2,847</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-info">
+                            <h4>本日のコメント</h4>
+                        </div>
+                        <div class="trend-value">642</div>
+                    </div>
+
+                    <div class="trend-item">
+                        <div class="trend-info">
+                            <h4>本日のアクセス</h4>
+                        </div>
+                        <div class="trend-value">45.2K</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- カテゴリ統計 -->
+        <section class="section">
+            <h2 class="section-title">カテゴリ別記事数</h2>
+            <div class="table-container">
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th>カテゴリ</th>
+                            <th>記事数</th>
+                            <th>平均信ぴょう性</th>
+                            <th>トレンド</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>移籍情報</td>
+                            <td>856</td>
+                            <td>89.2</td>
+                            <td style="color: #28a745; font-weight: bold;">↑ +12%</td>
+                        </tr>
+                        <tr>
+                            <td>プレミアリーグ</td>
+                            <td>742</td>
+                            <td>85.6</td>
+                            <td style="color: #28a745; font-weight: bold;">↑ +8%</td>
+                        </tr>
+                        <tr>
+                            <td>ラリーガ</td>
+                            <td>634</td>
+                            <td>82.1</td>
+                            <td style="color: #999;">→ 0%</td>
+                        </tr>
+                        <tr>
+                            <td>セリエA</td>
+                            <td>489</td>
+                            <td>78.9</td>
+                            <td style="color: #dc3545; font-weight: bold;">↓ -3%</td>
+                        </tr>
+                        <tr>
+                            <td>リーグアン</td>
+                            <td>426</td>
+                            <td>81.4</td>
+                            <td style="color: #28a745; font-weight: bold;">↑ +5%</td>
+                        </tr>
+                        <tr>
+                            <td>ブンデスリーガ</td>
+                            <td>384</td>
+                            <td>79.7</td>
+                            <td style="color: #28a745; font-weight: bold;">↑ +2%</td>
+                        </tr>
+                        <tr>
+                            <td>その他</td>
+                            <td>316</td>
+                            <td>76.3</td>
+                            <td style="color: #999;">→ 0%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // ページ更新（実装予定）
+        console.log('ダッシュボード読み込み完了');
+        console.log('リアルタイム更新機能はバックエンド実装後に有効になります');
+    </script>
+</body>
+</html>
