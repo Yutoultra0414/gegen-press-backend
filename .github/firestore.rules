@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ユーザーコレクション
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 記事コレクション
+    match /articles/{articleId} {
+      allow read: if true; // すべての人が閲覧可能
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+                            && request.auth.uid == resource.data.authorId;
+    }
+
+    // コメントコレクション（投稿はログイン必須）
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+                            && request.auth.uid == resource.data.userId;
+    }
+
+    // 評価コレクション（記事・記者評価はログイン不要で投稿可能）
+    match /ratings/{ratingId} {
+      allow read: if true;
+      allow create: if true; // 誰でも評価可能
+      allow update, delete: if request.auth != null
+                            && request.auth.uid == resource.data.userId;
+    }
+
+    // 記者コレクション（ログインユーザーが追加可能・追加者本人のみ編集可能）
+    match /reporters/{reporterId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null
+                    && request.auth.uid == resource.data.createdBy;
+      allow delete: if false; // 削除は不可（評価データの整合性のため）
+    }
+
+    // フォロー関係コレクション
+    match /follows/{followId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null
+                    && request.auth.uid == resource.data.followerId;
+    }
+  }
+}
