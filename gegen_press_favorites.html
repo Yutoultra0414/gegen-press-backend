@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お気に入り | Gegen Press!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* ヘッダー */
+        header {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border-bottom: 3px solid #e63946;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: #e63946;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #e63946;
+        }
+
+        .back-button {
+            background-color: #e63946;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #ff6b6b;
+        }
+
+        /* ページタイトル */
+        .page-title-section {
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-title-section::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .page-title-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            color: #fff;
+        }
+
+        /* コンテナ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 40px;
+        }
+
+        /* サイドバー */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-box {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .sidebar-box h3 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #e63946;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .folder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .folder-item {
+            padding: 10px 12px;
+            background-color: transparent;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .folder-item:hover {
+            border-color: #e63946;
+            color: #e63946;
+            background-color: rgba(230, 57, 70, 0.05);
+        }
+
+        .folder-item.active {
+            background-color: #e63946;
+            border-color: #e63946;
+            color: #fff;
+        }
+
+        .stat-box {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #e63946;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* メインコンテンツ */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* フォルダヘッダー */
+        .folder-header {
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .folder-name {
+            font-size: 32px;
+            font-weight: 900;
+            color: #e63946;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .folder-description {
+            font-size: 14px;
+            color: #999;
+            line-height: 1.6;
+        }
+
+        .folder-stats {
+            display: flex;
+            gap: 25px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e63946;
+        }
+
+        .stat-label-text {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ソート・アクション */
+        .sort-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .sort-label {
+            font-size: 13px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sort-select {
+            background-color: #fff;
+            border: 2px solid #ddd;
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .sort-select:hover {
+            border-color: #e63946;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: #e63946;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background-color: transparent;
+            border: 2px solid #ddd;
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .action-btn:hover {
+            border-color: #e63946;
+            color: #e63946;
+        }
+
+        /* 記事グリッド */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .article-card {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #ddd;
+            border-left: 4px solid #e63946;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .article-card:hover {
+            border-color: #e63946;
+            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .article-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        .article-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #000;
+            line-height: 1.4;
+        }
+
+        .remove-btn {
+            background-color: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            transition: color 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .remove-btn:hover {
+            color: #e63946;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .article-author {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .author-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .article-time {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .article-score {
+            background-color: rgba(230, 57, 70, 0.1);
+            color: #e63946;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 11px;
+            margin-left: auto;
+        }
+
+        .article-description {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            flex-grow: 1;
+        }
+
+        .article-footer {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            color: #999;
+            border-top: 1px solid #ddd;
+            padding-top: 12px;
+        }
+
+        /* 空状態 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-description {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .empty-state-link {
+            color: #e63946;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        /* ページネーション */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            background-color: #fff;
+            color: #333;
+            border: 2px solid #ddd;
+            padding: 10px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .pagination-btn:hover {
+            border-color: #e63946;
+            color: #e63946;
+        }
+
+        .pagination-btn.active {
+            background-color: #e63946;
+            border-color: #e63946;
+            color: #fff;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .articles-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .page-title-section {
+                padding: 40px 20px;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+
+            .folder-name {
+                font-size: 24px;
+            }
+
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sort-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .action-buttons {
+                width: 100%;
+            }
+
+            .action-btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <a href="gegen_press_top.html" class="logo"><img src="logo.png" alt="Gegen Press!" style="height:46px;width:auto;display:block;"></a>
+        <div class="header-nav">
+            <a href="gegen_press_top.html" class="nav-link">ホーム</a>
+            <a href="#" class="nav-link">お気に入り</a>
+            <a href="gegen_press_top.html"><button class="back-button">トップに戻る</button></a>
+        </div>
+    </header>
+
+    <!-- ページタイトル -->
+    <section class="page-title-section">
+        <div class="page-title-content">
+            <h1 class="page-title">お気に入り</h1>
+            <p class="page-subtitle">ブックマークした記事を整理・管理。あとで読みたい記事をまとめて保存</p>
+        </div>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <div class="container">
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <!-- フォルダ選択 -->
+            <div class="sidebar-box">
+                <h3>フォルダ</h3>
+                <div class="folder-list">
+                    <button class="folder-item active" data-folder="all">すべて</button>
+                    <button class="folder-item" data-folder="transfer">移籍情報</button>
+                    <button class="folder-item" data-folder="premier">プレミアリーグ</button>
+                    <button class="folder-item" data-folder="important">重要</button>
+                    <button class="folder-item" data-folder="later">後で読む</button>
+                </div>
+            </div>
+
+            <!-- 統計情報 -->
+            <div class="sidebar-box">
+                <h3>統計</h3>
+                <div class="stat-box">
+                    <div class="stat-number">25</div>
+                    <div class="stat-label">ブックマーク数</div>
+                </div>
+            </div>
+
+            <!-- フォルダ管理 -->
+            <div class="sidebar-box">
+                <h3>管理</h3>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button style="padding: 8px 12px; background-color: #e63946; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; transition: all 0.3s ease; text-transform: uppercase;">新規フォルダ</button>
+                    <button style="padding: 8px 12px; background-color: transparent; border: 2px solid #ddd; color: #333; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; transition: all 0.3s ease; text-transform: uppercase;">設定</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- フォルダヘッダー -->
+            <div class="folder-header">
+                <div class="folder-name">すべて</div>
+                <p class="folder-description">
+                    ブックマークしたすべての記事を表示しています。フォルダで整理することで、関心のあるテーマごとに記事を分類できます。
+                </p>
+                <div class="folder-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">25</div>
+                        <div class="stat-label-text">記事数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label-text">記者</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ソート・アクション -->
+            <div class="sort-section">
+                <span class="sort-label">並び替え:</span>
+                <select class="sort-select">
+                    <option>ブックマーク日時（新着順）</option>
+                    <option>ブックマーク日時（古い順）</option>
+                    <option>記事投稿日時（新着順）</option>
+                    <option>信頼度が高い順</option>
+                    <option>評価が高い順</option>
+                </select>
+                <div class="action-buttons">
+                    <button class="action-btn">移動</button>
+                    <button class="action-btn">削除</button>
+                </div>
+            </div>
+
+            <!-- 記事グリッド -->
+            <div class="articles-grid">
+                <!-- 記事1 -->
+                <div class="article-card">
+                    <div class="article-header">
+                        <div class="article-title">マンチェスター・シティが超大型補強を発表</div>
+                        <button class="remove-btn">✕</button>
+                    </div>
+                    <div class="article-meta">
+                        <div class="article-author">
+                            <div class="author-avatar">F</div>
+                            <span>Fabrizio Romano</span>
+                        </div>
+                        <span class="article-time">2024年6月27日</span>
+                        <span class="article-score">96/100</span>
+                    </div>
+                    <div class="article-description">
+                        プレミアリーグの雄、マンチェスター・シティが2024-25シーズンに向けた大規模な補強計画を発表しました...
+                    </div>
+                    <div class="article-footer">
+                        <span>📖 閲覧: 2,450</span>
+                        <span>⭐ 評価: 4.8</span>
+                    </div>
+                </div>
+
+                <!-- 記事2 -->
+                <div class="article-card">
+                    <div class="article-header">
+                        <div class="article-title">ユナイテッド、レアル・マドリーのスター選手を獲得か</div>
+                        <button class="remove-btn">✕</button>
+                    </div>
+                    <div class="article-meta">
+                        <div class="article-author">
+                            <div class="author-avatar">F</div>
+                            <span>Fabrizio Romano</span>
+                        </div>
+                        <span class="article-time">2024年6月26日</span>
+                        <span class="article-score">94/100</span>
+                    </div>
+                    <div class="article-description">
+                        マンチェスター・ユナイテッドが、レアル・マドリーのスター選手との契約交渉に進むという最新情報が入ってきました...
+                    </div>
+                    <div class="article-footer">
+                        <span>📖 閲覧: 1,892</span>
+                        <span>⭐ 評価: 4.7</span>
+                    </div>
+                </div>
+
+                <!-- 記事3 -->
+                <div class="article-card">
+                    <div class="article-header">
+                        <div class="article-title">PSG、フランス代表MFの争奪戦に勝利</div>
+                        <button class="remove-btn">✕</button>
+                    </div>
+                    <div class="article-meta">
+                        <div class="article-author">
+                            <div class="author-avatar">F</div>
+                            <span>Fabrizio Romano</span>
+                        </div>
+                        <span class="article-time">2024年6月25日</span>
+                        <span class="article-score">92/100</span>
+                    </div>
+                    <div class="article-description">
+                        パリ・サンジェルマンが、フランス代表の有望なMFの獲得に成功しました。複数のビッグクラブからのオファーを制しての獲得...
+                    </div>
+                    <div class="article-footer">
+                        <span>📖 閲覧: 3,267</span>
+                        <span>⭐ 評価: 4.9</span>
+                    </div>
+                </div>
+
+                <!-- 記事4 -->
+                <div class="article-card">
+                    <div class="article-header">
+                        <div class="article-title">シティのゴールキーパー、契約延長で合意</div>
+                        <button class="remove-btn">✕</button>
+                    </div>
+                    <div class="article-meta">
+                        <div class="article-author">
+                            <div class="author-avatar">F</div>
+                            <span>Fabrizio Romano</span>
+                        </div>
+                        <span class="article-time">2024年6月23日</span>
+                        <span class="article-score">91/100</span>
+                    </div>
+                    <div class="article-description">
+                        マンチェスター・シティのレギュラーゴールキーパーが、クラブとの契約延長で合意しました。3年契約となり...
+                    </div>
+                    <div class="article-footer">
+                        <span>📖 閲覧: 1,234</span>
+                        <span>⭐ 評価: 4.8</span>
+                    </div>
+                </div>
+
+                <!-- 記事5 -->
+                <div class="article-card">
+                    <div class="article-header">
+                        <div class="article-title">バルセロナ、スペイン代表FWと5年契約</div>
+                        <button class="remove-btn">✕</button>
+                    </div>
+                    <div class="article-meta">
+                        <div class="article-author">
+                            <div class="author-avatar">M</div>
+                            <span>Marca Sports</span>
+                        </div>
+                        <span class="article-time">2024年6月22日</span>
+                        <span class="article-score">88/100</span>
+                    </div>
+                    <div class="article-description">
+                        バルセロナが、スペイン代表のフォワードと長期契約に合意しました。将来を見据えた新生バルセロナの重要な補強...
+                    </div>
+                    <div class="article-footer">
+                        <span>📖 閲覧: 856</span>
+                        <span>⭐ 評価: 4.6</span>
+                    </div>
+                </div>
+
+                <!-- 記事6 -->
+                <div class="article-card">
+                    <div class="article-header">
+                        <div class="article-title">ユベントス、イタリア国家代表CBを獲得</div>
+                        <button class="remove-btn">✕</button>
+                    </div>
+                    <div class="article-meta">
+                        <div class="article-author">
+                            <div class="author-avatar">C</div>
+                            <span>Calcio & Calcetti</span>
+                        </div>
+                        <span class="article-time">2024年6月20日</span>
+                        <span class="article-score">85/100</span>
+                    </div>
+                    <div class="article-description">
+                        ユベントスが、イタリア代表の主力ディフェンダーの獲得を発表。セリエAの最強ディフェンス構築に向けた...
+                    </div>
+                    <div class="article-footer">
+                        <span>📖 閲覧: 2,145</span>
+                        <span>⭐ 評価: 4.5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ページネーション -->
+            <div class="pagination">
+                <button class="pagination-btn" disabled>前へ</button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">3</button>
+                <button class="pagination-btn">4</button>
+                <button class="pagination-btn">次へ</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // フォルダ選択
+        const folderButtons = document.querySelectorAll('.folder-item');
+        folderButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                folderButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const folder = this.getAttribute('data-folder');
+                const folderName = this.textContent;
+                
+                // フォルダ名を更新
+                document.querySelector('.folder-name').textContent = folderName;
+                console.log('Selected folder:', folder);
+            });
+        });
+
+        // 記事削除
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (confirm('このブックマークを削除してもよろしいですか？')) {
+                    this.closest('.article-card').remove();
+                    console.log('Article removed from favorites');
+                }
+            });
+        });
+
+        // ソート機能
+        document.querySelector('.sort-select').addEventListener('change', function() {
+            console.log('Sort changed to:', this.value);
+        });
+
+        // アクションボタン
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                alert(action + '機能は準備中です');
+            });
+        });
+
+        // 管理ボタン
+        document.querySelectorAll('.sidebar-box button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                if (action.includes('フォルダ') || action.includes('設定')) {
+                    alert(action + '機能は準備中です');
+                }
+            });
+        });
+
+        // 記事カードクリック
+        document.querySelectorAll('.article-card').forEach(card => {
+            card.addEventListener('click', function() {
+                alert('記事詳細ページへのナビゲーション（実装予定）');
+            });
+        });
+
+        // ページネーション
+        document.querySelectorAll('.pagination-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.disabled && !this.classList.contains('active')) {
+                    console.log('Page changed to:', this.textContent);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

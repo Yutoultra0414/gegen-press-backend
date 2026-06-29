@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン・登録 | Gegen Press!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* ヘッダー */
+        header {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border-bottom: 3px solid #e63946;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: #e63946;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .back-button {
+            background-color: #e63946;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #ff6b6b;
+        }
+
+        /* メインコンテンツ */
+        .container {
+            max-width: 450px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+        }
+
+        .form-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #000;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .form-subtitle {
+            font-size: 14px;
+            color: #999;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* タブ */
+        .tab-buttons {
+            display: flex;
+            gap: 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 20px;
+            background-color: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #999;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            color: #333;
+        }
+
+        .tab-btn.active {
+            color: #e63946;
+            border-bottom-color: #e63946;
+        }
+
+        /* フォームコンテナ */
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* フォーム要素 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #000;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            color: #333;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #e63946;
+            box-shadow: 0 0 12px rgba(230, 57, 70, 0.15);
+        }
+
+        .form-group input::placeholder {
+            color: #999;
+        }
+
+        /* チェックボックス */
+        .form-group-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-group-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #e63946;
+        }
+
+        .form-group-checkbox label {
+            margin: 0;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        /* ボタン */
+        .submit-button {
+            width: 100%;
+            padding: 14px;
+            background-color: #e63946;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-button:hover {
+            background-color: #ff6b6b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(230, 57, 70, 0.3);
+        }
+
+        /* リンク */
+        .form-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+
+        .form-links a {
+            color: #e63946;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .form-links a:hover {
+            color: #ff6b6b;
+            text-decoration: underline;
+        }
+
+        /* ディバイダー */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #ddd;
+        }
+
+        .divider::before {
+            margin-right: 15px;
+        }
+
+        .divider::after {
+            margin-left: 15px;
+        }
+
+        /* ソーシャルボタン */
+        .social-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .social-btn {
+            padding: 12px;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .social-btn:hover {
+            border-color: #e63946;
+            color: #e63946;
+        }
+
+        /* フッター */
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .form-footer a {
+            color: #e63946;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .container {
+                margin: 40px auto;
+            }
+
+            .form-card {
+                padding: 30px 20px;
+            }
+
+            .form-title {
+                font-size: 24px;
+            }
+
+            .tab-btn {
+                padding: 12px 15px;
+                font-size: 12px;
+            }
+
+            .social-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <a href="gegen_press_top.html" class="logo"><img src="logo.png" alt="Gegen Press!" style="height:46px;width:auto;display:block;"></a>
+        <a href="gegen_press_top.html"><button class="back-button">トップに戻る</button></a>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <div class="container">
+        <div class="form-card">
+            <!-- タブ -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="login">ログイン</button>
+                <button class="tab-btn" data-tab="register">登録</button>
+            </div>
+
+            <!-- ログインフォーム -->
+            <div class="form-content active" id="login">
+                <h1 class="form-title">ログイン</h1>
+                <p class="form-subtitle">アカウントにログインしてください</p>
+
+                <form>
+                    <div class="form-group">
+                        <label for="login-email">メールアドレス</label>
+                        <input type="email" id="login-email" placeholder="example@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-password">パスワード</label>
+                        <input type="password" id="login-password" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="form-group-checkbox">
+                        <input type="checkbox" id="login-remember" checked>
+                        <label for="login-remember">次回から自動ログイン</label>
+                    </div>
+
+                    <button type="submit" class="submit-button">ログイン</button>
+                </form>
+
+                <div class="form-links">
+                    <a href="#">パスワードをお忘れですか?</a>
+                    <a href="#">利用規約</a>
+                </div>
+
+                <div class="divider">または</div>
+
+                <div class="social-buttons">
+                    <button class="social-btn">Google</button>
+                    <button class="social-btn">Twitter/X</button>
+                </div>
+
+                <div class="form-footer">
+                    アカウントをお持ちでないですか?
+                    <a href="#" class="toggle-tab" data-tab="register">ここから登録</a>
+                </div>
+            </div>
+
+            <!-- 登録フォーム -->
+            <div class="form-content" id="register">
+                <h1 class="form-title">新規登録</h1>
+                <p class="form-subtitle">Gegen Press!に参加しましょう</p>
+
+                <form>
+                    <div class="form-group">
+                        <label for="register-username">ユーザー名</label>
+                        <input type="text" id="register-username" placeholder="サッカーファン太郎" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-email">メールアドレス</label>
+                        <input type="email" id="register-email" placeholder="example@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-password">パスワード</label>
+                        <input type="password" id="register-password" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-password-confirm">パスワード確認</label>
+                        <input type="password" id="register-password-confirm" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="form-group-checkbox">
+                        <input type="checkbox" id="register-terms" required>
+                        <label for="register-terms">
+                            <a href="#" style="color: #e63946; text-decoration: none;">利用規約</a>
+                            と
+                            <a href="#" style="color: #e63946; text-decoration: none;">プライバシーポリシー</a>
+                            に同意します
+                        </label>
+                    </div>
+
+                    <button type="submit" class="submit-button">登録</button>
+                </form>
+
+                <div class="divider">または</div>
+
+                <div class="social-buttons">
+                    <button class="social-btn">Google</button>
+                    <button class="social-btn">Twitter/X</button>
+                </div>
+
+                <div class="form-footer">
+                    すでにアカウントをお持ちですか?
+                    <a href="#" class="toggle-tab" data-tab="login">ここからログイン</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase クライアントSDK（本番認証用）。読み込めない環境ではデモ動作にフォールバック -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js" onerror="console.warn('Firebase SDK 未読込: デモモードで動作します')"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <!-- 本番デプロイ時は api-client.js を同じフォルダに置いてください -->
+    <script src="api-client.js" onerror="console.warn('api-client.js 未読込: デモモードで動作します')"></script>
+    <script>
+        // =========================================================
+        // Firebase 設定
+        // Firebase Console > プロジェクト設定 > 全般 > マイアプリ から取得した値を入れてください。
+        // 値が空のあいだは「デモモード」で動作します（プレビューでも動く）。
+        // =========================================================
+        const FIREBASE_CONFIG = {
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: "",
+        };
+
+        const API_AVAILABLE = (typeof GegenPressAPI !== 'undefined');
+        let firebaseReady = false;
+
+        try {
+            if (typeof firebase !== 'undefined' && FIREBASE_CONFIG.apiKey) {
+                firebase.initializeApp(FIREBASE_CONFIG);
+                firebaseReady = true;
+            }
+        } catch (e) {
+            console.warn('Firebase 初期化に失敗:', e);
+        }
+
+        // セッション保存（他ページで利用するトークン・ユーザーID）
+        function saveSession(token, uid) {
+            try {
+                localStorage.setItem('gegenPressToken', token);
+                localStorage.setItem('gegenPressUserId', uid);
+            } catch (e) { /* プレビュー環境などでは無視 */ }
+            if (API_AVAILABLE && token) GegenPressAPI.setToken(token);
+        }
+
+        function goHome() {
+            window.location.href = 'gegen_press_top.html';
+        }
+
+        // =========================================================
+        // タブ切り替え
+        // =========================================================
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const formContents = document.querySelectorAll('.form-content');
+        const toggleTabs = document.querySelectorAll('.toggle-tab');
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                switchTab(this.getAttribute('data-tab'));
+            });
+        });
+        toggleTabs.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                switchTab(this.getAttribute('data-tab'));
+            });
+        });
+        function switchTab(tabName) {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            formContents.forEach(content => content.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // =========================================================
+        // ログイン処理
+        // =========================================================
+        async function handleLogin(email, password, btn) {
+            if (firebaseReady) {
+                btn.disabled = true;
+                btn.textContent = 'ログイン中...';
+                try {
+                    const cred = await firebase.auth().signInWithEmailAndPassword(email, password);
+                    const idToken = await cred.user.getIdToken();
+                    saveSession(idToken, cred.user.uid);
+                    // バックエンドでユーザー情報を取得（任意）
+                    if (API_AVAILABLE) {
+                        try { await GegenPressAPI.auth.login(idToken); } catch (e) {}
+                    }
+                    goHome();
+                } catch (e) {
+                    btn.disabled = false;
+                    btn.textContent = 'ログイン';
+                    alert(loginErrorMessage(e));
+                }
+                return;
+            }
+            // デモモード
+            alert('（デモ）ログインしました。Firebaseの設定を入れると実際の認証になります。');
+            saveSession('demo-token', 'demo-user');
+            goHome();
+        }
+
+        // =========================================================
+        // 新規登録処理
+        // バックエンドの /api/auth/signup でユーザー作成 → カスタムトークンで
+        // サインインして本物のIDトークンを取得する流れ。
+        // =========================================================
+        async function handleSignup(username, email, password, btn) {
+            if (firebaseReady && API_AVAILABLE) {
+                btn.disabled = true;
+                btn.textContent = '登録中...';
+                try {
+                    const res = await GegenPressAPI.auth.signup(email, password, username);
+                    if (res && res.success && res.token) {
+                        const cred = await firebase.auth().signInWithCustomToken(res.token);
+                        const idToken = await cred.user.getIdToken();
+                        saveSession(idToken, cred.user.uid);
+                        goHome();
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = '登録';
+                        alert((res && res.message) || '登録に失敗しました。');
+                    }
+                } catch (e) {
+                    btn.disabled = false;
+                    btn.textContent = '登録';
+                    alert('登録中にエラーが発生しました: ' + (e.message || e));
+                }
+                return;
+            }
+            // デモモード
+            alert('（デモ）登録しました。Firebaseの設定を入れると実際に登録されます。');
+            saveSession('demo-token', 'demo-user');
+            goHome();
+        }
+
+        // Firebase のエラーを日本語に
+        function loginErrorMessage(e) {
+            const code = e && e.code ? e.code : '';
+            if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+                return 'メールアドレスまたはパスワードが正しくありません。';
+            }
+            if (code === 'auth/invalid-email') return 'メールアドレスの形式が正しくありません。';
+            if (code === 'auth/too-many-requests') return '試行回数が多すぎます。しばらくしてからお試しください。';
+            return 'ログインに失敗しました: ' + (e.message || e);
+        }
+
+        // =========================================================
+        // フォーム送信のひもづけ
+        // =========================================================
+        const loginForm = document.querySelector('#login form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value;
+                const btn = loginForm.querySelector('.submit-button');
+                if (!email || !password) { alert('メールアドレスとパスワードを入力してください。'); return; }
+                handleLogin(email, password, btn);
+            });
+        }
+
+        const registerForm = document.querySelector('#register form');
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('register-username').value.trim();
+                const email = document.getElementById('register-email').value.trim();
+                const password = document.getElementById('register-password').value;
+                const confirm = document.getElementById('register-password-confirm').value;
+                const terms = document.getElementById('register-terms').checked;
+                const btn = registerForm.querySelector('.submit-button');
+
+                if (!username || !email || !password) { alert('すべての項目を入力してください。'); return; }
+                if (password.length < 6) { alert('パスワードは6文字以上で設定してください。'); return; }
+                if (password !== confirm) { alert('パスワードが一致しません。'); return; }
+                if (!terms) { alert('利用規約への同意が必要です。'); return; }
+
+                handleSignup(username, email, password, btn);
+            });
+        }
+
+        // =========================================================
+        // パスワードリセット
+        // =========================================================
+        const resetLink = document.querySelector('.form-links a');
+        if (resetLink) {
+            resetLink.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value.trim();
+                if (!email) { alert('パスワードをリセットするメールアドレスを、上のログイン欄に入力してください。'); return; }
+                if (firebaseReady) {
+                    try {
+                        await firebase.auth().sendPasswordResetEmail(email);
+                        alert('パスワードリセット用のメールを送信しました。受信箱をご確認ください。');
+                    } catch (err) {
+                        alert('送信に失敗しました: ' + (err.message || err));
+                    }
+                } else {
+                    alert('（デモ）パスワードリセットメールを送信しました。');
+                }
+            });
+        }
+
+        // =========================================================
+        // ソーシャルログイン（Google）
+        // =========================================================
+        document.querySelectorAll('.social-btn').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const isGoogle = this.textContent.trim().toLowerCase().includes('google');
+
+                if (firebaseReady && isGoogle) {
+                    try {
+                        const provider = new firebase.auth.GoogleAuthProvider();
+                        const cred = await firebase.auth().signInWithPopup(provider);
+                        const idToken = await cred.user.getIdToken();
+                        saveSession(idToken, cred.user.uid);
+                        goHome();
+                    } catch (err) {
+                        alert('ソーシャルログインに失敗しました: ' + (err.message || err));
+                    }
+                } else if (!firebaseReady) {
+                    alert('（デモ）ソーシャルログインは Firebase 設定後に有効になります。');
+                } else {
+                    alert('Twitter/X ログインは追加設定が必要です。準備中です。');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
