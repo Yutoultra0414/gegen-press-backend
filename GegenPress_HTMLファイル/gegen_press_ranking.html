@@ -520,10 +520,10 @@
                         <th width="15%">順位</th>
                         <th width="45%">記者名</th>
                         <th width="20%">スコア</th>
-                        <th width="20%">正確性</th>
+                        <th width="20%">平均評価</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="rankingBody">
                     <!-- 1位 -->
                     <tr class="rank-1" data-reporter-id="rep_fabrizio" onclick="goReporterProfile('rep_fabrizio')" style="cursor: pointer;">
                         <td class="rank-number"><span class="medal medal-gold">Gold</span>1</td>
@@ -537,7 +537,7 @@
                             </div>
                         </td>
                         <td class="score-cell">96<span class="score-max">/100</span></td>
-                        <td class="number-cell">98%</td>
+                        <td class="number-cell">4.8</td>
                     </tr>
 
                     <!-- 2位 -->
@@ -553,7 +553,7 @@
                             </div>
                         </td>
                         <td class="score-cell">92<span class="score-max">/100</span></td>
-                        <td class="number-cell">95%</td>
+                        <td class="number-cell">4.6</td>
                     </tr>
 
                     <!-- 3位 -->
@@ -569,7 +569,7 @@
                             </div>
                         </td>
                         <td class="score-cell">88<span class="score-max">/100</span></td>
-                        <td class="number-cell">92%</td>
+                        <td class="number-cell">4.4</td>
                     </tr>
 
                     <!-- 4位 -->
@@ -585,7 +585,7 @@
                             </div>
                         </td>
                         <td class="score-cell">85<span class="score-max">/100</span></td>
-                        <td class="number-cell">89%</td>
+                        <td class="number-cell">4.3</td>
                     </tr>
 
                     <!-- 5位 -->
@@ -601,7 +601,7 @@
                             </div>
                         </td>
                         <td class="score-cell">81<span class="score-max">/100</span></td>
-                        <td class="number-cell">85%</td>
+                        <td class="number-cell">4.1</td>
                     </tr>
 
                     <!-- 6位 -->
@@ -617,7 +617,7 @@
                             </div>
                         </td>
                         <td class="score-cell">78<span class="score-max">/100</span></td>
-                        <td class="number-cell">82%</td>
+                        <td class="number-cell">4.2</td>
                     </tr>
 
                     <!-- 7位 -->
@@ -633,7 +633,7 @@
                             </div>
                         </td>
                         <td class="score-cell">75<span class="score-max">/100</span></td>
-                        <td class="number-cell">79%</td>
+                        <td class="number-cell">3.9</td>
                     </tr>
 
                     <!-- 8位 -->
@@ -649,7 +649,7 @@
                             </div>
                         </td>
                         <td class="score-cell">72<span class="score-max">/100</span></td>
-                        <td class="number-cell">76%</td>
+                        <td class="number-cell">3.7</td>
                     </tr>
 
                     <!-- 9位 -->
@@ -665,7 +665,7 @@
                             </div>
                         </td>
                         <td class="score-cell">68<span class="score-max">/100</span></td>
-                        <td class="number-cell">71%</td>
+                        <td class="number-cell">3.5</td>
                     </tr>
 
                     <!-- 10位 -->
@@ -681,7 +681,7 @@
                             </div>
                         </td>
                         <td class="score-cell">64<span class="score-max">/100</span></td>
-                        <td class="number-cell">68%</td>
+                        <td class="number-cell">3.3</td>
                     </tr>
                 </tbody>
             </table>
@@ -697,14 +697,14 @@
         </div>
     </div>
 
+    <script src="api-client.js" onerror="console.warn('api-client.js 未読込: 見本データを表示します')"></script>
     <script>
-        // フィルター機能
+        // フィルター機能（期間データは未実装のため、現状は見た目のみ）
         const filterButtons = document.querySelectorAll('.filter-btn');
         filterButtons.forEach(btn => {
             btn.addEventListener('click', function() {
                 filterButtons.forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                console.log('Filter:', this.getAttribute('data-filter'));
             });
         });
 
@@ -713,14 +713,84 @@
             window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(reporterId);
         }
 
-        // テーブル行クリック（on-clickで処理済みなので削除）
-        // フォールバック: data-reporter-id を持つ行でハンドルされるよう確保
+        // 静的行（見本）のクリック
         document.querySelectorAll('.ranking-table tbody tr[data-reporter-id]').forEach(row => {
             row.addEventListener('click', function(e) {
                 const reporterId = this.getAttribute('data-reporter-id');
                 if (reporterId) goReporterProfile(reporterId);
             });
         });
+
+        // =====================================================
+        // Firestore の実データでランキングを描画
+        // 読み込みに失敗した場合は、上の見本データをそのまま表示
+        // =====================================================
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = String(name).trim().split(/\s+/).filter(p => /[A-Za-z0-9\u00C0-\u024F]/.test(p.charAt(0)));
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            const one = parts[0] || String(name).trim();
+            return one.substring(0, 2).toUpperCase();
+        }
+        const AVATAR_PALETTE = [
+            ['#e63946', '#a4161a'], ['#1d3557', '#14213d'], ['#2a9d8f', '#1f7a6f'],
+            ['#e76f51', '#c44a30'], ['#6a4c93', '#4e3470'], ['#457b9d', '#2f5a73'],
+            ['#588157', '#3a5a3a'], ['#bc6c25', '#8a4e16']
+        ];
+        function avatarColor(name) {
+            let h = 0; const s = name || '';
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+        }
+
+        async function loadRanking() {
+            if (typeof GegenPressAPI === 'undefined') return;
+            try {
+                const res = await GegenPressAPI.reporters.getRanking();
+                if (!res || !res.success || !res.ranking || res.ranking.length === 0) {
+                    console.warn('ランキング取得に失敗、見本データを表示します:', res && res.message);
+                    return;
+                }
+                const tbody = document.getElementById('rankingBody');
+                tbody.innerHTML = '';
+                // 見せかけのページ送りは実データ表示時には隠す
+                const pg = document.querySelector('.pagination');
+                if (pg) pg.style.display = 'none';
+                res.ranking.forEach((r, i) => {
+                    const rank = i + 1;
+                    const tr = document.createElement('tr');
+                    if (rank <= 3) tr.className = 'rank-' + rank;
+                    tr.style.cursor = 'pointer';
+                    tr.setAttribute('data-reporter-id', r.id);
+                    tr.addEventListener('click', () => goReporterProfile(r.id));
+
+                    const medal = rank === 1 ? '<span class="medal medal-gold">Gold</span>'
+                                : rank === 2 ? '<span class="medal medal-silver">Silver</span>'
+                                : rank === 3 ? '<span class="medal medal-bronze">Bronze</span>' : '';
+                    const g = avatarColor(r.name);
+                    const rating = (typeof r.averageRating === 'number') ? r.averageRating.toFixed(1) : '-';
+                    const score = (typeof r.trustScore === 'number') ? r.trustScore : 0;
+
+                    tr.innerHTML =
+                        '<td class="rank-number">' + medal + rank + '</td>' +
+                        '<td><div class="reporter-info">' +
+                            '<div class="reporter-avatar" style="background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;">' + esc(getInitials(r.name)) + '</div>' +
+                            '<div class="reporter-details"><h3>' + esc(r.name) + '</h3><p>' + esc(r.mediaOutlet || '') + '</p></div>' +
+                        '</div></td>' +
+                        '<td class="score-cell">' + score + '<span class="score-max">/100</span></td>' +
+                        '<td class="number-cell">' + esc(rating) + '</td>';
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                console.warn('ランキング取得エラー、見本データを表示します:', e);
+            }
+        }
+        loadRanking();
     </script>
 </body>
 </html>
