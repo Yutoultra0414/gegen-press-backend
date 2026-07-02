@@ -569,7 +569,7 @@
         <div class="container">
             <h2 class="section-title">今注目の速報</h2>
 
-            <div class="pickup-articles">
+            <div class="pickup-articles" id="pickupArticles">
                 <!-- ピックアップ1 -->
                 <div class="pickup-card" data-article-id="art_001">
                     <div class="pickup-card-content">
@@ -640,7 +640,7 @@
         <div class="container">
             <h2 class="section-title">トップ記者たち</h2>
 
-            <div class="reporters-grid">
+            <div class="reporters-grid" id="reportersGrid">
                 <!-- 記者1 -->
                 <!-- 記者1 -->
                 <div class="reporter-card" data-reporter-id="rep_fabrizio">
@@ -838,6 +838,7 @@
         </div>
     </footer>
 
+    <script src="api-client.js" onerror="console.warn('api-client.js 未読込: 見本データを表示します')"></script>
     <script>
         // 検索バー: Enterで検索ページへ
         const homeSearch = document.getElementById('homeSearch');
@@ -853,29 +854,157 @@
             });
         }
 
-        // 記者カードの「プロフィール」ボタン → 記者ページ（ID付き）
+        function goReporter(id) {
+            window.location.href = id
+                ? 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(id)
+                : 'gegen_press_reporter_profile.html';
+        }
+        function goArticle(id) {
+            window.location.href = id
+                ? 'gegen_press_article_detail.html?id=' + encodeURIComponent(id)
+                : 'gegen_press_article_detail.html';
+        }
+
+        // 静的（見本）カードのクリック
         document.querySelectorAll('.reporter-button').forEach(btn => {
             btn.addEventListener('click', function() {
                 const card = this.closest('.reporter-card');
-                const reporterId = card ? card.getAttribute('data-reporter-id') : null;
-                const url = reporterId
-                    ? 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(reporterId)
-                    : 'gegen_press_reporter_profile.html';
-                window.location.href = url;
+                goReporter(card ? card.getAttribute('data-reporter-id') : null);
             });
         });
-
-        // 速報（ピックアップ）カード → 記事詳細（ID付き）
         document.querySelectorAll('.pickup-card').forEach(card => {
             card.style.cursor = 'pointer';
             card.addEventListener('click', function() {
-                const articleId = this.getAttribute('data-article-id');
-                const url = articleId
-                    ? 'gegen_press_article_detail.html?id=' + encodeURIComponent(articleId)
-                    : 'gegen_press_article_detail.html';
-                window.location.href = url;
+                goArticle(this.getAttribute('data-article-id'));
             });
         });
+
+        // =====================================================
+        // Firestore の実データで「速報」「トップ記者」を描画
+        // 読み込みに失敗した場合は、見本データをそのまま表示
+        // =====================================================
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = String(name).trim().split(/\s+/).filter(p => /[A-Za-z0-9\u00C0-\u024F]/.test(p.charAt(0)));
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            const one = parts[0] || String(name).trim();
+            return one.substring(0, 2).toUpperCase();
+        }
+        const AVATAR_PALETTE = [
+            ['#e63946', '#a4161a'], ['#1d3557', '#14213d'], ['#2a9d8f', '#1f7a6f'],
+            ['#e76f51', '#c44a30'], ['#6a4c93', '#4e3470'], ['#457b9d', '#2f5a73'],
+            ['#588157', '#3a5a3a'], ['#bc6c25', '#8a4e16']
+        ];
+        function avatarColor(name) {
+            let h = 0; const s = name || '';
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+        }
+        function avatarStyle(name) {
+            const g = avatarColor(name);
+            return 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
+        }
+        function timeAgo(ts) {
+            try {
+                const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                if (!d || isNaN(d)) return '';
+                const diff = Math.floor((Date.now() - d.getTime()) / 60000); // 分
+                if (diff < 1) return 'たった今';
+                if (diff < 60) return diff + '分前';
+                if (diff < 60 * 24) return Math.floor(diff / 60) + '時間前';
+                return Math.floor(diff / 60 / 24) + '日前';
+            } catch (e) { return ''; }
+        }
+        function starsHtml(rating) {
+            const n = Math.round(rating || 0);
+            let out = '';
+            for (let i = 0; i < 5; i++) out += '<span class="star' + (i < n ? '' : ' empty') + '">★</span>';
+            return out;
+        }
+
+        async function loadTopPage() {
+            if (typeof GegenPressAPI === 'undefined') return;
+
+            // 記者一覧（トップ記者・ハンドル参照用）
+            let reporterMap = {};
+            try {
+                const rres = await GegenPressAPI.reporters.getRanking();
+                if (rres && rres.success && rres.ranking && rres.ranking.length > 0) {
+                    rres.ranking.forEach(r => { reporterMap[r.id] = r; });
+
+                    const grid = document.getElementById('reportersGrid');
+                    grid.innerHTML = '';
+                    rres.ranking.slice(0, 6).forEach(r => {
+                        const div = document.createElement('div');
+                        div.className = 'reporter-card';
+                        div.setAttribute('data-reporter-id', r.id);
+                        const rating = (typeof r.averageRating === 'number') ? r.averageRating.toFixed(1) : '-';
+                        div.innerHTML =
+                            '<div class="reporter-header">' +
+                                '<div class="reporter-avatar" style="' + avatarStyle(r.name) + '">' + esc(getInitials(r.name)) + '</div>' +
+                                '<div class="reporter-info"><h3>' + esc(r.name) + '</h3><p>' + esc(r.mediaOutlet || '') + '</p></div>' +
+                            '</div>' +
+                            '<div class="reporter-score">' + (r.trustScore || 0) + '/100' +
+                                '<div class="reporter-score-label">信ぴょう性スコア</div></div>' +
+                            '<div class="reporter-stats">' +
+                                '<div class="stat"><div class="stat-number">' + (r.articlesCount || 0) + '</div><div class="stat-label">記事数</div></div>' +
+                                '<div class="stat"><div class="stat-number">' + esc(rating) + '</div><div class="stat-label">平均評価</div></div>' +
+                            '</div>' +
+                            '<div class="reporter-description">' + esc(r.bio || '') + '</div>' +
+                            '<button class="reporter-button">プロフィール</button>';
+                        div.querySelector('.reporter-button').addEventListener('click', () => goReporter(r.id));
+                        grid.appendChild(div);
+                    });
+                }
+            } catch (e) {
+                console.warn('記者の読み込みに失敗、見本を表示します:', e);
+            }
+
+            // 速報（閲覧数の多い記事 上位2件）
+            try {
+                const ares = await GegenPressAPI.articles.getAll();
+                if (ares && ares.success && ares.articles && ares.articles.length > 0) {
+                    const wrap = document.getElementById('pickupArticles');
+                    wrap.innerHTML = '';
+                    ares.articles.slice(0, 2).forEach(a => {
+                        const rep = reporterMap[a.authorId] || {};
+                        const handle = rep.twitterHandle ? esc(rep.twitterHandle) : '';
+                        const div = document.createElement('div');
+                        div.className = 'pickup-card';
+                        div.setAttribute('data-article-id', a.id);
+                        div.style.cursor = 'pointer';
+                        const t = timeAgo(a.createdAt);
+                        div.innerHTML =
+                            '<div class="pickup-card-content">' +
+                                '<div class="pickup-label">' + esc(a.category || '速報') + '</div>' +
+                                '<h3 class="pickup-title">' + esc(a.title) + '</h3>' +
+                                '<div class="pickup-meta">' +
+                                    '<div class="pickup-author">' +
+                                        '<div class="author-avatar" style="' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</div>' +
+                                        '<div class="author-info"><h4>' + esc(a.authorName || '') + '</h4><p>' + handle + '</p></div>' +
+                                    '</div>' +
+                                    (t ? '<div class="pickup-time">' + esc(t) + '</div>' : '') +
+                                '</div>' +
+                                '<div class="pickup-description">' + esc(a.description || '') + '</div>' +
+                                '<div class="pickup-rating">' +
+                                    '<div class="stars">' + starsHtml(a.averageRating) + '</div>' +
+                                    (typeof a.trustScore === 'number' ? '<span class="rating-text">信頼度: ' + a.trustScore + '%</span>' : '') +
+                                '</div>' +
+                            '</div>';
+                        div.addEventListener('click', () => goArticle(a.id));
+                        wrap.appendChild(div);
+                    });
+                }
+            } catch (e) {
+                console.warn('記事の読み込みに失敗、見本を表示します:', e);
+            }
+        }
+        loadTopPage();
     </script>
 </body>
 </html>
