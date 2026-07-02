@@ -448,9 +448,9 @@
     <!-- 検索ヘッダー -->
     <section class="search-header">
         <div class="search-header-content">
-            <input type="text" class="search-box" value="マンチェスター・シティ" placeholder="記事や記者名で検索...">
+            <input type="text" class="search-box" id="searchInput" value="" placeholder="記事や記者名で検索...">
             <div class="search-info">
-                検索結果: <span class="search-result-count">23件</span>
+                検索結果: <span class="search-result-count" id="resultCount">0件</span>
                 <span style="margin-left: 15px; font-size: 13px;">記者が見つからない場合は <a href="gegen_press_add_reporter.html" style="color: #e63946; font-weight: bold; text-decoration: none;">記者を追加</a> できます</span>
             </div>
         </div>
@@ -460,9 +460,9 @@
     <div class="container">
         <!-- サイドバー -->
         <aside class="sidebar">
-            <!-- 記者フィルター -->
+            <!-- 記者フィルター（絞り込み機能は準備中） -->
             <div class="filter-box">
-                <h3>記者で絞る</h3>
+                <h3>記者で絞る <span style="font-size:11px; color:#999; font-weight:normal;">(準備中)</span></h3>
                 <div class="filter-option">
                     <label>
                         <input type="checkbox" checked>
@@ -495,9 +495,9 @@
                 </div>
             </div>
 
-            <!-- 信頼度フィルター -->
+            <!-- 信頼度フィルター（絞り込み機能は準備中） -->
             <div class="filter-box">
-                <h3>信頼度で絞る</h3>
+                <h3>信頼度で絞る <span style="font-size:11px; color:#999; font-weight:normal;">(準備中)</span></h3>
                 <div class="filter-option">
                     <label>
                         <input type="checkbox" checked>
@@ -524,9 +524,9 @@
                 </div>
             </div>
 
-            <!-- 期間フィルター -->
+            <!-- 期間フィルター（絞り込み機能は準備中） -->
             <div class="filter-box">
-                <h3>期間で絞る</h3>
+                <h3>期間で絞る <span style="font-size:11px; color:#999; font-weight:normal;">(準備中)</span></h3>
                 <div class="filter-option">
                     <label>
                         <input type="checkbox" checked>
@@ -559,7 +559,7 @@
             <!-- ソート -->
             <div class="sort-section">
                 <span class="sort-label">並び替え:</span>
-                <select class="sort-select">
+                <select class="sort-select" id="sortSelect">
                     <option>最新順</option>
                     <option>関連度順</option>
                     <option>信頼度が高い順</option>
@@ -568,154 +568,8 @@
             </div>
 
             <!-- 検索結果 -->
-            <div class="results-list">
-                <!-- 結果1 -->
-                <div class="result-item">
-                    <div class="result-header">
-                        <div>
-                            <div class="result-title">マンチェスター・シティが超大型補強を発表</div>
-                            <div class="result-meta">
-                                <div class="result-author">
-                                    <div class="author-avatar">F</div>
-                                    <span>Fabrizio Romano</span>
-                                </div>
-                                <span class="result-time">2024年6月27日 14:30</span>
-                            </div>
-                        </div>
-                        <div class="result-score">96/100</div>
-                    </div>
-                    <div class="result-description">
-                        プレミアリーグの雄、マンチェスター・シティが2024-25シーズンに向けた大規模な補強計画を発表しました。複数の欧州トップリーグの有力選手が加入予定となっており...
-                    </div>
-                    <div class="result-tags">
-                        <span class="result-tag">マンチェスター・シティ</span>
-                        <span class="result-tag">移籍情報</span>
-                        <span class="result-tag">速報</span>
-                    </div>
-                    <div class="result-footer">
-                        <span>閲覧数: 2,450</span>
-                        <span>コメント: 34</span>
-                        <span>評価: 4.8/5.0</span>
-                    </div>
-                </div>
-
-                <!-- 結果2 -->
-                <div class="result-item">
-                    <div class="result-header">
-                        <div>
-                            <div class="result-title">シティのDFランク、プレミアリーグで第3位に躍進</div>
-                            <div class="result-meta">
-                                <div class="result-author">
-                                    <div class="author-avatar">S</div>
-                                    <span>Sky Sports</span>
-                                </div>
-                                <span class="result-time">2024年6月25日 09:15</span>
-                            </div>
-                        </div>
-                        <div class="result-score">92/100</div>
-                    </div>
-                    <div class="result-description">
-                        マンチェスター・シティのディフェンスラインが、プレミアリーグの統計で第3位のランクに躍進しました。新シーズンに向けた守備強化の成果が早くも表れています...
-                    </div>
-                    <div class="result-tags">
-                        <span class="result-tag">マンチェスター・シティ</span>
-                        <span class="result-tag">ディフェンス</span>
-                        <span class="result-tag">プレミアリーグ</span>
-                    </div>
-                    <div class="result-footer">
-                        <span>閲覧数: 1,234</span>
-                        <span>コメント: 18</span>
-                        <span>評価: 4.6/5.0</span>
-                    </div>
-                </div>
-
-                <!-- 結果3 -->
-                <div class="result-item">
-                    <div class="result-header">
-                        <div>
-                            <div class="result-title">シティとユナイテッド、プレミアリーグ優勝争いは接戦へ</div>
-                            <div class="result-meta">
-                                <div class="result-author">
-                                    <div class="author-avatar">S</div>
-                                    <span>Sky Sports</span>
-                                </div>
-                                <span class="result-time">2024年6月24日 16:45</span>
-                            </div>
-                        </div>
-                        <div class="result-score">88/100</div>
-                    </div>
-                    <div class="result-description">
-                        マンチェスター・シティとマンチェスター・ユナイテッドの新シーズン対決が注目を集めています。両クラブの強化戦略により、優勝争いは例年以上に白熱することが予想されます...
-                    </div>
-                    <div class="result-tags">
-                        <span class="result-tag">マンチェスター・シティ</span>
-                        <span class="result-tag">プレミアリーグ</span>
-                        <span class="result-tag">2024-25シーズン</span>
-                    </div>
-                    <div class="result-footer">
-                        <span>閲覧数: 3,267</span>
-                        <span>コメント: 89</span>
-                        <span>評価: 4.7/5.0</span>
-                    </div>
-                </div>
-
-                <!-- 結果4 -->
-                <div class="result-item">
-                    <div class="result-header">
-                        <div>
-                            <div class="result-title">シティのゴールキーパー、契約延長で合意</div>
-                            <div class="result-meta">
-                                <div class="result-author">
-                                    <div class="author-avatar">F</div>
-                                    <span>Fabrizio Romano</span>
-                                </div>
-                                <span class="result-time">2024年6月23日 11:20</span>
-                            </div>
-                        </div>
-                        <div class="result-score">94/100</div>
-                    </div>
-                    <div class="result-description">
-                        マンチェスター・シティのレギュラーゴールキーパーが、クラブとの契約延長で合意しました。3年契約となり、来シーズン以降の安定したフォーメーション構築が期待されます...
-                    </div>
-                    <div class="result-tags">
-                        <span class="result-tag">マンチェスター・シティ</span>
-                        <span class="result-tag">契約延長</span>
-                    </div>
-                    <div class="result-footer">
-                        <span>閲覧数: 1,892</span>
-                        <span>コメント: 42</span>
-                        <span>評価: 4.9/5.0</span>
-                    </div>
-                </div>
-
-                <!-- 結果5 -->
-                <div class="result-item">
-                    <div class="result-header">
-                        <div>
-                            <div class="result-title">シティ、U-23チームに新しい監督を招聘</div>
-                            <div class="result-meta">
-                                <div class="result-author">
-                                    <div class="author-avatar">G</div>
-                                    <span>Goal.com</span>
-                                </div>
-                                <span class="result-time">2024年6月22日 13:00</span>
-                            </div>
-                        </div>
-                        <div class="result-score">85/100</div>
-                    </div>
-                    <div class="result-description">
-                        マンチェスター・シティが、若手育成を担当するU-23チームの新しい監督として、欧州の有名コーチを招聘することを発表しました。下部組織の強化を目指す同クラブの戦略が明確になります...
-                    </div>
-                    <div class="result-tags">
-                        <span class="result-tag">マンチェスター・シティ</span>
-                        <span class="result-tag">若手育成</span>
-                    </div>
-                    <div class="result-footer">
-                        <span>閲覧数: 856</span>
-                        <span>コメント: 23</span>
-                        <span>評価: 4.4/5.0</span>
-                    </div>
-                </div>
+            <div class="results-list" id="resultsList">
+                <p style="color:#999; padding:20px 0;">読み込み中...</p>
             </div>
 
             <!-- ページネーション -->
@@ -731,34 +585,156 @@
         </main>
     </div>
 
+    <script src="api-client.js" onerror="console.warn('api-client.js 未読込: 検索は利用できません')"></script>
     <script>
-        // フィルター機能
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = String(name).trim().split(/\s+/).filter(p => /[A-Za-z0-9\u00C0-\u024F]/.test(p.charAt(0)));
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            const one = parts[0] || String(name).trim();
+            return one.substring(0, 2).toUpperCase();
+        }
+        const AVATAR_PALETTE = [
+            ['#e63946', '#a4161a'], ['#1d3557', '#14213d'], ['#2a9d8f', '#1f7a6f'],
+            ['#e76f51', '#c44a30'], ['#6a4c93', '#4e3470'], ['#457b9d', '#2f5a73'],
+            ['#588157', '#3a5a3a'], ['#bc6c25', '#8a4e16']
+        ];
+        function avatarColor(name) {
+            let h = 0; const s = name || '';
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+        }
+        function avatarStyle(name) {
+            const g = avatarColor(name);
+            return 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
+        }
+        function fmtDate(ts) {
+            try {
+                const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                if (!d || isNaN(d)) return '';
+                return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' +
+                    String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+            } catch (e) { return ''; }
+        }
+
+        // フィルターのチェックボックスは今回未配線（見た目のみ・準備中）
         document.querySelectorAll('.filter-option input').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                console.log('Filter changed:', this.value);
+            checkbox.disabled = true;
+        });
+
+        // 検索欄・ソート
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sortSelect');
+        const resultsList = document.getElementById('resultsList');
+        const resultCount = document.getElementById('resultCount');
+
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                const q = this.value.trim();
+                const url = new URL(window.location.href);
+                if (q) url.searchParams.set('q', q); else url.searchParams.delete('q');
+                window.location.href = url.toString();
+            }
+        });
+        sortSelect.addEventListener('change', function () {
+            renderResults(currentResults, this.value);
+        });
+
+        function goArticle(id) {
+            window.location.href = 'gegen_press_article_detail.html?id=' + encodeURIComponent(id);
+        }
+
+        let currentResults = [];
+
+        function sortResults(list, mode) {
+            const arr = list.slice();
+            if (mode === '信頼度が高い順') {
+                arr.sort((a, b) => (b.trustScore || 0) - (a.trustScore || 0));
+            } else if (mode === '人気順') {
+                arr.sort((a, b) => (b.views || 0) - (a.views || 0));
+            } else { // 最新順・関連度順（データ上は投稿日時順で代用）
+                arr.sort((a, b) => {
+                    const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                    const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                    return tb - ta;
+                });
+            }
+            return arr;
+        }
+
+        function renderResults(list, sortMode) {
+            const sorted = sortResults(list, sortMode || sortSelect.value);
+            resultCount.textContent = sorted.length + '件';
+            const pg = document.querySelector('.pagination');
+            if (pg) pg.style.display = 'none'; // 見せかけのページ送りは実データ表示時には隠す
+
+            if (sorted.length === 0) {
+                resultsList.innerHTML = '<p style="color:#999; padding:20px 0;">該当する記事が見つかりませんでした。</p>';
+                return;
+            }
+            resultsList.innerHTML = sorted.map(a => {
+                const rating = (typeof a.averageRating === 'number') ? a.averageRating.toFixed(1) : '-';
+                const tags = (a.tags || []).slice(0, 4).map(t => '<span class="result-tag">' + esc(t) + '</span>').join('');
+                return (
+                    '<div class="result-item" style="cursor:pointer;" data-id="' + esc(a.id) + '">' +
+                        '<div class="result-header">' +
+                            '<div>' +
+                                '<div class="result-title">' + esc(a.title) + '</div>' +
+                                '<div class="result-meta">' +
+                                    '<div class="result-author">' +
+                                        '<div class="author-avatar" style="' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</div>' +
+                                        '<span>' + esc(a.authorName || '') + '</span>' +
+                                    '</div>' +
+                                    '<span class="result-time">' + esc(fmtDate(a.createdAt)) + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="result-score">' + (a.trustScore || 0) + '/100</div>' +
+                        '</div>' +
+                        '<div class="result-description">' + esc(a.description || '') + '</div>' +
+                        '<div class="result-tags">' + tags + '</div>' +
+                        '<div class="result-footer">' +
+                            '<span>閲覧数: ' + (a.views || 0).toLocaleString() + '</span>' +
+                            '<span>評価: ' + rating + '/5.0</span>' +
+                        '</div>' +
+                    '</div>'
+                );
+            }).join('');
+            resultsList.querySelectorAll('.result-item').forEach(el => {
+                el.addEventListener('click', () => goArticle(el.getAttribute('data-id')));
             });
-        });
+        }
 
-        // ソート機能
-        document.querySelector('.sort-select').addEventListener('change', function() {
-            console.log('Sort changed:', this.value);
-        });
+        async function runSearch() {
+            if (typeof GegenPressAPI === 'undefined') {
+                resultsList.innerHTML = '<p style="color:#999; padding:20px 0;">検索機能を読み込めませんでした。</p>';
+                return;
+            }
+            const params = new URLSearchParams(window.location.search);
+            const q = params.get('q') || '';
+            searchInput.value = q;
 
-        // 結果アイテムクリック
-        document.querySelectorAll('.result-item').forEach(item => {
-            item.addEventListener('click', function() {
-                alert('記事詳細ページへのナビゲーション（実装予定）');
-            });
-        });
-
-        // ページネーション
-        document.querySelectorAll('.pagination-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (!this.disabled && !this.classList.contains('active')) {
-                    console.log('Page changed to:', this.textContent);
+            try {
+                const res = q
+                    ? await GegenPressAPI.articles.search(q)
+                    : await GegenPressAPI.articles.getAll();
+                if (!res || !res.success) {
+                    resultsList.innerHTML = '<p style="color:#999; padding:20px 0;">検索に失敗しました。</p>';
+                    return;
                 }
-            });
-        });
+                currentResults = res.articles || [];
+                renderResults(currentResults);
+            } catch (e) {
+                resultsList.innerHTML = '<p style="color:#999; padding:20px 0;">検索中にエラーが発生しました。</p>';
+            }
+        }
+
+        runSearch();
+    </script>
     </script>
 </body>
 </html>
