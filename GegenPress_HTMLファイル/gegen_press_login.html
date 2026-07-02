@@ -474,30 +474,11 @@
     <script src="api-client.js" onerror="console.warn('api-client.js 未読込: デモモードで動作します')"></script>
     <script>
         // =========================================================
-        // Firebase 設定
-        // Firebase Console > プロジェクト設定 > 全般 > マイアプリ から取得した値を入れてください。
-        // 値が空のあいだは「デモモード」で動作します（プレビューでも動く）。
+        // Firebase まわりの初期化は api-client.js がすべて行います。
+        // （設定値も api-client.js 内にあります）
         // =========================================================
-        const FIREBASE_CONFIG = {
-            apiKey: "",
-            authDomain: "",
-            projectId: "",
-            storageBucket: "",
-            messagingSenderId: "",
-            appId: "",
-        };
-
         const API_AVAILABLE = (typeof GegenPressAPI !== 'undefined');
-        let firebaseReady = false;
-
-        try {
-            if (typeof firebase !== 'undefined' && FIREBASE_CONFIG.apiKey) {
-                firebase.initializeApp(FIREBASE_CONFIG);
-                firebaseReady = true;
-            }
-        } catch (e) {
-            console.warn('Firebase 初期化に失敗:', e);
-        }
+        const firebaseReady = API_AVAILABLE; // api-client が SDK を読み込んで初期化する
 
         // セッション保存（他ページで利用するトークン・ユーザーID）
         function saveSession(token, uid) {
@@ -541,56 +522,41 @@
         // ログイン処理
         // =========================================================
         async function handleLogin(email, password, btn) {
-            if (firebaseReady) {
+            if (API_AVAILABLE) {
                 btn.disabled = true;
                 btn.textContent = 'ログイン中...';
-                try {
-                    const cred = await firebase.auth().signInWithEmailAndPassword(email, password);
-                    const idToken = await cred.user.getIdToken();
-                    saveSession(idToken, cred.user.uid);
-                    // バックエンドでユーザー情報を取得（任意）
-                    if (API_AVAILABLE) {
-                        try { await GegenPressAPI.auth.login(idToken); } catch (e) {}
-                    }
+                const res = await GegenPressAPI.auth.login(email, password);
+                if (res && res.success) {
+                    saveSession(res.token, res.uid);
                     goHome();
-                } catch (e) {
+                } else {
                     btn.disabled = false;
                     btn.textContent = 'ログイン';
-                    alert(loginErrorMessage(e));
+                    alert((res && res.message) || 'ログインに失敗しました。');
                 }
                 return;
             }
-            // デモモード
-            alert('（デモ）ログインしました。Firebaseの設定を入れると実際の認証になります。');
+            // デモモード（api-client.js が読み込めない環境のみ）
+            alert('（デモ）ログインしました。本番では実際の認証になります。');
             saveSession('demo-token', 'demo-user');
             goHome();
         }
 
         // =========================================================
-        // 新規登録処理
-        // バックエンドの /api/auth/signup でユーザー作成 → カスタムトークンで
-        // サインインして本物のIDトークンを取得する流れ。
+        // 新規登録処理（Firebase に直接登録・サーバー不要）
         // =========================================================
         async function handleSignup(username, email, password, btn) {
-            if (firebaseReady && API_AVAILABLE) {
+            if (API_AVAILABLE) {
                 btn.disabled = true;
                 btn.textContent = '登録中...';
-                try {
-                    const res = await GegenPressAPI.auth.signup(email, password, username);
-                    if (res && res.success && res.token) {
-                        const cred = await firebase.auth().signInWithCustomToken(res.token);
-                        const idToken = await cred.user.getIdToken();
-                        saveSession(idToken, cred.user.uid);
-                        goHome();
-                    } else {
-                        btn.disabled = false;
-                        btn.textContent = '登録';
-                        alert((res && res.message) || '登録に失敗しました。');
-                    }
-                } catch (e) {
+                const res = await GegenPressAPI.auth.signup(email, password, username);
+                if (res && res.success) {
+                    saveSession(res.token, res.uid);
+                    goHome();
+                } else {
                     btn.disabled = false;
                     btn.textContent = '登録';
-                    alert('登録中にエラーが発生しました: ' + (e.message || e));
+                    alert((res && res.message) || '登録に失敗しました。');
                 }
                 return;
             }
@@ -655,12 +621,12 @@
                 e.preventDefault();
                 const email = document.getElementById('login-email').value.trim();
                 if (!email) { alert('パスワードをリセットするメールアドレスを、上のログイン欄に入力してください。'); return; }
-                if (firebaseReady) {
-                    try {
-                        await firebase.auth().sendPasswordResetEmail(email);
+                if (API_AVAILABLE) {
+                    const res = await GegenPressAPI.auth.resetPassword(email);
+                    if (res && res.success) {
                         alert('パスワードリセット用のメールを送信しました。受信箱をご確認ください。');
-                    } catch (err) {
-                        alert('送信に失敗しました: ' + (err.message || err));
+                    } else {
+                        alert('送信に失敗しました: ' + ((res && res.message) || ''));
                     }
                 } else {
                     alert('（デモ）パスワードリセットメールを送信しました。');
@@ -676,18 +642,16 @@
                 e.preventDefault();
                 const isGoogle = this.textContent.trim().toLowerCase().includes('google');
 
-                if (firebaseReady && isGoogle) {
-                    try {
-                        const provider = new firebase.auth.GoogleAuthProvider();
-                        const cred = await firebase.auth().signInWithPopup(provider);
-                        const idToken = await cred.user.getIdToken();
-                        saveSession(idToken, cred.user.uid);
+                if (API_AVAILABLE && isGoogle) {
+                    const res = await GegenPressAPI.auth.loginWithGoogle();
+                    if (res && res.success) {
+                        saveSession(res.token, res.uid);
                         goHome();
-                    } catch (err) {
-                        alert('ソーシャルログインに失敗しました: ' + (err.message || err));
+                    } else {
+                        alert('Googleログインに失敗しました: ' + ((res && res.message) || ''));
                     }
-                } else if (!firebaseReady) {
-                    alert('（デモ）ソーシャルログインは Firebase 設定後に有効になります。');
+                } else if (!API_AVAILABLE) {
+                    alert('（デモ）ソーシャルログインは本番環境で有効になります。');
                 } else {
                     alert('Twitter/X ログインは追加設定が必要です。準備中です。');
                 }
