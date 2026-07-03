@@ -904,6 +904,34 @@
             <!-- レビューセクション -->
             <section class="reviews-section">
                 <h2 class="reviews-title">ユーザーレビュー</h2>
+
+                <!-- レビュー投稿フォーム（ログイン必須） -->
+                <div id="reviewForm" style="display:none; background:#fff; border:2px solid #e63946; border-radius:8px; padding:20px; margin-bottom:24px;">
+                    <h3 style="font-size:15px; color:#e63946; margin-bottom:12px; font-weight:bold;">この記者のクチコミを投稿</h3>
+                    <p id="reviewLoginNote" style="font-size:13px; color:#e63946; margin-bottom:14px; padding:10px; background:rgba(230,57,70,0.08); border-left:3px solid #e63946; border-radius:4px;">
+                        クチコミ投稿には<a href="gegen_press_login.html" style="color:#e63946; font-weight:bold; text-decoration:none;">ログイン</a>が必要です
+                    </p>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-size:13px; color:#666; margin-bottom:6px;">評価</label>
+                        <div id="reviewStarInput">
+                            <button type="button" class="review-star-btn" data-value="1" style="background:none;border:none;font-size:26px;color:#ddd;cursor:pointer;padding:2px;">★</button>
+                            <button type="button" class="review-star-btn" data-value="2" style="background:none;border:none;font-size:26px;color:#ddd;cursor:pointer;padding:2px;">★</button>
+                            <button type="button" class="review-star-btn" data-value="3" style="background:none;border:none;font-size:26px;color:#ddd;cursor:pointer;padding:2px;">★</button>
+                            <button type="button" class="review-star-btn" data-value="4" style="background:none;border:none;font-size:26px;color:#ddd;cursor:pointer;padding:2px;">★</button>
+                            <button type="button" class="review-star-btn" data-value="5" style="background:none;border:none;font-size:26px;color:#ddd;cursor:pointer;padding:2px;">★</button>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-size:13px; color:#666; margin-bottom:6px;">ニックネーム（任意）</label>
+                        <input type="text" id="reviewName" placeholder="あなたの名前" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:14px;">
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="display:block; font-size:13px; color:#666; margin-bottom:6px;">クチコミ</label>
+                        <textarea id="reviewText" placeholder="この記者の信頼性について、あなたの意見を書いてください" style="width:100%; min-height:90px; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:14px; resize:vertical;"></textarea>
+                    </div>
+                    <button id="reviewSubmitBtn" style="background:#e63946; color:#fff; border:none; border-radius:6px; padding:10px 20px; font-size:14px; font-weight:bold; cursor:pointer;">クチコミを投稿</button>
+                </div>
+
                 <div id="reviewsList">
 
                 <div class="review-card">
@@ -1205,7 +1233,8 @@
         function formatDate(value) {
             if (!value) return '';
             try {
-                const d = new Date(value._seconds ? value._seconds * 1000 : value);
+                const d = value.toDate ? value.toDate()
+                    : new Date(value._seconds ? value._seconds * 1000 : (value.seconds ? value.seconds * 1000 : value));
                 if (isNaN(d.getTime())) return '';
                 return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
             } catch (e) { return ''; }
@@ -1330,7 +1359,12 @@
                 container.innerHTML = '<p style="color:#999;font-size:14px;padding:20px 0;">まだレビューがありません。最初のレビューを投稿してみましょう。</p>';
                 return;
             }
-            container.innerHTML = reviews.map(rv => `
+            const sorted = reviews.slice().sort((a, b) => {
+                const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                return tb - ta;
+            });
+            container.innerHTML = sorted.map(rv => `
                 <div class="review-card">
                     <div class="review-header">
                         <div class="review-author">${escapeHtml(rv.username || '匿名ユーザー')}</div>
@@ -1340,6 +1374,67 @@
                     <div class="review-content">${escapeHtml(rv.comment || '')}</div>
                 </div>
             `).join('');
+        }
+
+        // ============ クチコミ（レビュー）投稿 ============
+        let reviewSelectedRating = 0;
+        const reviewForm = document.getElementById('reviewForm');
+        const reviewStarBtns = document.querySelectorAll('.review-star-btn');
+
+        function paintReviewStars(n) {
+            reviewStarBtns.forEach((b, i) => { b.style.color = i < n ? '#e63946' : '#ddd'; });
+        }
+        reviewStarBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                reviewSelectedRating = Number(this.getAttribute('data-value'));
+                paintReviewStars(reviewSelectedRating);
+            });
+        });
+
+        function setupReviewForm() {
+            // 実データの記者ページ（?id=あり）でのみ表示
+            if (!API_AVAILABLE || !currentReporter.id) return;
+            reviewForm.style.display = 'block';
+            const loggedIn = !!authToken;
+            const noteEl = document.getElementById('reviewLoginNote');
+            const submitBtn = document.getElementById('reviewSubmitBtn');
+            const nameEl = document.getElementById('reviewName');
+            const textEl = document.getElementById('reviewText');
+            if (loggedIn) {
+                noteEl.style.display = 'none';
+            } else {
+                nameEl.disabled = true;
+                textEl.disabled = true;
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                submitBtn.style.cursor = 'not-allowed';
+                submitBtn.textContent = 'クチコミを投稿（ログイン必須）';
+                return;
+            }
+            submitBtn.addEventListener('click', async function () {
+                const text = (textEl.value || '').trim();
+                if (!reviewSelectedRating) { alert('評価（★）を選択してください'); return; }
+                if (!text) { alert('クチコミを入力してください'); return; }
+                submitBtn.disabled = true;
+                submitBtn.textContent = '投稿中...';
+                const res = await GegenPressAPI.reviews.create(
+                    currentReporter.id, reviewSelectedRating, text, (nameEl.value || '').trim() || null
+                );
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'クチコミを投稿';
+                if (res && res.success) {
+                    textEl.value = '';
+                    reviewSelectedRating = 0;
+                    paintReviewStars(0);
+                    try {
+                        const rres = await GegenPressAPI.reporters.getReviews(currentReporter.id);
+                        if (rres && rres.success) renderReviews(rres.reviews);
+                    } catch (e) {}
+                    alert('クチコミを投稿しました。ありがとうございます。');
+                } else {
+                    alert((res && res.message) || 'クチコミの投稿に失敗しました');
+                }
+            });
         }
 
         // -------- 統合ローダー --------
@@ -1472,6 +1567,7 @@
         }
 
         loadReporterPage();
+        setupReviewForm();
 
         // モーダルの開閉
         const editModal = document.getElementById('editModal');

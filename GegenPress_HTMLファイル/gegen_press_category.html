@@ -527,12 +527,12 @@
                 <h3>カテゴリ選択</h3>
                 <div class="category-list">
                     <button class="category-item active" data-category="all">すべて</button>
-                    <button class="category-item" data-category="transfer">移籍情報</button>
-                    <button class="category-item" data-category="premier">プレミアリーグ</button>
-                    <button class="category-item" data-category="laliga">ラリーガ</button>
-                    <button class="category-item" data-category="seriea">セリエA</button>
-                    <button class="category-item" data-category="ligue1">リーグアン</button>
-                    <button class="category-item" data-category="bundesliga">ブンデスリーガ</button>
+                    <button class="category-item" data-category="移籍情報">移籍情報</button>
+                    <button class="category-item" data-category="プレミアリーグ">プレミアリーグ</button>
+                    <button class="category-item" data-category="ラリーガ">ラリーガ</button>
+                    <button class="category-item" data-category="セリエA">セリエA</button>
+                    <button class="category-item" data-category="リーグアン">リーグアン</button>
+                    <button class="category-item" data-category="ブンデスリーガ">ブンデスリーガ</button>
                 </div>
             </div>
         </aside>
@@ -541,21 +541,21 @@
         <main class="main-content">
             <!-- カテゴリヘッダー -->
             <div class="category-header">
-                <div class="category-name">移籍情報</div>
-                <p class="category-description">
-                    世界中のサッカークラブの選手移籍に関する最新ニュース。契約交渉、移籍金、選手のコメントなど、移籍に関するすべての情報をお届けします。
+                <div class="category-name" id="catName">すべて</div>
+                <p class="category-description" id="catDesc">
+                    全カテゴリの記事を表示しています。
                 </p>
                 <div class="category-stats">
                     <div class="stat-item">
-                        <div class="stat-value">856</div>
+                        <div class="stat-value" id="statCount">0</div>
                         <div class="stat-label">記事数</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">89.2</div>
+                        <div class="stat-value" id="statTrust">-</div>
                         <div class="stat-label">平均信ぴょう性</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">48K</div>
+                        <div class="stat-value" id="statViews">0</div>
                         <div class="stat-label">総閲覧数</div>
                     </div>
                 </div>
@@ -564,7 +564,7 @@
             <!-- ソート -->
             <div class="sort-section">
                 <span class="sort-label">並び替え:</span>
-                <select class="sort-select">
+                <select class="sort-select" id="sortSelect">
                     <option>最新順</option>
                     <option>関連度順</option>
                     <option>信頼度が高い順</option>
@@ -573,150 +573,8 @@
             </div>
 
             <!-- 記事一覧 -->
-            <div class="articles-list">
-                <!-- 記事1 -->
-                <div class="article-card">
-                    <div class="article-header">
-                        <div>
-                            <div class="article-title">マンチェスター・シティが超大型補強を発表</div>
-                            <div class="article-meta">
-                                <div class="article-author">
-                                    <div class="author-avatar">F</div>
-                                    <span>Fabrizio Romano</span>
-                                </div>
-                                <span class="article-time">2024年6月27日</span>
-                            </div>
-                        </div>
-                        <div class="article-label">速報</div>
-                    </div>
-                    <div class="article-description">
-                        プレミアリーグの雄、マンチェスター・シティが2024-25シーズンに向けた大規模な補強計画を発表しました。複数の欧州トップリーグの有力選手が加入予定となっており...
-                    </div>
-                    <div class="article-footer">
-                        <span>閲覧数: 2,450</span>
-                        <span>評価: <strong style="color: #e63946;">4.8/5.0</strong></span>
-                    </div>
-                </div>
-
-                <!-- 記事2 -->
-                <div class="article-card">
-                    <div class="article-header">
-                        <div>
-                            <div class="article-title">ユナイテッド、レアル・マドリーのスター選手を獲得か</div>
-                            <div class="article-meta">
-                                <div class="article-author">
-                                    <div class="author-avatar">F</div>
-                                    <span>Fabrizio Romano</span>
-                                </div>
-                                <span class="article-time">2024年6月26日</span>
-                            </div>
-                        </div>
-                        <div class="article-label">独占</div>
-                    </div>
-                    <div class="article-description">
-                        マンチェスター・ユナイテッドが、レアル・マドリーのスター選手との契約交渉に進むという最新情報が入ってきました。複数のソースから確認されています...
-                    </div>
-                    <div class="article-footer">
-                        <span>閲覧数: 1,892</span>
-                        <span>評価: <strong style="color: #e63946;">4.7/5.0</strong></span>
-                    </div>
-                </div>
-
-                <!-- 記事3 -->
-                <div class="article-card">
-                    <div class="article-header">
-                        <div>
-                            <div class="article-title">PSG、フランス代表MFの争奪戦に勝利</div>
-                            <div class="article-meta">
-                                <div class="article-author">
-                                    <div class="author-avatar">F</div>
-                                    <span>Fabrizio Romano</span>
-                                </div>
-                                <span class="article-time">2024年6月25日</span>
-                            </div>
-                        </div>
-                        <div class="article-label">確定</div>
-                    </div>
-                    <div class="article-description">
-                        パリ・サンジェルマンが、フランス代表の有望なMFの獲得に成功しました。複数のビッグクラブからのオファーを制しての獲得となります...
-                    </div>
-                    <div class="article-footer">
-                        <span>閲覧数: 3,267</span>
-                        <span>評価: <strong style="color: #e63946;">4.9/5.0</strong></span>
-                    </div>
-                </div>
-
-                <!-- 記事4 -->
-                <div class="article-card">
-                    <div class="article-header">
-                        <div>
-                            <div class="article-title">シティのゴールキーパー、契約延長で合意</div>
-                            <div class="article-meta">
-                                <div class="article-author">
-                                    <div class="author-avatar">F</div>
-                                    <span>Fabrizio Romano</span>
-                                </div>
-                                <span class="article-time">2024年6月23日</span>
-                            </div>
-                        </div>
-                        <div class="article-label">確定</div>
-                    </div>
-                    <div class="article-description">
-                        マンチェスター・シティのレギュラーゴールキーパーが、クラブとの契約延長で合意しました。3年契約となり、来シーズン以降の安定したフォーメーション構築が期待されます...
-                    </div>
-                    <div class="article-footer">
-                        <span>閲覧数: 1,234</span>
-                        <span>評価: <strong style="color: #e63946;">4.8/5.0</strong></span>
-                    </div>
-                </div>
-
-                <!-- 記事5 -->
-                <div class="article-card">
-                    <div class="article-header">
-                        <div>
-                            <div class="article-title">バルセロナ、スペイン代表FWと5年契約</div>
-                            <div class="article-meta">
-                                <div class="article-author">
-                                    <div class="author-avatar">M</div>
-                                    <span>Marca Sports</span>
-                                </div>
-                                <span class="article-time">2024年6月22日</span>
-                            </div>
-                        </div>
-                        <div class="article-label">確定</div>
-                    </div>
-                    <div class="article-description">
-                        バルセロナが、スペイン代表のフォワードと長期契約に合意しました。将来を見据えた新生バルセロナの重要な補強となります...
-                    </div>
-                    <div class="article-footer">
-                        <span>閲覧数: 856</span>
-                        <span>評価: <strong style="color: #e63946;">4.6/5.0</strong></span>
-                    </div>
-                </div>
-
-                <!-- 記事6 -->
-                <div class="article-card">
-                    <div class="article-header">
-                        <div>
-                            <div class="article-title">ユベントス、イタリア国家代表CBを獲得</div>
-                            <div class="article-meta">
-                                <div class="article-author">
-                                    <div class="author-avatar">C</div>
-                                    <span>Calcio & Calcetti</span>
-                                </div>
-                                <span class="article-time">2024年6月20日</span>
-                            </div>
-                        </div>
-                        <div class="article-label">速報</div>
-                    </div>
-                    <div class="article-description">
-                        ユベントスが、イタリア代表の主力ディフェンダーの獲得を発表。セリエAの最強ディフェンス構築に向けた重要な一手となります...
-                    </div>
-                    <div class="article-footer">
-                        <span>閲覧数: 2,145</span>
-                        <span>評価: <strong style="color: #e63946;">4.5/5.0</strong></span>
-                    </div>
-                </div>
+            <div class="articles-list" id="articlesList">
+                <p style="color:#999; padding:20px 0;">読み込み中...</p>
             </div>
 
             <!-- ページネーション -->
@@ -732,43 +590,162 @@
         </main>
     </div>
 
+    <script src="api-client.js" onerror="console.warn('api-client.js 未読込')"></script>
     <script>
-        // カテゴリ切り替え
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = String(name).trim().split(/\s+/).filter(p => /[A-Za-z0-9\u00C0-\u024F]/.test(p.charAt(0)));
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            const one = parts[0] || String(name).trim();
+            return one.substring(0, 2).toUpperCase();
+        }
+        const AVATAR_PALETTE = [
+            ['#e63946', '#a4161a'], ['#1d3557', '#14213d'], ['#2a9d8f', '#1f7a6f'],
+            ['#e76f51', '#c44a30'], ['#6a4c93', '#4e3470'], ['#457b9d', '#2f5a73'],
+            ['#588157', '#3a5a3a'], ['#bc6c25', '#8a4e16']
+        ];
+        function avatarColor(name) {
+            let h = 0; const s = name || '';
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+        }
+        function avatarStyle(name) {
+            const g = avatarColor(name);
+            return 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
+        }
+        function fmtDate(ts) {
+            try {
+                const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                if (!d || isNaN(d)) return '';
+                return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+            } catch (e) { return ''; }
+        }
+
+        const CATEGORY_DESC = {
+            'all': '全カテゴリの記事を表示しています。',
+            '移籍情報': '世界中のサッカークラブの選手移籍に関する最新ニュース。契約交渉、移籍金、選手のコメントなど、移籍に関するすべての情報をお届けします。',
+            'プレミアリーグ': 'イングランド・プレミアリーグの試合結果、順位争い、クラブの最新動向をお届けします。',
+            'ラリーガ': 'スペイン・ラリーガの最新情報。レアル・マドリー、バルセロナをはじめとするクラブの動向を追います。',
+            'セリエA': 'イタリア・セリエAの最新情報。ユベントス、ミラン勢などの動向をお届けします。',
+            'リーグアン': 'フランス・リーグアンの最新情報。PSGをはじめとするクラブの動向を追います。',
+            'ブンデスリーガ': 'ドイツ・ブンデスリーガの最新情報。バイエルンなど各クラブの動向をお届けします。'
+        };
+
+        let allArticles = [];
+        let currentCategory = 'all';
+
         const categoryButtons = document.querySelectorAll('.category-item');
         categoryButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 categoryButtons.forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                
-                const category = this.getAttribute('data-category');
-                const categoryName = this.textContent;
-                
-                // カテゴリ名を更新
-                document.querySelector('.category-name').textContent = categoryName;
-                console.log('Selected category:', category);
+                currentCategory = this.getAttribute('data-category');
+                renderCategory();
             });
         });
 
-        // ソート機能
-        document.querySelector('.sort-select').addEventListener('change', function() {
-            console.log('Sort changed to:', this.value);
-        });
+        document.getElementById('sortSelect').addEventListener('change', renderCategory);
 
-        // 記事カードクリック
-        document.querySelectorAll('.article-card').forEach(card => {
-            card.addEventListener('click', function() {
-                alert('記事詳細ページへのナビゲーション（実装予定）');
+        function sortArticles(list, mode) {
+            const arr = list.slice();
+            if (mode === '信頼度が高い順') arr.sort((a, b) => (b.trustScore || 0) - (a.trustScore || 0));
+            else if (mode === '人気順') arr.sort((a, b) => (b.views || 0) - (a.views || 0));
+            else arr.sort((a, b) => {
+                const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                return tb - ta;
             });
-        });
+            return arr;
+        }
 
-        // ページネーション
-        document.querySelectorAll('.pagination-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (!this.disabled && !this.classList.contains('active')) {
-                    console.log('Page changed to:', this.textContent);
+        function renderCategory() {
+            const listEl = document.getElementById('articlesList');
+            const filtered = currentCategory === 'all'
+                ? allArticles
+                : allArticles.filter(a => (a.category || '') === currentCategory);
+            const sorted = sortArticles(filtered, document.getElementById('sortSelect').value);
+
+            // ヘッダー更新（実データから計算）
+            document.getElementById('catName').textContent = currentCategory === 'all' ? 'すべて' : currentCategory;
+            document.getElementById('catDesc').textContent = CATEGORY_DESC[currentCategory] || '';
+            document.getElementById('statCount').textContent = filtered.length;
+            const trustAvg = filtered.length
+                ? (filtered.reduce((s, a) => s + (a.trustScore || 0), 0) / filtered.length).toFixed(1) : '-';
+            document.getElementById('statTrust').textContent = trustAvg;
+            document.getElementById('statViews').textContent =
+                filtered.reduce((s, a) => s + (a.views || 0), 0).toLocaleString();
+
+            if (sorted.length === 0) {
+                listEl.innerHTML = '<p style="color:#999; padding:20px 0;">このカテゴリの記事はまだありません。</p>';
+                return;
+            }
+            listEl.innerHTML = sorted.map(a => {
+                const rating = (typeof a.averageRating === 'number') ? a.averageRating.toFixed(1) : '-';
+                return (
+                    '<div class="article-card" style="cursor:pointer;" data-id="' + esc(a.id) + '">' +
+                        '<div class="article-header">' +
+                            '<div>' +
+                                '<div class="article-title">' + esc(a.title) + '</div>' +
+                                '<div class="article-meta">' +
+                                    '<div class="article-author">' +
+                                        '<div class="author-avatar" style="' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</div>' +
+                                        '<span>' + esc(a.authorName || '') + '</span>' +
+                                    '</div>' +
+                                    '<span class="article-time">' + esc(fmtDate(a.createdAt)) + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="article-label">' + esc(a.category || '') + '</div>' +
+                        '</div>' +
+                        '<div class="article-description">' + esc(a.description || '') + '</div>' +
+                        '<div class="article-footer">' +
+                            '<span>閲覧数: ' + (a.views || 0).toLocaleString() + '</span>' +
+                            '<span>評価: <strong style="color: #e63946;">' + rating + '/5.0</strong></span>' +
+                        '</div>' +
+                    '</div>'
+                );
+            }).join('');
+            listEl.querySelectorAll('.article-card').forEach(el => {
+                el.addEventListener('click', () => {
+                    window.location.href = 'gegen_press_article_detail.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                });
+            });
+        }
+
+        async function loadCategoryPage() {
+            const listEl = document.getElementById('articlesList');
+            const pg = document.querySelector('.pagination');
+            if (pg) pg.style.display = 'none'; // 見せかけのページ送りは隠す
+            if (typeof GegenPressAPI === 'undefined') {
+                listEl.innerHTML = '<p style="color:#999; padding:20px 0;">記事を読み込めませんでした。</p>';
+                return;
+            }
+            try {
+                const res = await GegenPressAPI.articles.getAll();
+                if (!res || !res.success) {
+                    listEl.innerHTML = '<p style="color:#999; padding:20px 0;">記事の読み込みに失敗しました。</p>';
+                    return;
                 }
-            });
-        });
+                allArticles = res.articles || [];
+                // URLの ?cat= があれば初期カテゴリに反映
+                const cat = new URLSearchParams(window.location.search).get('cat');
+                if (cat && CATEGORY_DESC[cat]) {
+                    currentCategory = cat;
+                    categoryButtons.forEach(b => {
+                        b.classList.toggle('active', b.getAttribute('data-category') === cat);
+                    });
+                }
+                renderCategory();
+            } catch (e) {
+                listEl.innerHTML = '<p style="color:#999; padding:20px 0;">記事の読み込み中にエラーが発生しました。</p>';
+            }
+        }
+        loadCategoryPage();
+    </script>
     </script>
 </body>
 </html>
