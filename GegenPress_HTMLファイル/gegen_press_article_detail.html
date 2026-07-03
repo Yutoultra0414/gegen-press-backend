@@ -542,6 +542,40 @@
                 align-items: flex-start;
             }
         }
+    
+        /* ===== コンパクトヘッダー（モバイル・小画面用の上書き） ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 14px !important;
+            }
+            .logo img { height: 26px !important; }
+            .header-nav {
+                width: auto !important;
+                gap: 10px !important;
+                justify-content: flex-end !important;
+            }
+            .header-nav a, .nav-link {
+                font-size: 12px !important;
+                padding: 3px 4px !important;
+                white-space: nowrap !important;
+            }
+            .back-button {
+                padding: 5px 10px !important;
+                font-size: 12px !important;
+                white-space: nowrap !important;
+            }
+            .search-bar {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 6px 12px !important;
+                font-size: 13px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -610,26 +644,6 @@
                 </p>
             </article>
 
-            <!-- アクション -->
-            <div class="article-actions">
-                <button class="action-button">
-                    <div class="action-icon">👍</div>
-                    <div class="action-text">高く評価</div>
-                </button>
-                <button class="action-button">
-                    <div class="action-icon">😍</div>
-                    <div class="action-text">素晴らしい</div>
-                </button>
-                <button class="action-button">
-                    <div class="action-icon">🤔</div>
-                    <div class="action-text">参考になる</div>
-                </button>
-                <button class="action-button">
-                    <div class="action-icon">📤</div>
-                    <div class="action-text">シェア</div>
-                </button>
-            </div>
-
             <!-- コメントセクション -->
             <section class="comments-section">
                 <h2 class="comments-title" id="ratingCountTitle">この記事への評価 (34)</h2>
@@ -655,28 +669,27 @@
                 </div>
 
                 <!-- コメントフォーム（ログイン必須） -->
-                <div class="comment-form" style="margin-top: 30px; opacity: 0.6;">
-                    <h3 style="font-size: 16px; color: #999; margin-bottom: 15px; font-weight: bold;">コメントを投稿する</h3>
-                    <p style="font-size: 13px; color: #e63946; margin-bottom: 20px; padding: 12px; background-color: rgba(230, 57, 70, 0.1); border-left: 3px solid #e63946; border-radius: 4px;">
+                <div class="comment-form" id="commentForm" style="margin-top: 30px; opacity: 0.6;">
+                    <h3 id="commentFormTitle" style="font-size: 16px; color: #999; margin-bottom: 15px; font-weight: bold;">コメントを投稿する</h3>
+                    <p id="commentLoginNote" style="font-size: 13px; color: #e63946; margin-bottom: 20px; padding: 12px; background-color: rgba(230, 57, 70, 0.1); border-left: 3px solid #e63946; border-radius: 4px;">
                         コメント投稿には<a href="gegen_press_login.html" style="color: #e63946; font-weight: bold; text-decoration: none;">ログイン</a>が必要です
                     </p>
                     
                     <div class="form-group">
                         <label for="name">ニックネーム</label>
-                        <input type="text" id="name" placeholder="あなたの名前" disabled>
+                        <input type="text" id="commentName" placeholder="あなたの名前" disabled>
                     </div>
 
                     <div class="form-group">
                         <label for="comment">コメント</label>
-                        <textarea id="comment" placeholder="あなたのコメントを入力してください..." disabled></textarea>
+                        <textarea id="commentText" placeholder="あなたのコメントを入力してください..." disabled></textarea>
                     </div>
 
-                    <button class="submit-button" disabled style="opacity: 0.5; cursor: not-allowed;">コメントを投稿（ログイン必須）</button>
+                    <button class="submit-button" id="commentSubmitBtn" disabled style="opacity: 0.5; cursor: not-allowed;">コメントを投稿（ログイン必須）</button>
                 </div>
 
                 <!-- コメント一覧 -->
-                <!-- 評価一覧（実際に投稿された評価。本文コメント機能は準備中） -->
-                <div class="comments-list" id="ratingsList">
+                <div class="comments-list" id="commentsList" style="margin-top: 24px;">
                     <p style="color:#999; font-size:14px;">読み込み中...</p>
                 </div>
             </section>
@@ -842,21 +855,104 @@
             });
         }
 
-        // ==== コメント投稿（本文コメントは今回未実装・ログイン必須の案内のまま） ====
-        document.querySelectorAll('.submit-button').forEach(btn => {
-            if (btn.textContent.includes('コメント')) {
-                btn.addEventListener('click', function() {
-                    alert('コメント投稿にはログインが必要です（本文コメント機能は準備中です）');
-                });
-            }
-        });
+        // ==== コメント投稿（ログイン必須・Firestoreに保存） ====
+        const commentForm = document.getElementById('commentForm');
+        const commentName = document.getElementById('commentName');
+        const commentText = document.getElementById('commentText');
+        const commentSubmitBtn = document.getElementById('commentSubmitBtn');
+        const commentLoginNote = document.getElementById('commentLoginNote');
+        const commentFormTitle = document.getElementById('commentFormTitle');
 
-        // ==== アクションボタン（未実装） ====
-        document.querySelectorAll('.action-button').forEach(btn => {
-            btn.addEventListener('click', function() {
-                alert('この機能は準備中です');
+        // Firebase の認証状態を直接確認してフォームを有効化（localStorage非依存）
+        async function initCommentForm() {
+            if (typeof GegenPressAPI === 'undefined') return;
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) { return; }
+            if (!user) return; // 未ログイン: 案内表示のまま
+
+            commentForm.style.opacity = '1';
+            commentFormTitle.style.color = '#e63946';
+            commentLoginNote.style.display = 'none';
+            commentName.disabled = false;
+            commentText.disabled = false;
+            commentSubmitBtn.disabled = false;
+            commentSubmitBtn.style.opacity = '1';
+            commentSubmitBtn.style.cursor = 'pointer';
+            commentSubmitBtn.textContent = 'コメントを投稿';
+            if (user.displayName && !commentName.value) commentName.value = user.displayName;
+
+            commentSubmitBtn.addEventListener('click', async function () {
+                const text = (commentText.value || '').trim();
+                if (!text) { alert('コメントを入力してください'); return; }
+                commentSubmitBtn.disabled = true;
+                commentSubmitBtn.textContent = '投稿中...';
+                const res = await GegenPressAPI.comments.create(
+                    articleId, text, null, (commentName.value || '').trim() || null
+                );
+                commentSubmitBtn.disabled = false;
+                commentSubmitBtn.textContent = 'コメントを投稿';
+                if (res && res.success) {
+                    commentText.value = '';
+                    loadComments();
+                } else {
+                    alert((res && res.message) || 'コメントの投稿に失敗しました');
+                }
             });
-        });
+        }
+        initCommentForm();
+
+        // ==== コメント一覧の読み込み ====
+        async function loadComments() {
+            if (typeof GegenPressAPI === 'undefined') return;
+            try {
+                const res = await GegenPressAPI.comments.getByArticle(articleId);
+                if (!res || !res.success) return;
+                const comments = res.comments || [];
+                document.getElementById('ratingCountTitle').textContent = 'コメント (' + comments.length + ')';
+                const listEl = document.getElementById('commentsList');
+                if (comments.length === 0) {
+                    listEl.innerHTML = '<p style="color:#999; font-size:14px;">まだコメントがありません。最初のコメントを投稿してみましょう。</p>';
+                    return;
+                }
+                const sorted = comments.slice().sort((a, b) => {
+                    const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                    const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                    return tb - ta;
+                });
+                listEl.innerHTML = sorted.map(c =>
+                    '<div class="comment">' +
+                        '<div class="comment-header">' +
+                            '<div><div class="comment-author">' + esc(c.username || '匿名ユーザー') + '</div>' +
+                                '<div class="comment-time">' + esc(fmtDate(c.createdAt)) + '</div></div>' +
+                            (c.rating ? '<div class="comment-rating">' + starsHtml(c.rating) + '</div>' : '') +
+                        '</div>' +
+                        '<div class="comment-text">' + esc(c.content || '') + '</div>' +
+                    '</div>'
+                ).join('');
+            } catch (e) {
+                console.warn('コメントの読み込みに失敗:', e);
+            }
+        }
+
+        // ==== 評価の集計（件数・平均をヘッダーとサイドバーに反映） ====
+        async function loadRatings() {
+            if (typeof GegenPressAPI === 'undefined') return;
+            try {
+                const res = await GegenPressAPI.ratings.getByArticle(articleId);
+                if (!res || !res.success) return;
+                const ratings = res.ratings || [];
+                const count = ratings.length;
+                const avg = count > 0 ? (ratings.reduce((s, r) => s + (r.rating || 0), 0) / count) : 0;
+
+                document.getElementById('infoRatingCount').textContent = count;
+                document.getElementById('infoAvgRating').textContent = count > 0 ? (avg.toFixed(1) + ' / 5.0') : 'まだ評価なし';
+                if (count > 0) {
+                    document.getElementById('articleStars').innerHTML = starsHtml(avg);
+                }
+            } catch (e) {
+                console.warn('評価集計の読み込みに失敗:', e);
+            }
+        }
 
         // ==== 記事本体の読み込み ====
         async function loadArticle() {
@@ -903,47 +999,10 @@
                 }
 
                 loadRatings();
+                loadComments();
                 loadRelated(a);
             } catch (e) {
                 console.warn('記事読み込みエラー、見本データを表示します:', e);
-            }
-        }
-
-        // ==== 評価一覧・平均の読み込み ====
-        async function loadRatings() {
-            if (typeof GegenPressAPI === 'undefined') return;
-            try {
-                const res = await GegenPressAPI.ratings.getByArticle(articleId);
-                if (!res || !res.success) return;
-                const ratings = res.ratings || [];
-                const count = ratings.length;
-                const avg = count > 0 ? (ratings.reduce((s, r) => s + (r.rating || 0), 0) / count) : 0;
-
-                document.getElementById('ratingCountTitle').textContent = 'この記事への評価 (' + count + ')';
-                document.getElementById('infoRatingCount').textContent = count;
-                document.getElementById('infoAvgRating').textContent = avg.toFixed(1) + ' / 5.0';
-
-                const listEl = document.getElementById('ratingsList');
-                if (count === 0) {
-                    listEl.innerHTML = '<p style="color:#999; font-size:14px;">まだ評価がありません。最初の評価を投稿してみましょう。</p>';
-                    return;
-                }
-                const sorted = ratings.slice().sort((a, b) => {
-                    const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
-                    const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
-                    return tb - ta;
-                });
-                listEl.innerHTML = sorted.map(r =>
-                    '<div class="comment">' +
-                        '<div class="comment-header">' +
-                            '<div><div class="comment-author">匿名ユーザー</div>' +
-                                '<div class="comment-time">' + esc(fmtDate(r.createdAt)) + '</div></div>' +
-                            '<div class="comment-rating">' + starsHtml(r.rating) + '</div>' +
-                        '</div>' +
-                    '</div>'
-                ).join('');
-            } catch (e) {
-                console.warn('評価一覧の読み込みに失敗:', e);
             }
         }
 

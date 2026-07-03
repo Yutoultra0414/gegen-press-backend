@@ -359,6 +359,35 @@
       }
     },
 
+    // ===== 記者へのクチコミ（レビュー） =====
+    reviews: {
+      async create(reporterId, rating, comment, username) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: false, message: 'レビューの投稿にはログインが必要です' };
+          var fb = await _ready;
+          var docData = {
+            reporterId: reporterId,
+            rating: rating || null,
+            comment: comment || '',
+            userId: u.uid,
+            username: username || u.displayName || '匿名ユーザー',
+            createdAt: tsNow()
+          };
+          var ref = await fb.db.collection('reviews').add(docData);
+          docData.id = ref.id;
+          return { success: true, review: docData };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async getByReporter(reporterId) {
+        try {
+          var fb = await _ready;
+          var snap = await fb.db.collection('reviews').where('reporterId', '==', reporterId).get();
+          return { success: true, reviews: docList(snap) };
+        } catch (e) { return { success: false, message: String(e), reviews: [] }; }
+      }
+    },
+
     // ===== コメント =====
     comments: {
       async getByArticle(articleId, params) {
@@ -368,14 +397,14 @@
           return { success: true, comments: docList(snap) };
         } catch (e) { return { success: false, message: String(e), comments: [] }; }
       },
-      async create(articleId, content, rating) {
+      async create(articleId, content, rating, username) {
         try {
           var u = await currentUser();
           if (!u) return { success: false, message: 'コメントの投稿にはログインが必要です' };
           var fb = await _ready;
           var docData = {
             articleId: articleId, content: content, rating: rating || null,
-            userId: u.uid, username: u.displayName || '', createdAt: tsNow()
+            userId: u.uid, username: username || u.displayName || '匿名ユーザー', createdAt: tsNow()
           };
           var ref = await fb.db.collection('comments').add(docData);
           docData.id = ref.id;

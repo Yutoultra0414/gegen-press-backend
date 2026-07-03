@@ -302,6 +302,40 @@
             .check-btn { padding: 12px; }
             .form-actions { flex-direction: column; }
         }
+    
+        /* ===== コンパクトヘッダー（モバイル・小画面用の上書き） ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 14px !important;
+            }
+            .logo img { height: 26px !important; }
+            .header-nav {
+                width: auto !important;
+                gap: 10px !important;
+                justify-content: flex-end !important;
+            }
+            .header-nav a, .nav-link {
+                font-size: 12px !important;
+                padding: 3px 4px !important;
+                white-space: nowrap !important;
+            }
+            .back-button {
+                padding: 5px 10px !important;
+                font-size: 12px !important;
+                white-space: nowrap !important;
+            }
+            .search-bar {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 6px 12px !important;
+                font-size: 13px !important;
+            }
+        }
     </style>
 </head>
 <body>
