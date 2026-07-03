@@ -775,11 +775,15 @@
                     const g = avatarColor(r.name);
                     const rating = (typeof r.averageRating === 'number') ? r.averageRating.toFixed(1) : '-';
                     const score = (typeof r.trustScore === 'number') ? r.trustScore : 0;
+                    const avatarInner = r.profileImage
+                        ? '<img src="' + r.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">'
+                        : esc(getInitials(r.name));
+                    const avatarBg = r.profileImage ? '' : 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
 
                     tr.innerHTML =
                         '<td class="rank-number">' + medal + rank + '</td>' +
                         '<td><div class="reporter-info">' +
-                            '<div class="reporter-avatar" style="background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;">' + esc(getInitials(r.name)) + '</div>' +
+                            '<div class="reporter-avatar" style="' + avatarBg + 'overflow:hidden;">' + avatarInner + '</div>' +
                             '<div class="reporter-details"><h3>' + esc(r.name) + '</h3><p>' + esc(r.mediaOutlet || '') + '</p></div>' +
                         '</div></td>' +
                         '<td class="score-cell">' + score + '<span class="score-max">/100</span></td>' +

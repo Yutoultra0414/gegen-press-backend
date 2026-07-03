@@ -909,6 +909,14 @@
             const g = avatarColor(name);
             return 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
         }
+        // profileImage があれば画像アバター、無ければ頭文字アバターのHTMLを返す
+        function avatarHtml(cls, name, profileImage) {
+            if (profileImage) {
+                return '<div class="' + cls + '" style="overflow:hidden;">' +
+                    '<img src="' + profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"></div>';
+            }
+            return '<div class="' + cls + '" style="' + avatarStyle(name) + '">' + esc(getInitials(name)) + '</div>';
+        }
         function timeAgo(ts) {
             try {
                 const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
@@ -946,7 +954,7 @@
                         const rating = (typeof r.averageRating === 'number') ? r.averageRating.toFixed(1) : '-';
                         div.innerHTML =
                             '<div class="reporter-header">' +
-                                '<div class="reporter-avatar" style="' + avatarStyle(r.name) + '">' + esc(getInitials(r.name)) + '</div>' +
+                                avatarHtml('reporter-avatar', r.name, r.profileImage) +
                                 '<div class="reporter-info"><h3>' + esc(r.name) + '</h3><p>' + esc(r.mediaOutlet || '') + '</p></div>' +
                             '</div>' +
                             '<div class="reporter-score">' + (r.trustScore || 0) + '/100' +
@@ -985,7 +993,7 @@
                                 '<h3 class="pickup-title">' + esc(a.title) + '</h3>' +
                                 '<div class="pickup-meta">' +
                                     '<div class="pickup-author">' +
-                                        '<div class="author-avatar" style="' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</div>' +
+                                        avatarHtml('author-avatar', a.authorName, rep.profileImage) +
                                         '<div class="author-info"><h4>' + esc(a.authorName || '') + '</h4><p>' + handle + '</p></div>' +
                                     '</div>' +
                                     (t ? '<div class="pickup-time">' + esc(t) + '</div>' : '') +
