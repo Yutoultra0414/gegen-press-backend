@@ -61,6 +61,17 @@
         <div id="log">ここに実行ログが表示されます。</div>
     </div>
 
+    <div class="section" style="border-top:2px solid #eee; padding-top:16px; margin-top:16px;">
+        <h2 style="color:#c0392b;">3. 記者・記事のリセット（全削除）</h2>
+        <p style="font-size:13px; color:#666; margin-bottom:10px; line-height:1.6;">
+            reporters（記者）と articles（記事）コレクションの中身を、ユーザー投稿分も含めて<strong>全件削除</strong>します。
+            コメント・評価・クチコミなどの関連データは削除されません（孤立しますが表示上は問題ありません）。<br>
+            この操作には、firestore.rules の <code>YOUR_ADMIN_UID</code> を自分のUIDに置き換えて公開している必要があります。
+        </p>
+        <button class="btn-white" id="resetBtn" disabled style="border-color:#c0392b; color:#c0392b;">記者・記事を全削除する</button>
+        <div id="resetLog" style="font-size:12px; line-height:1.9; background:#1d1d1d; color:#ffd7d7; border-radius:6px; padding:12px; min-height:60px; max-height:280px; overflow-y:auto; white-space:pre-wrap; font-family:Consolas, monospace; margin-top:10px;">まだ実行していません。</div>
+    </div>
+
     <div class="note">
         投入されるデータ: 記者 rep_fabrizio / rep_skysports / rep_marca / rep_goal / rep_as / rep_calcio、記事 art_001〜art_006。<br>
         すでに投入済みの場合、上書きはセキュリティルールにより拒否されます（エラーになりますが正常です）。
@@ -89,17 +100,22 @@ const articles = [
 const statusEl = document.getElementById('status');
 const logEl = document.getElementById('log');
 const seedBtn = document.getElementById('seedBtn');
+const resetBtn = document.getElementById('resetBtn');
+const resetLogEl = document.getElementById('resetLog');
 function log(msg) { logEl.textContent += '\n' + msg; logEl.scrollTop = logEl.scrollHeight; }
+function resetLog(msg) { resetLogEl.textContent += '\n' + msg; resetLogEl.scrollTop = resetLogEl.scrollHeight; }
 
 async function refreshStatus() {
     try {
         const u = await GegenPressAPI._currentUser();
         if (u) {
-            statusEl.textContent = 'ログイン中: ' + (u.email || u.displayName || u.uid);
+            statusEl.textContent = 'ログイン中: ' + (u.email || u.displayName || u.uid) + '（UID: ' + u.uid + '）';
             seedBtn.disabled = false;
+            resetBtn.disabled = false;
         } else {
             statusEl.textContent = '未ログインです。Googleまたはメールでログインしてください。';
             seedBtn.disabled = true;
+            resetBtn.disabled = true;
         }
     } catch (e) {
         statusEl.textContent = 'Firebase接続エラー: ' + e;
@@ -165,6 +181,43 @@ seedBtn.addEventListener('click', async () => {
     }
     seedBtn.textContent = 'サンプルデータを投入する';
     seedBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', async () => {
+    if (!confirm('reporters と articles の全データを削除します。元に戻せません。本当に実行しますか？')) return;
+    resetBtn.disabled = true;
+    resetBtn.textContent = '削除中...';
+    resetLogEl.textContent = '削除を開始します。';
+    try {
+        const db = await GegenPressAPI._db();
+
+        resetLog('[1/2] 記事(articles)を削除中...');
+        const articlesSnap = await db.collection('articles').get();
+        for (const doc of articlesSnap.docs) {
+            try {
+                await db.collection('articles').doc(doc.id).delete();
+                resetLog('  削除OK  ' + doc.id);
+            } catch (e) {
+                resetLog('  削除NG  ' + doc.id + ' : ' + (e.code || e.message || e));
+            }
+        }
+
+        resetLog('[2/2] 記者(reporters)を削除中...');
+        const reportersSnap = await db.collection('reporters').get();
+        for (const doc of reportersSnap.docs) {
+            try {
+                await db.collection('reporters').doc(doc.id).delete();
+                resetLog('  削除OK  ' + doc.id);
+            } catch (e) {
+                resetLog('  削除NG  ' + doc.id + ' : ' + (e.code || e.message || e));
+            }
+        }
+        resetLog('完了しました。「サンプルデータを投入する」で再度初期データを入れることもできます。');
+    } catch (e) {
+        resetLog('エラー: ' + e);
+    }
+    resetBtn.textContent = '記者・記事を全削除する';
+    resetBtn.disabled = false;
 });
 </script>
 </body>
