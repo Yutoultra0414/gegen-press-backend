@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マンチェスター・シティが超大型補強を発表 | Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* ヘッダー */
+        header {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border-bottom: 3px solid #e63946;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: #e63946;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .back-button {
+            background-color: #e63946;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #ff6b6b;
+        }
+
+        /* 記事ヘッダー */
+        .article-header {
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .article-header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .article-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 25px;
+            line-height: 1.2;
+            color: #fff;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .author-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #e63946;
+            font-size: 20px;
+        }
+
+        .author-info h3 {
+            font-size: 14px;
+            margin-bottom: 3px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .author-info p {
+            font-size: 12px;
+            opacity: 0.9;
+            color: #fff;
+        }
+
+        .article-time {
+            font-size: 13px;
+            opacity: 0.85;
+            color: #fff;
+        }
+
+        .article-rating-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 3px;
+        }
+
+        .star {
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .star.empty {
+            opacity: 0.3;
+        }
+
+        .rating-percent {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* コンテナ */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 40px;
+            padding: 60px 40px;
+        }
+
+        /* 記事本文 */
+        .article-content {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        .article-content p {
+            margin-bottom: 20px;
+        }
+
+        .article-content strong {
+            color: #e63946;
+        }
+
+        /* 引用 */
+        .article-quote {
+            background-color: rgba(230, 57, 70, 0.08);
+            border-left: 4px solid #e63946;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+            font-size: 15px;
+            font-style: italic;
+            color: #666;
+        }
+
+        /* アクション */
+        .article-actions {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #e63946;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 40px 0;
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+        }
+
+        .action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background-color: transparent;
+            border: none;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            color: #e63946;
+            transform: scale(1.1);
+        }
+
+        .action-icon {
+            font-size: 24px;
+        }
+
+        .action-text {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* コメントセクション */
+        .comments-section {
+            margin-top: 50px;
+            border-top: 2px solid #e63946;
+            padding-top: 40px;
+        }
+
+        .comments-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 30px;
+            color: #e63946;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .comment-form {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #000;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            color: #333;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #e63946;
+            box-shadow: 0 0 12px rgba(230, 57, 70, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .rating-input .star-btn {
+            background-color: transparent;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .rating-input .star-btn:hover {
+            color: #e63946;
+            transform: scale(1.2);
+        }
+
+        .rating-input .star-btn.active {
+            color: #e63946;
+        }
+
+        .submit-button {
+            background-color: #e63946;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-button:hover {
+            background-color: #ff6b6b;
+            transform: translateY(-2px);
+        }
+
+        /* コメント一覧 */
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .comment {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 1px solid #ddd;
+            border-left: 3px solid #e63946;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            color: #000;
+            font-size: 14px;
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .comment-rating {
+            display: flex;
+            gap: 2px;
+        }
+
+        .comment-rating .star {
+            color: #e63946;
+            font-size: 12px;
+        }
+
+        .comment-rating .star.empty {
+            opacity: 0.3;
+        }
+
+        .comment-text {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+        }
+
+        .comment-action {
+            background-color: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .comment-action:hover {
+            color: #e63946;
+        }
+
+        /* サイドバー */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sidebar-box {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .sidebar-box:hover {
+            border-color: #e63946;
+        }
+
+        .sidebar-box h3 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #e63946;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-box .info-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 13px;
+        }
+
+        .sidebar-box .info-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .sidebar-box .info-label {
+            color: #999;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-box .info-value {
+            color: #000;
+            font-weight: bold;
+        }
+
+        .related-article {
+            background-color: #f9f9f9;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            border-left: 3px solid transparent;
+        }
+
+        .related-article:hover {
+            background-color: #f0f0f0;
+            border-left-color: #e63946;
+            transform: translateX(5px);
+        }
+
+        .related-article-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .related-article-author {
+            font-size: 11px;
+            color: #999;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .article-header {
+                padding: 40px 20px;
+            }
+
+            .article-title {
+                font-size: 32px;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+
+            .article-actions {
+                flex-wrap: wrap;
+            }
+
+            .article-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    
+        /* ===== コンパクト表示（文字・余白の圧縮） ===== */
+        .article-header { padding: 24px 40px !important; }
+        .article-title { font-size: 24px !important; margin-bottom: 14px !important; line-height: 1.4 !important; }
+        .article-meta { gap: 16px !important; }
+        .article-time { font-size: 12px !important; }
+        .article-content { font-size: 14px !important; line-height: 1.8 !important; padding: 20px !important; }
+        .article-content p { margin-bottom: 12px !important; }
+        .article-quote { padding: 14px 18px !important; font-size: 13px !important; margin: 14px 0 !important; }
+        .comments-section { padding: 20px !important; }
+        .comments-title { font-size: 17px !important; margin-bottom: 14px !important; }
+        .comment { padding: 12px 14px !important; margin-bottom: 10px !important; }
+        .comment-author { font-size: 13px !important; }
+        .comment-time { font-size: 11px !important; }
+        .comment-text { font-size: 13px !important; line-height: 1.7 !important; }
+        .comment-form { padding: 16px !important; margin-top: 20px !important; }
+        .comment-form h3 { font-size: 14px !important; margin-bottom: 10px !important; }
+        .form-group { margin-bottom: 10px !important; }
+        .form-group label { font-size: 12px !important; }
+        .form-group input, .form-group textarea { padding: 8px 10px !important; font-size: 13px !important; }
+        .form-group textarea { min-height: 70px !important; }
+        .submit-button { padding: 9px 18px !important; font-size: 13px !important; }
+        .sidebar-box { padding: 14px !important; margin-bottom: 14px !important; }
+        .sidebar-box h3 { font-size: 14px !important; margin-bottom: 10px !important; }
+        .info-item { padding: 7px 0 !important; }
+        .info-label { font-size: 11px !important; }
+        .info-value { font-size: 14px !important; }
+        .related-article { padding: 9px 10px !important; margin-bottom: 6px !important; }
+        .related-article-title { font-size: 12px !important; line-height: 1.5 !important; }
+        .related-article-author { font-size: 11px !important; }
+    
+        @media (max-width: 768px) {
+            header {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 14px !important;
+            }
+            .logo img { height: 26px !important; }
+            .header-nav {
+                width: auto !important;
+                gap: 10px !important;
+                justify-content: flex-end !important;
+            }
+            .header-nav a, .nav-link {
+                font-size: 12px !important;
+                padding: 3px 4px !important;
+                white-space: nowrap !important;
+            }
+            .back-button {
+                padding: 5px 10px !important;
+                font-size: 12px !important;
+                white-space: nowrap !important;
+            }
+            .search-bar {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 6px 12px !important;
+                font-size: 13px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <a href="gegen_press_top.html" class="logo"><img src="logo.png" alt="Gegen Press!" style="height:46px;width:auto;display:block;"></a>
+        <a href="gegen_press_top.html"><button class="back-button">トップに戻る</button></a>
+    </header>
+
+    <!-- 記事ヘッダー -->
+    <section class="article-header">
+        <div class="article-header-content">
+            <h1 class="article-title" id="articleTitle">マンチェスター・シティが超大型補強を発表</h1>
+            
+            <div class="article-meta">
+                <div class="author-section" id="authorSection" style="cursor:pointer;">
+                    <div class="author-avatar" id="authorAvatar">F</div>
+                    <div class="author-info">
+                        <h3 id="authorName">Fabrizio Romano</h3>
+                        <p id="authorHandle">@FabrizioRomano</p>
+                    </div>
+                </div>
+                <div class="article-time" id="articleTime">2024年6月27日 14:30</div>
+                <div class="article-rating-display">
+                    <div class="stars" id="articleStars">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                    </div>
+                    <div class="rating-percent" id="ratingPercent">信頼度: 98%</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <div class="container">
+        <main>
+            <!-- 記事本文 -->
+            <article class="article-content" id="articleContent">
+                <p>
+                    プレミアリーグの強豪、マンチェスター・シティが2024-25シーズンに向けた大規模な補強計画を発表しました。複数の欧州トップリーグの有力選手が加入予定となっており、同クラブの攻守の両面での強化が期待されます。
+                </p>
+
+                <p>
+                    報道によると、新たに加入予定の選手たちは、攻撃的ミッドフィールダー、ディフェンダー、そしてゴールキーパーなど、複数のポジションでの補強となるようです。同クラブのマネジャーは、「<strong>これからの戦いに向けて最高のスカッドを整備した</strong>」とコメントしており、今シーズンへの強い自信を示しています。
+                </p>
+
+                <div class="article-quote">
+                    我々のビジョンは明確です。プレミアリーグとチャンピオンズリーグの連覇を目指し、世界最高のスカッドを構成することです。新しいメンバーたちは、その目標達成に向けて重要な役割を果たすでしょう。<br><br>
+                    - マンチェスター・シティ マネジャー
+                </div>
+
+                <p>
+                    新たに加入予定の選手の中には、インテル・ミラノやレアル・マドリー、バイエルン・ミュンヘンなど、欧州の一流クラブで活躍してきた実績者も含まれています。これらの選手たちの経験と実力は、シティのさらなる強化をもたらすと予想されます。
+                </p>
+
+                <p>
+                    ファンの間では、新メンバーたちの加入についてさまざまな期待の声が上がっています。シティの戦術システムへの適応と、チームの一員としての統合がどの程度進むかが、来シーズンの成功の鍵となるでしょう。
+                </p>
+
+                <p>
+                    同クラブは、プレシーズンマッチを通じて新しいスカッドの調整を進める予定です。正式な発表は近日中に行われる見通しで、ファンたちの期待がさらに高まることが予想されます。
+                </p>
+            </article>
+
+            <!-- コメントセクション -->
+            <section class="comments-section">
+                <h2 class="comments-title" id="ratingCountTitle">この記事への評価 (34)</h2>
+
+                <!-- 信ぴょう性評価フォーム（ログインなしでOK） -->
+                <div class="comment-form" style="background: linear-gradient(135deg, rgba(230, 57, 70, 0.05) 0%, transparent 100%); border: 2px solid #e63946;">
+                    <h3 style="font-size: 16px; color: #e63946; margin-bottom: 15px; font-weight: bold;">この記事の信ぴょう性を評価</h3>
+                    <p style="font-size: 12px; color: #999; margin-bottom: 15px;">ログインなしで投稿できます</p>
+                    
+                    <div class="form-group">
+                        <label for="rating">評価を選択</label>
+                        <div class="rating-input" id="ratingInput">
+                            <button class="star-btn" data-value="1">★</button>
+                            <button class="star-btn" data-value="2">★</button>
+                            <button class="star-btn" data-value="3">★</button>
+                            <button class="star-btn" data-value="4">★</button>
+                            <button class="star-btn" data-value="5">★</button>
+                        </div>
+                    </div>
+
+                    <button class="submit-button" id="ratingSubmit">評価を投稿</button>
+                    <p style="font-size: 12px; color: #999; margin-top: 12px;">※ご投稿いただいた評価は、他のユーザーの判断の参考になります</p>
+                </div>
+
+                <!-- コメントフォーム（ログイン必須） -->
+                <div class="comment-form" id="commentForm" style="margin-top: 30px; opacity: 0.6;">
+                    <h3 id="commentFormTitle" style="font-size: 16px; color: #999; margin-bottom: 15px; font-weight: bold;">コメントを投稿する</h3>
+                    <p id="commentLoginNote" style="font-size: 13px; color: #e63946; margin-bottom: 20px; padding: 12px; background-color: rgba(230, 57, 70, 0.1); border-left: 3px solid #e63946; border-radius: 4px;">
+                        コメント投稿には<a href="gegen_press_login.html" style="color: #e63946; font-weight: bold; text-decoration: none;">ログイン</a>が必要です
+                    </p>
+                    
+                    <div class="form-group">
+                        <label for="name">ニックネーム</label>
+                        <input type="text" id="commentName" placeholder="あなたの名前" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comment">コメント</label>
+                        <textarea id="commentText" placeholder="あなたのコメントを入力してください..." disabled></textarea>
+                    </div>
+
+                    <button class="submit-button" id="commentSubmitBtn" disabled style="opacity: 0.5; cursor: not-allowed;">コメントを投稿（ログイン必須）</button>
+                </div>
+
+                <!-- コメント一覧 -->
+                <div class="comments-list" id="commentsList" style="margin-top: 24px;">
+                    <p style="color:#999; font-size:14px;">読み込み中...</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <!-- 記事情報 -->
+            <div class="sidebar-box">
+                <h3>記事情報</h3>
+                <div class="info-item">
+                    <div class="info-label">閲覧数</div>
+                    <div class="info-value" id="infoViews">2,450</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">評価件数</div>
+                    <div class="info-value" id="infoRatingCount">34</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">評価</div>
+                    <div class="info-value" id="infoAvgRating">4.8 / 5.0</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">信頼度</div>
+                    <div class="info-value" id="infoTrust">98%</div>
+                </div>
+                <div class="info-item" id="thumbSetRow" style="display:none;">
+                    <button id="setThumbBtn" style="background:#fff; color:#e63946; border:1px solid #e63946; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer;">サムネイルを設定</button>
+                    <input type="file" id="thumbFileInput" accept="image/*" style="display:none;">
+                </div>
+            </div>
+
+            <!-- 記者情報 -->
+            <div class="sidebar-box">
+                <h3>記者</h3>
+                <div class="info-item">
+                    <div class="info-label">名前</div>
+                    <div class="info-value" id="sideAuthorName">Fabrizio Romano</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">専門</div>
+                    <div class="info-value" id="sideAuthorOutlet">移籍情報</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">信ぴょう性</div>
+                    <div class="info-value" id="sideAuthorScore">96/100</div>
+                </div>
+                <div class="info-item">
+                    <a href="gegen_press_reporter_profile.html" id="sideAuthorLink" style="color: #e63946; text-decoration: none; font-weight: bold;">プロフィールを見る →</a>
+                </div>
+            </div>
+
+            <!-- 関連記事 -->
+            <div class="sidebar-box">
+                <h3>関連記事</h3>
+                <div id="relatedArticles">
+                    <p style="color:#999; font-size:13px;">読み込み中...</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script src="api-client.js" onerror="console.warn('api-client.js 未読込: 見本データを表示します')"></script>
+    <script>
+        // ==== 共通ヘルパー ====
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = String(name).trim().split(/\s+/).filter(p => /[A-Za-z0-9\u00C0-\u024F]/.test(p.charAt(0)));
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            const one = parts[0] || String(name).trim();
+            return one.substring(0, 2).toUpperCase();
+        }
+        const AVATAR_PALETTE = [
+            ['#e63946', '#a4161a'], ['#1d3557', '#14213d'], ['#2a9d8f', '#1f7a6f'],
+            ['#e76f51', '#c44a30'], ['#6a4c93', '#4e3470'], ['#457b9d', '#2f5a73'],
+            ['#588157', '#3a5a3a'], ['#bc6c25', '#8a4e16']
+        ];
+        function avatarColor(name) {
+            let h = 0; const s = name || '';
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+        }
+        function avatarStyle(name) {
+            const g = avatarColor(name);
+            return 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
+        }
+        function starsHtml(rating, cls) {
+            const n = Math.round(rating || 0);
+            let out = '';
+            for (let i = 0; i < 5; i++) out += '<span class="' + (cls || 'star') + (i < n ? '' : ' empty') + '">★</span>';
+            return out;
+        }
+        function fmtDate(ts) {
+            try {
+                const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                if (!d || isNaN(d)) return '';
+                return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' +
+                    String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+            } catch (e) { return ''; }
+        }
+
+        // ==== 星評価UI（クリック選択） ====
+        const ratingButtons = document.querySelectorAll('#ratingInput .star-btn');
+        let selectedRating = 0;
+
+        ratingButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                selectedRating = Number(this.getAttribute('data-value'));
+                ratingButtons.forEach((b, index) => {
+                    b.classList.toggle('active', index < selectedRating);
+                });
+            });
+            btn.addEventListener('mouseover', function() {
+                const value = Number(this.getAttribute('data-value'));
+                ratingButtons.forEach((b, index) => {
+                    b.style.color = index < value ? '#e63946' : '#ddd';
+                });
+            });
+        });
+        const ratingInputEl = document.getElementById('ratingInput');
+        if (ratingInputEl) {
+            ratingInputEl.addEventListener('mouseout', function() {
+                ratingButtons.forEach((btn, index) => {
+                    btn.style.color = index < selectedRating ? '#e63946' : '#ddd';
+                });
+            });
+        }
+
+        // ==== 記事IDの取得 ====
+        const params = new URLSearchParams(window.location.search);
+        const articleId = params.get('id') || 'art_001'; // 指定が無ければ見本のまま
+
+        let currentArticle = null; // Firestoreから読み込んだ記事データ
+
+        // ==== 評価投稿（ログイン不要・Firestoreに保存） ====
+        const ratingSubmitBtn = document.getElementById('ratingSubmit');
+        if (ratingSubmitBtn) {
+            ratingSubmitBtn.addEventListener('click', async function() {
+                if (!selectedRating) { alert('評価を選択してください'); return; }
+                if (typeof GegenPressAPI === 'undefined') {
+                    alert('現在この機能は利用できません（読み込みエラー）。');
+                    return;
+                }
+                ratingSubmitBtn.disabled = true;
+                ratingSubmitBtn.textContent = '投稿中...';
+                const res = await GegenPressAPI.ratings.create({
+                    articleId: articleId,
+                    reporterId: currentArticle ? currentArticle.authorId : null,
+                    rating: selectedRating
+                });
+                ratingSubmitBtn.disabled = false;
+                ratingSubmitBtn.textContent = '評価を投稿';
+                if (res && res.success) {
+                    alert('ご投稿ありがとうございます！\n\n選択された評価: ' + selectedRating + '★\n\nあなたの評価は他のユーザーの参考になります。');
+                    selectedRating = 0;
+                    ratingButtons.forEach(btn => { btn.classList.remove('active'); btn.style.color = '#ddd'; });
+                    loadRatings(); // 一覧と平均を更新
+                } else {
+                    alert((res && res.message) || '評価の投稿に失敗しました。');
+                }
+            });
+        }
+
+        // ==== コメント投稿（ログイン必須・Firestoreに保存） ====
+        const commentForm = document.getElementById('commentForm');
+        const commentName = document.getElementById('commentName');
+        const commentText = document.getElementById('commentText');
+        const commentSubmitBtn = document.getElementById('commentSubmitBtn');
+        const commentLoginNote = document.getElementById('commentLoginNote');
+        const commentFormTitle = document.getElementById('commentFormTitle');
+
+        // Firebase の認証状態を直接確認してフォームを有効化（localStorage非依存）
+        async function initCommentForm() {
+            if (typeof GegenPressAPI === 'undefined') return;
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) { return; }
+            if (!user) return; // 未ログイン: 案内表示のまま
+
+            commentForm.style.opacity = '1';
+            commentFormTitle.style.color = '#e63946';
+            commentLoginNote.style.display = 'none';
+            commentName.disabled = false;
+            commentText.disabled = false;
+            commentSubmitBtn.disabled = false;
+            commentSubmitBtn.style.opacity = '1';
+            commentSubmitBtn.style.cursor = 'pointer';
+            commentSubmitBtn.textContent = 'コメントを投稿';
+            if (user.displayName && !commentName.value) commentName.value = user.displayName;
+
+            commentSubmitBtn.addEventListener('click', async function () {
+                const text = (commentText.value || '').trim();
+                if (!text) { alert('コメントを入力してください'); return; }
+                commentSubmitBtn.disabled = true;
+                commentSubmitBtn.textContent = '投稿中...';
+                const res = await GegenPressAPI.comments.create(
+                    articleId, text, null, (commentName.value || '').trim() || null
+                );
+                commentSubmitBtn.disabled = false;
+                commentSubmitBtn.textContent = 'コメントを投稿';
+                if (res && res.success) {
+                    commentText.value = '';
+                    loadComments();
+                } else {
+                    alert((res && res.message) || 'コメントの投稿に失敗しました');
+                }
+            });
+        }
+        initCommentForm();
+
+        // ==== サムネイル設定（ログイン中のみボタン表示・保存可否はサーバー側が判定） ====
+        async function initThumbButton() {
+            if (typeof GegenPressAPI === 'undefined') return;
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) { return; }
+            if (!user) return;
+            document.getElementById('thumbSetRow').style.display = 'block';
+
+            const btn = document.getElementById('setThumbBtn');
+            const input = document.getElementById('thumbFileInput');
+            btn.addEventListener('click', () => input.click());
+            input.addEventListener('change', async function () {
+                const file = this.files && this.files[0];
+                this.value = '';
+                if (!file) return;
+                if (!file.type || file.type.indexOf('image/') !== 0) { alert('画像ファイルを選択してください'); return; }
+                btn.disabled = true; btn.textContent = '処理中...';
+                try {
+                    const dataUrl = await fileToJpeg(file, 640);
+                    const res = await GegenPressAPI.articles.update(articleId, { image: dataUrl });
+                    if (res && res.success) {
+                        if (currentArticle) { currentArticle.image = dataUrl; }
+                        loadArticle(); // 再描画
+                        alert('サムネイルを設定しました');
+                    } else {
+                        alert((res && res.message && String(res.message).indexOf('permission') >= 0)
+                            ? 'この記事のサムネイルを変更する権限がありません（記事の投稿者、または管理者のみ変更できます）'
+                            : ((res && res.message) || 'サムネイルの保存に失敗しました'));
+                    }
+                } catch (e) {
+                    alert('サムネイルの設定中にエラーが発生しました: ' + (e.message || e));
+                }
+                btn.disabled = false; btn.textContent = 'サムネイルを設定';
+            });
+        }
+        initThumbButton();
+
+        // 画像を幅指定で縮小してJPEG(dataURL)に変換（縦横比は維持）
+        function fileToJpeg(file, maxWidth) {
+            return new Promise(function (resolve, reject) {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('ファイルを読み込めませんでした'));
+                reader.onload = function () {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error('画像として読み込めませんでした'));
+                    img.onload = function () {
+                        try {
+                            const w = Math.min(img.width, maxWidth);
+                            const h = Math.round(img.height * w / img.width);
+                            const canvas = document.createElement('canvas');
+                            canvas.width = w; canvas.height = h;
+                            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                            let q = 0.82;
+                            let out = canvas.toDataURL('image/jpeg', q);
+                            while (out.length > 260000 && q > 0.4) { q -= 0.1; out = canvas.toDataURL('image/jpeg', q); }
+                            if (out.length > 400000) { reject(new Error('画像が大きすぎます。別の画像でお試しください')); return; }
+                            resolve(out);
+                        } catch (e) { reject(e); }
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ==== コメント一覧の読み込み ====
+        async function loadComments() {
+            if (typeof GegenPressAPI === 'undefined') return;
+            try {
+                const res = await GegenPressAPI.comments.getByArticle(articleId);
+                if (!res || !res.success) return;
+                const comments = res.comments || [];
+                document.getElementById('ratingCountTitle').textContent = 'コメント (' + comments.length + ')';
+                const listEl = document.getElementById('commentsList');
+                if (comments.length === 0) {
+                    listEl.innerHTML = '<p style="color:#999; font-size:14px;">まだコメントがありません。最初のコメントを投稿してみましょう。</p>';
+                    return;
+                }
+                const sorted = comments.slice().sort((a, b) => {
+                    const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                    const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                    return tb - ta;
+                });
+                listEl.innerHTML = sorted.map(c =>
+                    '<div class="comment">' +
+                        '<div class="comment-header">' +
+                            '<div><div class="comment-author">' + esc(c.username || '匿名ユーザー') + '</div>' +
+                                '<div class="comment-time">' + esc(fmtDate(c.createdAt)) + '</div></div>' +
+                            (c.rating ? '<div class="comment-rating">' + starsHtml(c.rating) + '</div>' : '') +
+                        '</div>' +
+                        '<div class="comment-text">' + esc(c.content || '') + '</div>' +
+                    '</div>'
+                ).join('');
+            } catch (e) {
+                console.warn('コメントの読み込みに失敗:', e);
+            }
+        }
+
+        // ==== 評価の集計（件数・平均をヘッダーとサイドバーに反映） ====
+        async function loadRatings() {
+            if (typeof GegenPressAPI === 'undefined') return;
+            try {
+                const res = await GegenPressAPI.ratings.getByArticle(articleId);
+                if (!res || !res.success) return;
+                const ratings = res.ratings || [];
+                const count = ratings.length;
+                const avg = count > 0 ? (ratings.reduce((s, r) => s + (r.rating || 0), 0) / count) : 0;
+
+                document.getElementById('infoRatingCount').textContent = count;
+                document.getElementById('infoAvgRating').textContent = count > 0 ? (avg.toFixed(1) + ' / 5.0') : 'まだ評価なし';
+                if (count > 0) {
+                    document.getElementById('articleStars').innerHTML = starsHtml(avg);
+                }
+            } catch (e) {
+                console.warn('評価集計の読み込みに失敗:', e);
+            }
+        }
+
+        // ==== 記事本体の読み込み ====
+        async function loadArticle() {
+            if (typeof GegenPressAPI === 'undefined') return; // 見本のまま
+            try {
+                const res = await GegenPressAPI.articles.getById(articleId);
+                if (!res || !res.success || !res.article) {
+                    console.warn('記事の読み込みに失敗、見本データを表示します:', res && res.message);
+                    return;
+                }
+                const a = res.article;
+                currentArticle = a;
+
+                document.getElementById('articleTitle').textContent = a.title || '';
+                document.title = (a.title || 'Gegen Press!') + ' - Gegen Press!';
+
+                document.getElementById('authorAvatar').textContent = getInitials(a.authorName);
+                document.getElementById('authorAvatar').setAttribute('style', avatarStyle(a.authorName));
+                document.getElementById('authorName').textContent = a.authorName || '';
+                document.getElementById('authorHandle').textContent = '';
+                document.getElementById('authorSection').onclick = function () {
+                    window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
+                };
+                document.getElementById('sideAuthorLink').href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
+                document.getElementById('sideAuthorName').textContent = a.authorName || '';
+                document.getElementById('sideAuthorOutlet').textContent = '';
+                document.getElementById('sideAuthorScore').textContent = (a.authorScore || 0) + '/100';
+
+                document.getElementById('articleTime').textContent = fmtDate(a.createdAt);
+
+                if (typeof a.trustScore === 'number') {
+                    document.getElementById('ratingPercent').textContent = '信頼度: ' + a.trustScore + '%';
+                    document.getElementById('infoTrust').textContent = a.trustScore + '%';
+                }
+                document.getElementById('articleStars').innerHTML = starsHtml(a.averageRating);
+
+                document.getElementById('infoViews').textContent = (a.views || 0).toLocaleString();
+
+                // 本文（サムネイル＋改行を段落として表示）
+                const bodyEl = document.getElementById('articleContent');
+                const text = a.content || a.description || '';
+                const thumbHtml = a.image
+                    ? '<img src="' + a.image + '" alt="" style="width:100%; max-height:340px; object-fit:cover; border-radius:8px; margin-bottom:16px; display:block;">'
+                    : '';
+                if (text || thumbHtml) {
+                    bodyEl.innerHTML = thumbHtml + text.split(/\n+/).filter(Boolean).map(p => '<p>' + esc(p) + '</p>').join('');
+                }
+
+                loadRatings();
+                loadComments();
+                loadRelated(a);
+            } catch (e) {
+                console.warn('記事読み込みエラー、見本データを表示します:', e);
+            }
+        }
+
+        // ==== 関連記事（同じ記者の他の記事、最大4件） ====
+        async function loadRelated(article) {
+            const wrap = document.getElementById('relatedArticles');
+            if (typeof GegenPressAPI === 'undefined') { wrap.innerHTML = ''; return; }
+            try {
+                const res = await GegenPressAPI.reporters.getArticles(article.authorId);
+                if (!res || !res.success) { wrap.innerHTML = ''; return; }
+                const others = (res.articles || []).filter(a => a.id !== articleId).slice(0, 4);
+                if (others.length === 0) {
+                    wrap.innerHTML = '<p style="color:#999; font-size:13px;">関連記事はありません。</p>';
+                    return;
+                }
+                wrap.innerHTML = others.map(a =>
+                    '<div class="related-article" style="cursor:pointer;" data-id="' + esc(a.id) + '">' +
+                        '<div class="related-article-title">' + esc(a.title) + '</div>' +
+                        '<div class="related-article-author">' + esc(a.authorName || '') + '</div>' +
+                    '</div>'
+                ).join('');
+                wrap.querySelectorAll('.related-article').forEach(el => {
+                    el.addEventListener('click', () => {
+                        window.location.href = 'gegen_press_article_detail.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                    });
+                });
+            } catch (e) {
+                wrap.innerHTML = '';
+            }
+        }
+
+        loadArticle();
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイページ - Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+            background-color: #f5f5f5; color: #333;
+        }
+        header {
+            background: #fff; padding: 14px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 3px solid #e63946;
+        }
+        .logo { text-decoration: none; }
+        .header-nav { display: flex; align-items: center; gap: 18px; }
+        .nav-link { color: #333; text-decoration: none; font-size: 14px; font-weight: bold; }
+        .nav-link:hover { color: #e63946; }
+        .back-button {
+            background: #e63946; color: #fff; text-decoration: none;
+            padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: bold;
+        }
+        .container { max-width: 640px; margin: 30px auto; padding: 0 16px; }
+        .card {
+            background: #fff; border-radius: 10px; padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 16px;
+        }
+        .card h2 {
+            font-size: 16px; color: #e63946; margin-bottom: 16px;
+            border-left: 4px solid #e63946; padding-left: 10px;
+        }
+        .account-row { display: flex; align-items: center; gap: 18px; }
+        .my-avatar {
+            width: 88px; height: 88px; border-radius: 50%;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            color: #fff; font-size: 30px; font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; flex-shrink: 0;
+        }
+        .my-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .account-info h3 { font-size: 18px; margin-bottom: 4px; }
+        .account-info p { font-size: 13px; color: #888; }
+        .btn {
+            display: inline-block; border: none; border-radius: 6px;
+            padding: 9px 16px; font-size: 13px; font-weight: bold; cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-red { background: #e63946; color: #fff; }
+        .btn-white { background: #fff; color: #333; border: 1px solid #ccc; }
+        .btn-row { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .menu-list a {
+            display: block; padding: 12px 4px; color: #333; text-decoration: none;
+            font-size: 14px; border-bottom: 1px solid #eee;
+        }
+        .menu-list a:last-child { border-bottom: none; }
+        .menu-list a:hover { color: #e63946; }
+        #notLoggedIn { text-align: center; padding: 40px 20px; }
+        #notLoggedIn p { color: #666; font-size: 14px; margin-bottom: 18px; }
+
+        /* ===== コンパクトヘッダー（モバイル・小画面用の上書き） ===== */
+        @media (max-width: 768px) {
+            header { padding: 8px 14px !important; gap: 6px !important; }
+            .logo img { height: 26px !important; }
+            .nav-link { font-size: 12px !important; }
+            .back-button { padding: 5px 10px !important; font-size: 12px !important; white-space: nowrap !important; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="gegen_press_top.html" class="logo"><img src="logo.png" alt="Gegen Press!" style="height:46px;width:auto;display:block;"></a>
+        <div class="header-nav">
+            <a href="gegen_press_ranking.html" class="nav-link">ランキング</a>
+            <a href="gegen_press_category.html" class="nav-link">記事一覧</a>
+            <a href="gegen_press_top.html" class="back-button">トップに戻る</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 未ログイン表示 -->
+        <div class="card" id="notLoggedIn" style="display:none;">
+            <p>マイページの利用にはログインが必要です。</p>
+            <a href="gegen_press_login.html" class="btn btn-red">ログイン / 新規登録</a>
+        </div>
+
+        <!-- ログイン済み表示 -->
+        <div id="loggedIn" style="display:none;">
+            <div class="card">
+                <h2>アカウント</h2>
+                <div class="account-row">
+                    <div class="my-avatar" id="myAvatar">?</div>
+                    <div class="account-info">
+                        <h3 id="myName">-</h3>
+                        <p id="myEmail">-</p>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-red" id="setMyIconBtn">アイコンを設定</button>
+                    <input type="file" id="myIconFile" accept="image/*" style="display:none;">
+                    <button class="btn btn-white" id="logoutBtn">ログアウト</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>メニュー</h2>
+                <div class="menu-list">
+                    <a href="gegen_press_add_reporter.html">記者を追加する</a>
+                    <a href="gegen_press_ranking.html">記者ランキングを見る</a>
+                    <a href="gegen_press_category.html">記事一覧を見る</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = String(name).trim().split(/\s+/).filter(p => /[A-Za-z0-9\u00C0-\u024F\u3040-\u30FF\u4E00-\u9FFF]/.test(p.charAt(0)));
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            const one = parts[0] || String(name).trim();
+            return one.substring(0, 2).toUpperCase();
+        }
+
+        let myUid = null;
+
+        function fileToSquareJpeg(file, size) {
+            return new Promise(function (resolve, reject) {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('ファイルを読み込めませんでした'));
+                reader.onload = function () {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error('画像として読み込めませんでした'));
+                    img.onload = function () {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = size; canvas.height = size;
+                            const ctx = canvas.getContext('2d');
+                            const s = Math.min(img.width, img.height);
+                            ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+                            let q = 0.85;
+                            let out = canvas.toDataURL('image/jpeg', q);
+                            while (out.length > 140000 && q > 0.4) { q -= 0.1; out = canvas.toDataURL('image/jpeg', q); }
+                            if (out.length > 200000) { reject(new Error('画像が大きすぎます')); return; }
+                            resolve(out);
+                        } catch (e) { reject(e); }
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderMyAvatar(profileImage, name) {
+            const el = document.getElementById('myAvatar');
+            if (profileImage) {
+                el.innerHTML = '<img src="' + profileImage + '" alt="">';
+                el.style.background = 'none';
+            } else {
+                el.textContent = getInitials(name);
+            }
+        }
+
+        async function initMyPage() {
+            if (typeof GegenPressAPI === 'undefined') {
+                document.getElementById('notLoggedIn').style.display = 'block';
+                return;
+            }
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+            if (!user) {
+                document.getElementById('notLoggedIn').style.display = 'block';
+                return;
+            }
+            myUid = user.uid;
+            document.getElementById('loggedIn').style.display = 'block';
+            document.getElementById('myName').textContent = user.displayName || '（名前未設定）';
+            document.getElementById('myEmail').textContent = user.email || '';
+
+            // 保存済みアイコンを読み込み
+            let profileImage = null;
+            try {
+                const res = await GegenPressAPI.users.get(user.uid);
+                if (res && res.success && res.user) {
+                    profileImage = res.user.profileImage || null;
+                    if (res.user.username) document.getElementById('myName').textContent = res.user.username;
+                }
+            } catch (e) {}
+            renderMyAvatar(profileImage, user.displayName || user.email);
+        }
+
+        document.getElementById('setMyIconBtn').addEventListener('click', () => {
+            document.getElementById('myIconFile').click();
+        });
+        document.getElementById('myIconFile').addEventListener('change', async function () {
+            const file = this.files && this.files[0];
+            this.value = '';
+            if (!file || !myUid) return;
+            if (!file.type || file.type.indexOf('image/') !== 0) { alert('画像ファイルを選択してください'); return; }
+            const btn = document.getElementById('setMyIconBtn');
+            btn.disabled = true; btn.textContent = '処理中...';
+            try {
+                const dataUrl = await fileToSquareJpeg(file, 256);
+                const res = await GegenPressAPI.users.update(myUid, { profileImage: dataUrl });
+                if (res && res.success) {
+                    renderMyAvatar(dataUrl, null);
+                    alert('アイコンを設定しました');
+                } else {
+                    alert((res && res.message) || 'アイコンの保存に失敗しました');
+                }
+            } catch (e) {
+                alert('アイコンの設定中にエラーが発生しました: ' + (e.message || e));
+            }
+            btn.disabled = false; btn.textContent = 'アイコンを設定';
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try { await GegenPressAPI.auth.logout(); } catch (e) {}
+            try {
+                localStorage.removeItem('gegenPressToken');
+                localStorage.removeItem('gegenPressUserId');
+            } catch (e) {}
+            window.location.href = 'gegen_press_top.html';
+        });
+
+        initMyPage();
+    </script>
+</body>
+</html>

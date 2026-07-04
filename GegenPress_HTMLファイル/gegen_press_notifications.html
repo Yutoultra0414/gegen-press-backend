@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知 | Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* ヘッダー */
+        header {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border-bottom: 3px solid #e63946;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: #e63946;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #e63946;
+        }
+
+        .back-button {
+            background-color: #e63946;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #ff6b6b;
+        }
+
+        /* ページタイトル */
+        .page-title-section {
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-title-section::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .page-title-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            color: #fff;
+        }
+
+        /* コンテナ */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        /* フィルターセクション */
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background-color: #fff;
+            color: #333;
+            border: 2px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+
+        .filter-btn:hover {
+            border-color: #e63946;
+            color: #e63946;
+        }
+
+        .filter-btn.active {
+            background-color: #e63946;
+            border-color: #e63946;
+            color: #fff;
+        }
+
+        /* アクション */
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            background-color: transparent;
+            border: 2px solid #ddd;
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .action-btn:hover {
+            border-color: #e63946;
+            color: #e63946;
+        }
+
+        /* 通知一覧 */
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .notification-item {
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            border: 2px solid #ddd;
+            border-left: 4px solid #e63946;
+            border-radius: 6px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            position: relative;
+        }
+
+        .notification-item:hover {
+            border-color: #e63946;
+            box-shadow: 0 6px 16px rgba(230, 57, 70, 0.1);
+        }
+
+        .notification-item.unread {
+            background: linear-gradient(135deg, rgba(230, 57, 70, 0.08) 0%, transparent 100%);
+            border-left-color: #e63946;
+        }
+
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            background-color: #e63946;
+            border-radius: 50%;
+        }
+
+        .notification-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 6px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .notification-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notification-time {
+            color: #999;
+        }
+
+        .notification-type {
+            background-color: rgba(230, 57, 70, 0.15);
+            color: #e63946;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .notification-actions-btn {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .action-small-btn {
+            background-color: transparent;
+            border: 1px solid #ddd;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+
+        .action-small-btn:hover {
+            border-color: #e63946;
+            color: #e63946;
+        }
+
+        /* 空状態 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-description {
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* ページネーション */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            background-color: #fff;
+            color: #333;
+            border: 2px solid #ddd;
+            padding: 10px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .pagination-btn:hover {
+            border-color: #e63946;
+            color: #e63946;
+        }
+
+        .pagination-btn.active {
+            background-color: #e63946;
+            border-color: #e63946;
+            color: #fff;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .page-title-section {
+                padding: 40px 20px;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-buttons {
+                width: 100%;
+            }
+
+            .notification-item {
+                flex-direction: column;
+            }
+
+            .notification-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .notification-actions {
+                justify-content: flex-start;
+            }
+        }
+    
+        /* ===== コンパクトヘッダー（モバイル・小画面用の上書き） ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 14px !important;
+            }
+            .logo img { height: 26px !important; }
+            .header-nav {
+                width: auto !important;
+                gap: 10px !important;
+                justify-content: flex-end !important;
+            }
+            .header-nav a, .nav-link {
+                font-size: 12px !important;
+                padding: 3px 4px !important;
+                white-space: nowrap !important;
+            }
+            .back-button {
+                padding: 5px 10px !important;
+                font-size: 12px !important;
+                white-space: nowrap !important;
+            }
+            .search-bar {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 6px 12px !important;
+                font-size: 13px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <a href="gegen_press_top.html" class="logo"><img src="logo.png" alt="Gegen Press!" style="height:46px;width:auto;display:block;"></a>
+        <div class="header-nav">
+            <a href="gegen_press_top.html" class="nav-link">ホーム</a>
+            <a href="#" class="nav-link">通知</a>
+            <a href="gegen_press_top.html"><button class="back-button">トップに戻る</button></a>
+        </div>
+    </header>
+
+    <!-- ページタイトル -->
+    <section class="page-title-section">
+        <div class="page-title-content">
+            <h1 class="page-title">通知</h1>
+            <p class="page-subtitle">コメント、フォロー、新記事の最新情報をチェック</p>
+        </div>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <div class="container">
+        <!-- フィルターセクション -->
+        <div class="filter-section">
+            <span class="filter-label">フィルター:</span>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">すべて</button>
+                <button class="filter-btn" data-filter="comments">コメント返信</button>
+                <button class="filter-btn" data-filter="follows">フォロー</button>
+                <button class="filter-btn" data-filter="articles">新記事</button>
+                <button class="filter-btn" data-filter="system">システム</button>
+            </div>
+        </div>
+
+        <!-- アクション -->
+        <div class="notification-actions">
+            <button class="action-btn">すべてを既読にする</button>
+            <button class="action-btn">削除</button>
+        </div>
+
+        <!-- 通知一覧 -->
+        <div class="notifications-list">
+            <!-- 通知1 - コメント返信 -->
+            <div class="notification-item unread">
+                <div class="notification-icon">💬</div>
+                <div class="notification-content">
+                    <div class="notification-title">新しいコメント返信</div>
+                    <div class="notification-message">
+                        サッカーファン太郎さんから、「マンチェスター・シティが超大型補強を発表」への返信がありました。
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">1分前</span>
+                        <span class="notification-type">コメント</span>
+                    </div>
+                    <div class="notification-actions-btn">
+                        <button class="action-small-btn">返信を確認</button>
+                        <button class="action-small-btn">削除</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 通知2 - フォロー -->
+            <div class="notification-item unread">
+                <div class="notification-icon">⭐</div>
+                <div class="notification-content">
+                    <div class="notification-title">新しいフォロワー</div>
+                    <div class="notification-message">
+                        Football Analytics Proさんがあなたをフォローしました。プロフィールを確認して、フォローバックできます。
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">15分前</span>
+                        <span class="notification-type">フォロー</span>
+                    </div>
+                    <div class="notification-actions-btn">
+                        <button class="action-small-btn">プロフィール確認</button>
+                        <button class="action-small-btn">削除</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 通知3 - フォロー中の記者の新記事 -->
+            <div class="notification-item unread">
+                <div class="notification-icon">📰</div>
+                <div class="notification-content">
+                    <div class="notification-title">フォロー中の記者から新記事</div>
+                    <div class="notification-message">
+                        Fabrizio Romanoさんが「ユナイテッド、レアル・マドリーのスター選手を獲得か」を投稿しました。
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">1時間前</span>
+                        <span class="notification-type">新記事</span>
+                    </div>
+                    <div class="notification-actions-btn">
+                        <button class="action-small-btn">記事を読む</button>
+                        <button class="action-small-btn">削除</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 通知4 - 評価への反応 -->
+            <div class="notification-item">
+                <div class="notification-icon">👍</div>
+                <div class="notification-content">
+                    <div class="notification-title">あなたの評価が参考になりました</div>
+                    <div class="notification-message">
+                        あなたが投稿した「マンチェスター・シティが超大型補強を発表」への評価が他のユーザーに参考になりました。（現在20人が参考にしています）
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">3時間前</span>
+                        <span class="notification-type">評価</span>
+                    </div>
+                    <div class="notification-actions-btn">
+                        <button class="action-small-btn">削除</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 通知5 - カテゴリの新記事 -->
+            <div class="notification-item">
+                <div class="notification-icon">📂</div>
+                <div class="notification-content">
+                    <div class="notification-title">フォローしているカテゴリに新記事</div>
+                    <div class="notification-message">
+                        「移籍情報」カテゴリに新しい記事が5件投稿されました。最新情報をチェックしましょう。
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">5時間前</span>
+                        <span class="notification-type">カテゴリ</span>
+                    </div>
+                    <div class="notification-actions-btn">
+                        <button class="action-small-btn">カテゴリを開く</button>
+                        <button class="action-small-btn">削除</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 通知6 - システム通知 -->
+            <div class="notification-item">
+                <div class="notification-icon">⚙️</div>
+                <div class="notification-content">
+                    <div class="notification-title">プロフィール更新</div>
+                    <div class="notification-message">
+                        あなたのプロフィール情報が正常に更新されました。変更内容はいつでもプロフィール編集から確認できます。
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">1日前</span>
+                        <span class="notification-type">システム</span>
+                    </div>
+                    <div class="notification-actions-btn">
+                        <button class="action-small-btn">削除</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 通知7 - システム通知 -->
+            <div class="notification-item">
+                <div class="notification-icon">📧</div>
+                <div class="notification-content">
+                    <div class="notification-title">メール設定が更新されました</div>
+                    <div class="notification-message">
+                        通知設定から、メール受信の設定を変更できます。新記事通知の頻度なども調整可能です。
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">2日前</span>
+                        <span class="notification-type">システム</span>
+                    </div>
+                    <div class="notification-actions-btn">
+                        <button class="action-small-btn">設定を変更</button>
+                        <button class="action-small-btn">削除</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 通知8 - コメント返信 -->
+            <div class="notification-item">
+                <div class="notification-icon">💬</div>
+                <div class="notification-content">
+                    <div class="notification-title">新しいコメント返信</div>
+                    <div class="notification-message">
+                        移籍マニアさんから、「PSG、フランス代表MFの争奪戦に勝利」への返信がありました。
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">3日前</span>
+                        <span class="notification-type">コメント</span>
+                    </div>
+                    <div class="notification-actions-btn">
+                        <button class="action-small-btn">返信を確認</button>
+                        <button class="action-small-btn">削除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ページネーション -->
+        <div class="pagination">
+            <button class="pagination-btn" disabled>前へ</button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <button class="pagination-btn">次へ</button>
+        </div>
+    </div>
+
+    <script>
+        // フィルター機能
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.getAttribute('data-filter');
+                console.log('Filter changed to:', filter);
+            });
+        });
+
+        // 通知クリック
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (!e.target.closest('.action-small-btn')) {
+                    // 通知を既読にする
+                    this.classList.remove('unread');
+                    console.log('Notification marked as read');
+                }
+            });
+        });
+
+        // アクションボタン
+        document.querySelectorAll('.action-small-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const text = this.textContent.trim();
+                console.log('Action:', text);
+            });
+        });
+
+        // ページネーション
+        document.querySelectorAll('.pagination-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.disabled && !this.classList.contains('active')) {
+                    console.log('Page changed to:', this.textContent);
+                }
+            });
+        });
+
+        // すべてを既読にする
+        document.querySelector('.notification-actions .action-btn:first-child').addEventListener('click', function() {
+            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                item.classList.remove('unread');
+            });
+            alert('すべての通知が既読になりました');
+        });
+    </script>
+</body>
+</html>
