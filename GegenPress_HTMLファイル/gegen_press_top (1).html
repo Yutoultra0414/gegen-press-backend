@@ -181,17 +181,41 @@
 
         /* ピックアップ記事 */
         .pickup-articles {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
+            display: flex;
+            overflow-x: auto;
+            gap: 14px;
             margin-bottom: 40px;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .pickup-articles .pickup-card {
+            flex: 0 0 260px;
+            max-width: 260px;
+        }
+        .pickup-thumb {
+            width: 100%;
+            height: 140px;
+            border-radius: 8px 8px 0 0;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            font-weight: bold;
+            overflow: hidden;
+        }
+        .pickup-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .pickup-card {
             background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
             border: 2px solid #e63946;
             border-radius: 8px;
-            padding: 30px;
+            padding: 0;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -540,6 +564,40 @@
         .pickup-label {
             animation: pulse 2s infinite;
         }
+    
+        /* ===== コンパクトヘッダー（モバイル・小画面用の上書き） ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 14px !important;
+            }
+            .logo img { height: 26px !important; }
+            .header-nav {
+                width: auto !important;
+                gap: 10px !important;
+                justify-content: flex-end !important;
+            }
+            .header-nav a, .nav-link {
+                font-size: 12px !important;
+                padding: 3px 4px !important;
+                white-space: nowrap !important;
+            }
+            .back-button {
+                padding: 5px 10px !important;
+                font-size: 12px !important;
+                white-space: nowrap !important;
+            }
+            .search-bar {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 6px 12px !important;
+                font-size: 13px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -551,6 +609,7 @@
             <a href="gegen_press_ranking.html" class="nav-link">ランキング</a>
             <a href="gegen_press_category.html" class="nav-link">記事一覧</a>
             <a href="gegen_press_add_reporter.html" class="nav-link">記者を追加</a>
+            <a href="gegen_press_user_profile.html" style="background:#e63946; color:#fff; padding:8px 16px; border-radius:6px; font-size:14px; font-weight:bold; text-decoration:none; white-space:nowrap;">マイページ</a>
             <input type="text" class="search-bar" id="homeSearch" placeholder="検索..." autocomplete="off">
         </div>
     </header>
@@ -828,8 +887,7 @@
 
     <!-- フッター -->
     <footer>
-        <p>&copy; 2024 Gegen Press! All Rights Reserved.</p>
-        <p>海外サッカー記者の報道を一元管理 | ファンと運営による信ぴょう性評価</p>
+        <p>&copy; 2026 Gegen Press! All Rights Reserved.</p>
         <div class="footer-links">
             <a href="#">利用規約</a>
             <a href="#">プライバシーポリシー</a>
@@ -973,35 +1031,32 @@
                 console.warn('記者の読み込みに失敗、見本を表示します:', e);
             }
 
-            // 速報（閲覧数の多い記事 上位2件）
+            // 速報（閲覧数の多い記事 上位8件・横スクロール）
             try {
                 const ares = await GegenPressAPI.articles.getAll();
                 if (ares && ares.success && ares.articles && ares.articles.length > 0) {
                     const wrap = document.getElementById('pickupArticles');
                     wrap.innerHTML = '';
-                    ares.articles.slice(0, 2).forEach(a => {
+                    ares.articles.slice(0, 8).forEach(a => {
                         const rep = reporterMap[a.authorId] || {};
-                        const handle = rep.twitterHandle ? esc(rep.twitterHandle) : '';
                         const div = document.createElement('div');
                         div.className = 'pickup-card';
                         div.setAttribute('data-article-id', a.id);
                         div.style.cursor = 'pointer';
                         const t = timeAgo(a.createdAt);
+                        const thumb = a.image
+                            ? '<div class="pickup-thumb"><img src="' + a.image + '" alt=""></div>'
+                            : '<div class="pickup-thumb">' + esc(a.category || 'Gegen Press!') + '</div>';
                         div.innerHTML =
-                            '<div class="pickup-card-content">' +
-                                '<div class="pickup-label">' + esc(a.category || '速報') + '</div>' +
-                                '<h3 class="pickup-title">' + esc(a.title) + '</h3>' +
-                                '<div class="pickup-meta">' +
-                                    '<div class="pickup-author">' +
+                            thumb +
+                            '<div class="pickup-card-content" style="padding:12px 14px;">' +
+                                '<h3 class="pickup-title" style="font-size:14px; line-height:1.5; margin-bottom:8px;">' + esc(a.title) + '</h3>' +
+                                '<div class="pickup-meta" style="margin-bottom:0;">' +
+                                    '<div class="pickup-author" style="gap:6px;">' +
                                         avatarHtml('author-avatar', a.authorName, rep.profileImage) +
-                                        '<div class="author-info"><h4>' + esc(a.authorName || '') + '</h4><p>' + handle + '</p></div>' +
+                                        '<div class="author-info"><h4 style="font-size:12px;">' + esc(a.authorName || '') + '</h4></div>' +
                                     '</div>' +
-                                    (t ? '<div class="pickup-time">' + esc(t) + '</div>' : '') +
-                                '</div>' +
-                                '<div class="pickup-description">' + esc(a.description || '') + '</div>' +
-                                '<div class="pickup-rating">' +
-                                    '<div class="stars">' + starsHtml(a.averageRating) + '</div>' +
-                                    (typeof a.trustScore === 'number' ? '<span class="rating-text">信頼度: ' + a.trustScore + '%</span>' : '') +
+                                    (t ? '<div class="pickup-time" style="font-size:11px;">' + esc(t) + '</div>' : '') +
                                 '</div>' +
                             '</div>';
                         div.addEventListener('click', () => goArticle(a.id));
