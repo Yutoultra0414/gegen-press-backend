@@ -363,9 +363,77 @@
         }
 
         .reporters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e3e3e3;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .reporter-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .reporter-row:last-child { border-bottom: none; }
+        .reporter-row:nth-child(even) { background: #fafafa; }
+        .reporter-row:hover { background: #fdecec; }
+
+        .reporter-row-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 900;
+            overflow: hidden;
+        }
+        .reporter-row-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        .reporter-row-name {
+            flex: 1;
+            min-width: 0;
+        }
+        .reporter-row-name h3 {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1a0dab;
+            margin-bottom: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .reporter-row-name p {
+            font-size: 11px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .reporter-row-stat {
+            width: 64px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .reporter-row-stat .val {
+            font-size: 13px;
+            font-weight: bold;
+            color: #333;
+        }
+        .reporter-row-stat .lbl {
+            font-size: 9px;
+            color: #999;
+            text-transform: uppercase;
         }
 
         .reporter-card {
@@ -563,9 +631,8 @@
                 font-size: 24px;
             }
 
-            .reporters-grid {
-                grid-template-columns: 1fr;
-            }
+            .reporter-row-name h3 { font-size: 12px; }
+            .reporter-row-stat { width: 48px; }
         }
 
         /* アニメーション */
@@ -623,6 +690,7 @@
             <a href="gegen_press_category.html" class="nav-link">記事一覧</a>
             <a href="gegen_press_add_reporter.html" class="nav-link">記者を追加</a>
             <a href="gegen_press_write_article.html" class="nav-link">記事を投稿</a>
+            <a href="gegen_press_players.html" class="nav-link">選手一覧</a>
             <a href="gegen_press_user_profile.html" style="background:#e63946; color:#fff; padding:8px 16px; border-radius:6px; font-size:14px; font-weight:bold; text-decoration:none; white-space:nowrap;">マイページ</a>
             <input type="text" class="search-bar" id="homeSearch" placeholder="検索..." autocomplete="off">
         </div>
@@ -713,188 +781,26 @@
         <div class="container">
             <h2 class="section-title">トップ記者たち</h2>
 
-            <div class="reporters-grid" id="reportersGrid">
-                <!-- 記者1 -->
-                <!-- 記者1 -->
-                <div class="reporter-card" data-reporter-id="rep_fabrizio">
-                    <div class="reporter-header">
-                        <div class="reporter-avatar">F</div>
-                        <div class="reporter-info">
-                            <h3>Fabrizio Romano</h3>
-                            <p>移籍情報のスペシャリスト</p>
-                        </div>
-                    </div>
-                    <div class="reporter-score">
-                        96/100
-                        <div class="reporter-score-label">信ぴょう性スコア</div>
-                    </div>
-                    <div class="reporter-stats">
-                        <div class="stat">
-                            <div class="stat-number">284</div>
-                            <div class="stat-label">記事数</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">4.8</div>
-                            <div class="stat-label">平均評価</div>
-                        </div>
-                    </div>
-                    <div class="reporter-description">
-                        世界中の移籍情報を独占報道。スクープ力で定評があり、ファンからの信頼が厚い記者です。
-                    </div>
-                    <button class="reporter-button">プロフィール</button>
-                </div>
-
-                <!-- 記者2 -->
-                <div class="reporter-card" data-reporter-id="rep_marca">
-                    <div class="reporter-header">
-                        <div class="reporter-avatar">M</div>
-                        <div class="reporter-info">
-                            <h3>Marca Sports</h3>
-                            <p>スペインサッカー専門</p>
-                        </div>
-                    </div>
-                    <div class="reporter-score">
-                        85/100
-                        <div class="reporter-score-label">信ぴょう性スコア</div>
-                    </div>
-                    <div class="reporter-stats">
-                        <div class="stat">
-                            <div class="stat-number">156</div>
-                            <div class="stat-label">記事数</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">4.3</div>
-                            <div class="stat-label">平均評価</div>
-                        </div>
-                    </div>
-                    <div class="reporter-description">
-                        スペインサッカー、特にレアル・マドリーとバルセロナの動向に詳しい専門記者です。
-                    </div>
-                    <button class="reporter-button">プロフィール</button>
-                </div>
-
-                <!-- 記者3 -->
-                <div class="reporter-card" data-reporter-id="rep_skysports">
-                    <div class="reporter-header">
-                        <div class="reporter-avatar">S</div>
-                        <div class="reporter-info">
-                            <h3>Sky Sports</h3>
-                            <p>プレミアリーグ専門</p>
-                        </div>
-                    </div>
-                    <div class="reporter-score">
-                        92/100
-                        <div class="reporter-score-label">信ぴょう性スコア</div>
-                    </div>
-                    <div class="reporter-stats">
-                        <div class="stat">
-                            <div class="stat-number">312</div>
-                            <div class="stat-label">記事数</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">4.7</div>
-                            <div class="stat-label">平均評価</div>
-                        </div>
-                    </div>
-                    <div class="reporter-description">
-                        イギリスの大手スポーツメディア。プレミアリーグの最新情報は随一の信頼性です。
-                    </div>
-                    <button class="reporter-button">プロフィール</button>
-                </div>
-
-                <!-- 記者4 -->
-                <div class="reporter-card" data-reporter-id="rep_goal">
-                    <div class="reporter-header">
-                        <div class="reporter-avatar">G</div>
-                        <div class="reporter-info">
-                            <h3>Goal.com</h3>
-                            <p>ヨーロッパ全域対応</p>
-                        </div>
-                    </div>
-                    <div class="reporter-score">
-                        78/100
-                        <div class="reporter-score-label">信ぴょう性スコア</div>
-                    </div>
-                    <div class="reporter-stats">
-                        <div class="stat">
-                            <div class="stat-number">289</div>
-                            <div class="stat-label">記事数</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">4.1</div>
-                            <div class="stat-label">平均評価</div>
-                        </div>
-                    </div>
-                    <div class="reporter-description">
-                        ヨーロッパ全体のサッカー情報をカバー。多角的な視点が特徴の総合記者です。
-                    </div>
-                    <button class="reporter-button">プロフィール</button>
-                </div>
-
-                <!-- 記者5 -->
-                <div class="reporter-card" data-reporter-id="rep_as">
-                    <div class="reporter-header">
-                        <div class="reporter-avatar">A</div>
-                        <div class="reporter-info">
-                            <h3>AS España</h3>
-                            <p>ラリーガ・スペイン</p>
-                        </div>
-                    </div>
-                    <div class="reporter-score">
-                        88/100
-                        <div class="reporter-score-label">信ぴょう性スコア</div>
-                    </div>
-                    <div class="reporter-stats">
-                        <div class="stat">
-                            <div class="stat-number">201</div>
-                            <div class="stat-label">記事数</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">4.5</div>
-                            <div class="stat-label">平均評価</div>
-                        </div>
-                    </div>
-                    <div class="reporter-description">
-                        スペインの主要紙による本格的なラリーガ報道。深い分析が好評です。
-                    </div>
-                    <button class="reporter-button">プロフィール</button>
-                </div>
-
-                <!-- 記者6 -->
-                <div class="reporter-card" data-reporter-id="rep_calcio">
-                    <div class="reporter-header">
-                        <div class="reporter-avatar">C</div>
-                        <div class="reporter-info">
-                            <h3>Calcio & Calcetti</h3>
-                            <p>セリエA専門</p>
-                        </div>
-                    </div>
-                    <div class="reporter-score">
-                        81/100
-                        <div class="reporter-score-label">信ぴょう性スコア</div>
-                    </div>
-                    <div class="reporter-stats">
-                        <div class="stat">
-                            <div class="stat-number">167</div>
-                            <div class="stat-label">記事数</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">4.2</div>
-                            <div class="stat-label">平均評価</div>
-                        </div>
-                    </div>
-                    <div class="reporter-description">
-                        イタリアンフットボールの専門家。セリエAの動向に精通しています。
-                    </div>
-                    <button class="reporter-button">プロフィール</button>
-                </div>
-            </div>
+            <div class="reporters-grid" id="reportersGrid"></div>
 
             <!-- ランキングへの導線 -->
             <div style="text-align: center; margin-top: 40px;">
                 <a href="gegen_press_ranking.html" style="display: inline-block; background: linear-gradient(135deg, #e63946 0%, #a4161a 100%); color: #fff; padding: 14px 40px; border-radius: 6px; font-weight: bold; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; transition: all 0.3s ease;"
                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(230,57,70,0.3)';"
                    onmouseout="this.style.transform=''; this.style.boxShadow='';">記者ランキングをすべて見る</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 選手・移籍情報（暫定デザイン。参考画像2枚目が届いたら本デザインに差し替え予定） -->
+    <section class="reporters-section" style="background:#f5f5f5;">
+        <div style="max-width:1200px; margin:0 auto;">
+            <h2 class="section-title">話題になっている選手・移籍</h2>
+            <div id="playersSection" style="border:1px solid #e3e3e3; border-radius:6px; overflow:hidden; background:#fff;">
+                <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
+            </div>
+            <div style="text-align:center; margin-top:16px;">
+                <a href="gegen_press_players.html" style="display:inline-block; background:linear-gradient(135deg, #e63946 0%, #a4161a 100%); color:#fff; padding:10px 28px; border-radius:6px; font-weight:bold; text-decoration:none; font-size:13px;">選手一覧をすべて見る</a>
             </div>
         </div>
     </section>
@@ -1019,25 +925,25 @@
 
                     const grid = document.getElementById('reportersGrid');
                     grid.innerHTML = '';
-                    rres.ranking.slice(0, 6).forEach(r => {
+                    rres.ranking.slice(0, 8).forEach(r => {
                         const div = document.createElement('div');
-                        div.className = 'reporter-card';
+                        div.className = 'reporter-row';
                         div.setAttribute('data-reporter-id', r.id);
                         const rating = (typeof r.averageRating === 'number') ? r.averageRating.toFixed(1) : '-';
+                        const avatarInner = r.profileImage
+                            ? '<img src="' + r.profileImage + '" alt="">'
+                            : esc(getInitials(r.name));
+                        const g = avatarColor(r.name);
+                        const avatarStyleAttr = r.profileImage ? '' : ('background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%);');
                         div.innerHTML =
-                            '<div class="reporter-header">' +
-                                avatarHtml('reporter-avatar', r.name, r.profileImage) +
-                                '<div class="reporter-info"><h3>' + esc(r.name) + '</h3><p>' + esc(r.mediaOutlet || '') + '</p></div>' +
+                            '<div class="reporter-row-avatar" style="' + avatarStyleAttr + '">' + avatarInner + '</div>' +
+                            '<div class="reporter-row-name">' +
+                                '<h3>' + esc(r.name) + '</h3>' +
+                                '<p>' + esc(r.mediaOutlet || '') + '</p>' +
                             '</div>' +
-                            '<div class="reporter-score">' + (r.trustScore || 0) + '/100' +
-                                '<div class="reporter-score-label">信ぴょう性スコア</div></div>' +
-                            '<div class="reporter-stats">' +
-                                '<div class="stat"><div class="stat-number">' + (r.articlesCount || 0) + '</div><div class="stat-label">記事数</div></div>' +
-                                '<div class="stat"><div class="stat-number">' + esc(rating) + '</div><div class="stat-label">平均評価</div></div>' +
-                            '</div>' +
-                            '<div class="reporter-description">' + esc(r.bio || '') + '</div>' +
-                            '<button class="reporter-button">プロフィール</button>';
-                        div.querySelector('.reporter-button').addEventListener('click', () => goReporter(r.id));
+                            '<div class="reporter-row-stat"><div class="val">' + esc(rating) + '</div><div class="lbl">評価</div></div>' +
+                            '<div class="reporter-row-stat"><div class="val">' + (r.articlesCount || 0) + '</div><div class="lbl">記事数</div></div>';
+                        div.addEventListener('click', () => goReporter(r.id));
                         grid.appendChild(div);
                     });
                 }
@@ -1074,6 +980,51 @@
             }
         }
         loadTopPage();
+        loadPlayersSection();
+
+        // ==== 選手・移籍情報（暫定：全選手から移籍の噂/決定を優先表示） ====
+        async function loadPlayersSection() {
+            const wrap = document.getElementById('playersSection');
+            if (typeof GegenPressAPI === 'undefined') return;
+            try {
+                const res = await GegenPressAPI.players.getAll();
+                if (!res || !res.success || !res.players || res.players.length === 0) {
+                    wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">まだ選手が登録されていません。「選手一覧」から追加できます。</div>';
+                    return;
+                }
+                const sorted = res.players.slice().sort((a, b) => {
+                    const rank = s => s === 'rumor' ? 0 : s === 'completed' ? 1 : 2;
+                    return rank(a.transferStatus) - rank(b.transferStatus);
+                }).slice(0, 8);
+                wrap.innerHTML = sorted.map(p => {
+                    const g = avatarColor(p.name);
+                    const avatar = p.profileImage
+                        ? '<img src="' + p.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
+                        : esc(getInitials(p.name));
+                    const avatarStyleAttr = p.profileImage ? '' : ('background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;');
+                    let badge = '';
+                    if (p.transferStatus === 'rumor') badge = '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:4px;background:#fff3cd;color:#856404;">移籍の噂</span>';
+                    else if (p.transferStatus === 'completed') badge = '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:4px;background:#d4edda;color:#155724;">移籍決定</span>';
+                    return (
+                        '<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid #eee; cursor:pointer;" data-id="' + esc(p.id) + '">' +
+                            '<div style="width:42px;height:42px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;overflow:hidden;' + avatarStyleAttr + '">' + avatar + '</div>' +
+                            '<div style="flex:1; min-width:0;">' +
+                                '<div style="font-size:13px; font-weight:bold; color:#1a0dab;">' + esc(p.name) + '</div>' +
+                                '<div style="font-size:11px; color:#888;">' + esc(p.currentClub || '') + '</div>' +
+                            '</div>' +
+                            badge +
+                        '</div>'
+                    );
+                }).join('');
+                wrap.querySelectorAll('[data-id]').forEach(el => {
+                    el.addEventListener('click', () => {
+                        window.location.href = 'gegen_press_player_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                    });
+                });
+            } catch (e) {
+                wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中にエラーが発生しました。</div>';
+            }
+        }
     </script>
 </body>
 </html>

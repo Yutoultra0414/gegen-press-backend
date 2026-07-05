@@ -252,6 +252,83 @@
       }
     },
 
+    // ===== 選手 =====
+    players: {
+      async getAll(params) {
+        try {
+          var fb = await _ready;
+          var snap = await fb.db.collection('players').get();
+          var list = docList(snap);
+          return { success: true, players: list, count: list.length };
+        } catch (e) { return { success: false, message: String(e), players: [] }; }
+      },
+      async getById(id) {
+        try {
+          var fb = await _ready;
+          var doc = await fb.db.collection('players').doc(id).get();
+          if (!doc.exists) return { success: false, message: '選手が見つかりません' };
+          var data = doc.data(); data.id = doc.id;
+          return { success: true, player: data };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async checkDuplicate(name) {
+        try {
+          var fb = await _ready;
+          var snap = await fb.db.collection('players').get();
+          var lower = (name || '').trim().toLowerCase();
+          var dups = docList(snap).filter(function (p) {
+            return (p.name || '').trim().toLowerCase() === lower;
+          });
+          return { success: true, exists: dups.length > 0, duplicates: dups };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async create(data) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: false, message: '選手の追加にはログインが必要です' };
+          var fb = await _ready;
+          if (!data.allowDuplicate) {
+            var dup = await this.checkDuplicate(data.name);
+            if (dup.success && dup.exists) {
+              return { success: false, duplicates: dup.duplicates, message: '同名の選手が既に登録されています' };
+            }
+          }
+          var docData = {
+            name: data.name,
+            position: data.position || null,
+            nationality: data.nationality || null,
+            currentClub: data.currentClub || null,
+            transferStatus: data.transferStatus || null, // 'rumor' | 'completed' | null
+            fromClub: data.fromClub || null,
+            toClub: data.toClub || null,
+            transferFee: data.transferFee || null,
+            bio: data.bio || '',
+            profileImage: null,
+            createdBy: u.uid,
+            source: 'user',
+            createdAt: tsNow(), updatedAt: tsNow()
+          };
+          var ref = await fb.db.collection('players').add(docData);
+          docData.id = ref.id;
+          return { success: true, player: docData };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async update(id, data) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: false, message: 'ログインが必要です' };
+          var fb = await _ready;
+          var patch = {};
+          Object.keys(data || {}).forEach(function (k) {
+            if (k !== 'allowDuplicate') patch[k] = data[k];
+          });
+          patch.updatedAt = tsNow();
+          await fb.db.collection('players').doc(id).update(patch);
+          return { success: true };
+        } catch (e) { return { success: false, message: String(e) }; }
+      }
+    },
+
     // ===== 記事 =====
     articles: {
       async getAll(params) {
