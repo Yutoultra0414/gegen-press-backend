@@ -54,7 +54,23 @@
     return { db: firebase.firestore(), auth: firebase.auth() };
   }
 
-  var _ready = ensureFirebase().catch(function (e) {
+  var _ready = ensureFirebase().then(async function (fb) {
+    // Googleログインが signInWithRedirect にフォールバックした場合、
+    // リダイレクトで戻ってきた直後にその結果を回収して users コレクションに反映する
+    try {
+      var redirectResult = await fb.auth.getRedirectResult();
+      if (redirectResult && redirectResult.user) {
+        await fb.db.collection('users').doc(redirectResult.user.uid).set({
+          username: redirectResult.user.displayName || '',
+          email: redirectResult.user.email || '',
+          updatedAt: tsNow()
+        }, { merge: true });
+      }
+    } catch (e) {
+      console.warn('リダイレクトログインの結果取得に失敗しました:', e);
+    }
+    return fb;
+  }).catch(function (e) {
     console.error('Firebase 初期化に失敗しました:', e);
     throw e;
   });
@@ -129,7 +145,22 @@
         try {
           var fb = await _ready;
           var provider = new firebase.auth.GoogleAuthProvider();
-          var cred = await fb.auth.signInWithPopup(provider);
+          var cred;
+          try {
+            cred = await fb.auth.signInWithPopup(provider);
+          } catch (popupErr) {
+            var c = (popupErr && popupErr.code) || '';
+            // ポップアップがブロックされる/開けない環境（Edgeなど一部ブラウザの
+            // トラッキング防止設定やサードパーティCookieブロックで起きやすい）では
+            // リダイレクト方式に切り替える。リダイレクト後はページが再読み込みされ、
+            // 初期化時の getRedirectResult() でログイン状態が反映される。
+            if (c.indexOf('popup-blocked') >= 0 || c.indexOf('popup-closed-by-user') >= 0 ||
+                c.indexOf('cancelled-popup-request') >= 0 || c.indexOf('operation-not-supported') >= 0) {
+              await fb.auth.signInWithRedirect(provider);
+              return { success: true, redirecting: true };
+            }
+            throw popupErr;
+          }
           var uid = cred.user.uid;
           await fb.db.collection('users').doc(uid).set({
             username: cred.user.displayName || '', email: cred.user.email || '',
