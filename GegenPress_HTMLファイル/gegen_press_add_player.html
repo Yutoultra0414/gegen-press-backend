@@ -748,9 +748,8 @@
 
         async function loadPlayerForEdit() {
             if (!editPlayerId) return;
-            document.querySelector('.page-title').textContent = '選手情報を編集';
+            document.querySelector('.gp-page-strip h1').textContent = '選手情報を編集';
             document.title = '選手情報を編集 | Gegen Press!';
-            document.querySelector('.page-subtitle').textContent = '登録済みの選手情報を編集します。';
             document.getElementById('submitBtn').textContent = '変更を保存する';
             document.querySelector('.form-intro').textContent =
                 '選手情報を編集しています。変更したい項目のみ更新してください。';

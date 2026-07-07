@@ -430,9 +430,10 @@
         try {
           var fb = await _ready;
           var snap = await fb.db.collection('articles').get();
-          var kw = (keyword || '').trim().toLowerCase();
+          var kw = (keyword || '').trim().toLowerCase().replace(/^#+/, '');
           var list = docList(snap).filter(function (a) {
-            return ((a.title || '') + ' ' + (a.description || '') + ' ' + (a.content || ''))
+            var tagsStr = Array.isArray(a.tags) ? a.tags.join(' ') : '';
+            return ((a.title || '') + ' ' + (a.description || '') + ' ' + (a.content || '') + ' ' + tagsStr)
               .toLowerCase().indexOf(kw) >= 0;
           });
           return { success: true, articles: list };
@@ -508,13 +509,14 @@
           return { success: true, comments: docList(snap) };
         } catch (e) { return { success: false, message: String(e), comments: [] }; }
       },
-      async create(articleId, content, rating, username) {
+      async create(articleId, content, rating, username, parentId) {
         try {
           var u = await currentUser();
           if (!u) return { success: false, message: 'コメントの投稿にはログインが必要です' };
           var fb = await _ready;
           var docData = {
             articleId: articleId, content: content, rating: rating || null,
+            parentId: parentId || null,
             userId: u.uid, username: username || u.displayName || '匿名ユーザー', createdAt: tsNow()
           };
           var ref = await fb.db.collection('comments').add(docData);

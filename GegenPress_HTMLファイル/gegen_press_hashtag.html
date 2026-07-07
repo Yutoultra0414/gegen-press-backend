@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ハッシュタグ - Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Hiragino Sans', 'Meiryo', 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
+
+        .tag-header {
+            background: linear-gradient(135deg, #1d3557 0%, #14213d 100%);
+            padding: 22px 40px;
+        }
+        .tag-header h1 { font-size: 22px; color: #fff; font-weight: 900; }
+        .tag-header p { font-size: 12.5px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+
+        .content-wrap { max-width: 900px; margin: 0 auto; padding: 20px 40px 60px; }
+        .empty-note { font-size: 13px; color: #999; padding: 20px 0; }
+
+        .tag-article {
+            display: flex; gap: 14px; background: #fff; border-radius: 8px;
+            padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-decoration: none; color: inherit; cursor: pointer;
+        }
+        .tag-article:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+        .tag-article-thumb {
+            width: 120px; height: 84px; flex-shrink: 0; border-radius: 6px; overflow: hidden;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.85); font-size: 10px; font-weight: bold;
+        }
+        .tag-article-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .tag-article-title { font-size: 14px; font-weight: bold; color: #000; margin-bottom: 6px; line-height: 1.4; }
+        .tag-article-meta { font-size: 11.5px; color: #888; }
+        .tag-article-tags { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .tag-article-tags span {
+            background: #eef4ff; color: #1d3557; font-size: 10.5px; font-weight: bold;
+            padding: 2px 8px; border-radius: 10px;
+        }
+
+        /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
+        header.gp-header {
+            background: #fff !important;
+            border-bottom: 3px solid #e63946 !important;
+            padding: 6px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav {
+            display: flex; align-items: stretch; gap: 22px; flex: 1; min-width: 0;
+            overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-decoration: none; line-height: 1.15; padding: 6px 2px; white-space: nowrap;
+        }
+        .gp-en { font-size: 13px; font-weight: 900; letter-spacing: 0.5px; color: #111; text-transform: uppercase; }
+        .gp-jp { font-size: 9px; color: #888; font-weight: 600; margin-top: 1px; }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-shrink: 0; }
+        .gp-mypage {
+            display: flex; flex-direction: column; align-items: center;
+            background: #e63946; color: #fff; text-decoration: none;
+            padding: 5px 14px; border-radius: 5px; line-height: 1.15; white-space: nowrap;
+        }
+        .gp-mypage .gp-en { color: #fff; font-size: 11px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #ff6b6b; }
+        @media (max-width: 768px) {
+            header.gp-header { flex-wrap: wrap !important; padding: 8px 14px !important; gap: 0 !important; row-gap: 6px !important; }
+            .gp-logo { order: 1; }
+            .gp-logo img { height: 26px !important; }
+            .gp-actions { order: 2; margin-left: auto; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10px; }
+            .gp-nav {
+                order: 3; flex: 1 1 100%; width: 100%; max-width: 100%;
+                overflow-x: visible; flex-wrap: wrap; justify-content: space-between; gap: 6px 4px;
+            }
+            .gp-nav-item { white-space: nowrap; padding: 4px 2px; }
+            .gp-en { font-size: 11px; }
+            .gp-jp { font-size: 8.5px; }
+            .tag-header { padding: 14px 16px; }
+            .tag-header h1 { font-size: 18px; }
+            .content-wrap { padding: 14px; }
+            .tag-article { flex-direction: column; }
+            .tag-article-thumb { width: 100%; height: 160px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="gp-header">
+        <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
+            <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <a class="gp-nav-item" href="gegen_press_players.html"><span class="gp-en">PLAYERS</span><span class="gp-jp">選手一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_add_reporter.html"><span class="gp-en">ADD REPORTER</span><span class="gp-jp">記者を追加</span></a>
+            <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
+        </nav>
+        <div class="gp-actions">
+            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
+        </div>
+    </header>
+
+    <section class="tag-header">
+        <h1 id="tagTitle">#読み込み中...</h1>
+        <p id="tagCount"></p>
+    </section>
+
+    <div class="content-wrap">
+        <div id="tagArticles"><p class="empty-note">読み込み中...</p></div>
+    </div>
+
+    <script src="api-client.js" onerror="console.warn('api-client.js 未読込')"></script>
+    <script>
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function fmtDate(ts) {
+            try {
+                const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                if (!d || isNaN(d)) return '';
+                return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+            } catch (e) { return ''; }
+        }
+
+        const tag = new URLSearchParams(window.location.search).get('tag');
+
+        async function loadTagArticles() {
+            const wrap = document.getElementById('tagArticles');
+            document.getElementById('tagTitle').textContent = '#' + (tag || '');
+            document.title = '#' + (tag || 'ハッシュタグ') + ' - Gegen Press!';
+            if (!tag) {
+                wrap.innerHTML = '<p class="empty-note">ハッシュタグが指定されていません。</p>';
+                return;
+            }
+            if (typeof GegenPressAPI === 'undefined') {
+                wrap.innerHTML = '<p class="empty-note">読み込めませんでした。</p>';
+                return;
+            }
+            try {
+                const res = await GegenPressAPI.articles.getAll();
+                if (!res || !res.success) {
+                    wrap.innerHTML = '<p class="empty-note">読み込みに失敗しました。</p>';
+                    return;
+                }
+                const lowerTag = tag.toLowerCase();
+                const list = (res.articles || []).filter(a =>
+                    Array.isArray(a.tags) && a.tags.some(t => String(t).toLowerCase() === lowerTag)
+                );
+                document.getElementById('tagCount').textContent = list.length + '件のニュース';
+                if (list.length === 0) {
+                    wrap.innerHTML = '<p class="empty-note">このハッシュタグが付いたニュースはまだありません。</p>';
+                    return;
+                }
+                list.sort((a, b) => {
+                    const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                    const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                    return tb - ta;
+                });
+                wrap.innerHTML = list.map(a => {
+                    const pos = (a.imagePosition && typeof a.imagePosition.x === 'number')
+                        ? (a.imagePosition.x + '% ' + a.imagePosition.y + '%') : '50% 50%';
+                    const thumb = a.image
+                        ? '<img src="' + a.image + '" alt="" style="object-position:' + pos + ';">'
+                        : esc(a.category || 'Gegen Press!');
+                    const tagsHtml = (a.tags || []).map(t =>
+                        '<span onclick="event.stopPropagation(); window.location.href=\'gegen_press_hashtag.html?tag=' + encodeURIComponent(t) + '\';">#' + esc(t) + '</span>'
+                    ).join('');
+                    return (
+                        '<a class="tag-article" href="gegen_press_article_detail.html?id=' + encodeURIComponent(a.id) + '">' +
+                            '<div class="tag-article-thumb">' + thumb + '</div>' +
+                            '<div style="flex:1; min-width:0;">' +
+                                '<div class="tag-article-title">' + esc(a.title) + '</div>' +
+                                '<div class="tag-article-meta">' + esc(a.category || '') + ' ・ ' + esc(fmtDate(a.createdAt)) + '</div>' +
+                                '<div class="tag-article-tags">' + tagsHtml + '</div>' +
+                            '</div>' +
+                        '</a>'
+                    );
+                }).join('');
+            } catch (e) {
+                wrap.innerHTML = '<p class="empty-note">読み込み中にエラーが発生しました。</p>';
+            }
+        }
+        loadTagArticles();
+    </script>
+</body>
+</html>

@@ -345,6 +345,7 @@
             border-radius: 4px;
             font-size: 11px;
             border: 1px solid #e63946;
+            cursor: pointer;
         }
 
         .result-footer {
@@ -853,7 +854,9 @@
             }
             resultsList.innerHTML = sorted.map(a => {
                 const rating = (typeof a.averageRating === 'number') ? a.averageRating.toFixed(1) : '-';
-                const tags = (a.tags || []).slice(0, 4).map(t => '<span class="result-tag">' + esc(t) + '</span>').join('');
+                const tags = (a.tags || []).slice(0, 4).map(t =>
+                    '<span class="result-tag" onclick="event.stopPropagation(); window.location.href=\'gegen_press_hashtag.html?tag=' + encodeURIComponent(t) + '\';">#' + esc(t) + '</span>'
+                ).join('');
                 return (
                     '<div class="result-item" style="cursor:pointer;" data-id="' + esc(a.id) + '">' +
                         '<div class="result-header">' +

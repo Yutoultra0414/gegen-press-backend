@@ -125,6 +125,13 @@
             margin-top: 8px;
             line-height: 1.6;
         }
+        .hashtag-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #eef4ff; color: #1d3557; font-size: 12.5px; font-weight: bold;
+            padding: 4px 10px; border-radius: 14px;
+        }
+        .hashtag-chip .remove-chip { cursor: pointer; color: #888; font-weight: bold; }
+        .hashtag-chip .remove-chip:hover { color: #e63946; }
 
         /* カテゴリタグ */
         .tag-group { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -379,6 +386,14 @@
                     </div>
                 </div>
 
+                <!-- ハッシュタグ -->
+                <div class="form-group">
+                    <label class="form-label">ハッシュタグ <span class="optional-badge">任意</span></label>
+                    <p class="form-hint">Enterまたはカンマで確定します。自由に作成できます（例: 移籍市場、〇〇選手 など）。</p>
+                    <div id="hashtagChips" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;"></div>
+                    <input type="text" class="form-input" id="hashtagInput" placeholder="#タグを入力してEnter">
+                </div>
+
                 <!-- 概要 -->
                 <div class="form-group">
                     <label class="form-label">概要（一覧に表示される要約） <span class="required-badge">必須</span></label>
@@ -449,6 +464,40 @@
         }
 
         // カテゴリタグ選択（単一選択）
+        // ハッシュタグ（自由入力・チップ形式。ユーザーが自由に作成できます）
+        let hashtags = [];
+        const hashtagInput = document.getElementById('hashtagInput');
+        const hashtagChips = document.getElementById('hashtagChips');
+        function normalizeTag(raw) {
+            return String(raw || '').trim().replace(/^#+/, '').replace(/\s+/g, '');
+        }
+        function renderHashtagChips() {
+            hashtagChips.innerHTML = hashtags.map((t, i) =>
+                '<span class="hashtag-chip">#' + escapeHtml(t) + '<span class="remove-chip" data-i="' + i + '">×</span></span>'
+            ).join('');
+            hashtagChips.querySelectorAll('[data-i]').forEach(el => {
+                el.addEventListener('click', function () {
+                    hashtags.splice(Number(this.getAttribute('data-i')), 1);
+                    renderHashtagChips();
+                });
+            });
+        }
+        function addHashtagFromInput() {
+            const t = normalizeTag(hashtagInput.value);
+            hashtagInput.value = '';
+            if (!t) return;
+            if (hashtags.some(x => x.toLowerCase() === t.toLowerCase())) return;
+            hashtags.push(t);
+            renderHashtagChips();
+        }
+        hashtagInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                addHashtagFromInput();
+            }
+        });
+        hashtagInput.addEventListener('blur', addHashtagFromInput);
+
         let selectedCategory = null;
         document.querySelectorAll('#categoryTags .tag-option').forEach(tag => {
             tag.addEventListener('click', function () {
@@ -585,6 +634,7 @@
                 description: desc,
                 content: content,
                 category: selectedCategory,
+                tags: hashtags,
                 authorId: authorId,
                 authorName: rep ? rep.name : '',
                 authorScore: rep ? (rep.trustScore || 0) : 0,

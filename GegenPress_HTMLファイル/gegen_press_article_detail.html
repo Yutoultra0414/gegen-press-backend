@@ -390,6 +390,58 @@
             gap: 2px;
         }
 
+        /* ===== 掲示板風の追加スタイル（コメント番号・返信） ===== */
+        .comment-no {
+            font-size: 12px;
+            color: #e63946;
+            font-weight: 900;
+            margin-right: 6px;
+        }
+        .comment-reply-link {
+            font-size: 11.5px;
+            color: #888;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 8px;
+            display: inline-block;
+        }
+        .comment-reply-link:hover { color: #e63946; }
+        .comment-replies {
+            margin-top: 12px;
+            padding-left: 18px;
+            border-left: 2px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .comment-reply-form {
+            display: none;
+            margin-top: 10px;
+            gap: 8px;
+            flex-direction: column;
+        }
+        .comment-reply-form textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .comment-reply-form button {
+            align-self: flex-start;
+            background: #e63946;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         .comment-rating .star {
             color: #e63946;
             font-size: 12px;
@@ -715,6 +767,7 @@
                 gap: 0 !important;
                 row-gap: 6px !important;
             }
+            .comment-replies { padding-left: 10px; }
             .gp-logo { order: 1; }
             .gp-logo img { height: 26px !important; }
             .gp-actions { order: 2; margin-left: auto; }
@@ -772,6 +825,7 @@
                         <p id="authorHandle">@FabrizioRomano</p>
                     </div>
                 </div>
+                <a id="postedByLink" href="#" style="display:none; font-size:11px; color:#888; text-decoration:none; margin:-6px 0 4px 2px;">投稿: <span id="postedByName"></span></a>
                 <div class="article-time" id="articleTime">2024年6月27日 14:30</div>
                 <div class="article-rating-display">
                     <div class="stars" id="articleStars">
@@ -817,6 +871,9 @@
                     同クラブは、プレシーズンマッチを通じて新しいスカッドの調整を進める予定です。正式な発表は近日中に行われる見通しで、ファンたちの期待がさらに高まることが予想されます。
                 </p>
             </article>
+
+            <!-- ハッシュタグ -->
+            <div id="articleTagsWrap" style="display:none; flex-wrap:wrap; gap:8px; margin:-8px 0 20px;"></div>
 
             <!-- コメントセクション -->
             <section class="comments-section">
@@ -891,11 +948,12 @@
                     <div class="info-value" id="infoTrust">98%</div>
                 </div>
                 <div class="info-item" id="thumbSetRow" style="display:none; flex-direction:column; align-items:flex-start; gap:6px;">
-                    <div style="display:flex; gap:8px;">
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
                         <button id="setThumbBtn" style="background:#fff; color:#e63946; border:1px solid #e63946; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer;">サムネイルを設定</button>
                         <button id="adjustThumbBtn" style="display:none; background:#fff; color:#333; border:1px solid #ccc; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer;">表示位置を調整</button>
                     </div>
                     <input type="file" id="thumbFileInput" accept="image/*" style="display:none;">
+                    <button id="deleteArticleBtn" style="display:none; background:#fff; color:#c0392b; border:1px solid #c0392b; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer;">このニュースを削除</button>
                 </div>
             </div>
 
@@ -1143,6 +1201,32 @@
                 adjustBtn.style.display = 'inline-block';
             }
 
+            // 削除ボタンは投稿者本人 or 管理者のみ表示（最終的な可否はFirestoreルールが判定）
+            const ADMIN_UID = 'EcFjXMp6rpODK9i8E1DN1CPjZov2';
+            const deleteBtn = document.getElementById('deleteArticleBtn');
+            if (currentArticle && (currentArticle.createdBy === user.uid || currentArticle.authorId === user.uid || user.uid === ADMIN_UID)) {
+                deleteBtn.style.display = 'inline-block';
+                deleteBtn.addEventListener('click', async function () {
+                    if (!confirm('このニュースを削除します。元に戻せません。本当に削除しますか？')) return;
+                    deleteBtn.disabled = true; deleteBtn.textContent = '削除中...';
+                    try {
+                        const res = await GegenPressAPI.articles.delete(articleId);
+                        if (res && res.success) {
+                            alert('削除しました。');
+                            window.location.href = 'gegen_press_category.html';
+                        } else {
+                            alert((res && res.message && String(res.message).indexOf('permission') >= 0)
+                                ? 'このニュースを削除する権限がありません。'
+                                : ((res && res.message) || '削除に失敗しました。'));
+                            deleteBtn.disabled = false; deleteBtn.textContent = 'このニュースを削除';
+                        }
+                    } catch (e) {
+                        alert('削除中にエラーが発生しました: ' + (e.message || e));
+                        deleteBtn.disabled = false; deleteBtn.textContent = 'このニュースを削除';
+                    }
+                });
+            }
+
             btn.addEventListener('click', () => input.click());
             input.addEventListener('change', async function () {
                 const file = this.files && this.files[0];
@@ -1199,7 +1283,8 @@
                 saveBtn.disabled = false; saveBtn.textContent = '保存';
             });
         }
-        initThumbButton();
+        // ※ initThumbButton は currentArticle を参照するため、
+        //   loadArticle が完了した後に呼び出す（下の loadArticle().then(...) を参照）
 
         // 画像を幅指定で縮小してJPEG(dataURL)に変換（縦横比は維持）
         function fileToJpeg(file, maxWidth) {
@@ -1230,6 +1315,28 @@
         }
 
         // ==== コメント一覧の読み込み ====
+        function commentHtml(c, no) {
+            return (
+                '<div class="comment" data-comment-id="' + esc(c.id) + '">' +
+                    '<div class="comment-header">' +
+                        '<div>' +
+                            '<span class="comment-no">No.' + no + '</span>' +
+                            '<span class="comment-author">' + esc(c.username || '匿名ユーザー') + '</span>' +
+                            '<div class="comment-time">' + esc(fmtDate(c.createdAt)) + '</div>' +
+                        '</div>' +
+                        (c.rating ? '<div class="comment-rating">' + starsHtml(c.rating) + '</div>' : '') +
+                    '</div>' +
+                    '<div class="comment-text">' + esc(c.content || '') + '</div>' +
+                    '<span class="comment-reply-link" data-reply-toggle="' + esc(c.id) + '">返信する</span>' +
+                    '<div class="comment-reply-form" id="reply-form-' + esc(c.id) + '">' +
+                        '<textarea placeholder="返信を入力してください..." id="reply-text-' + esc(c.id) + '"></textarea>' +
+                        '<button type="button" data-reply-submit="' + esc(c.id) + '">返信を投稿</button>' +
+                    '</div>' +
+                    '<div class="comment-replies" id="replies-' + esc(c.id) + '"></div>' +
+                '</div>'
+            );
+        }
+
         async function loadComments() {
             if (typeof GegenPressAPI === 'undefined') return;
             try {
@@ -1242,24 +1349,65 @@
                     listEl.innerHTML = '<p style="color:#999; font-size:14px;">まだコメントがありません。最初のコメントを投稿してみましょう。</p>';
                     return;
                 }
-                const sorted = comments.slice().sort((a, b) => {
+                const sortAsc = (a, b) => {
                     const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
                     const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
-                    return tb - ta;
-                });
-                listEl.innerHTML = sorted.map(c =>
-                    '<div class="comment">' +
-                        '<div class="comment-header">' +
-                            '<div><div class="comment-author">' + esc(c.username || '匿名ユーザー') + '</div>' +
-                                '<div class="comment-time">' + esc(fmtDate(c.createdAt)) + '</div></div>' +
-                            (c.rating ? '<div class="comment-rating">' + starsHtml(c.rating) + '</div>' : '') +
-                        '</div>' +
-                        '<div class="comment-text">' + esc(c.content || '') + '</div>' +
-                    '</div>'
-                ).join('');
+                    return ta - tb;
+                };
+                // トップレベル（返信ではない）コメントは新しい順、返信は古い順（掲示板の会話順）で表示
+                const topLevel = comments.filter(c => !c.parentId).sort((a, b) => -sortAsc(a, b));
+                const repliesOf = (id) => comments.filter(c => c.parentId === id).sort(sortAsc);
+
+                listEl.innerHTML = topLevel.map((c, i) => commentHtml(c, topLevel.length - i)).join('');
+
+                // 返信・さらにその返信…と、何階層でも再帰的に描画する
+                function renderChildren(parentId) {
+                    const kids = repliesOf(parentId);
+                    if (kids.length === 0) return;
+                    const wrap = document.getElementById('replies-' + parentId);
+                    if (wrap) {
+                        wrap.innerHTML = kids.map(k => commentHtml(k, '')).join('');
+                        kids.forEach(k => renderChildren(k.id));
+                    }
+                }
+                topLevel.forEach(c => renderChildren(c.id));
+
+                bindCommentReplyHandlers(listEl);
             } catch (e) {
                 console.warn('コメントの読み込みに失敗:', e);
             }
+        }
+
+        function bindCommentReplyHandlers(root) {
+            root.querySelectorAll('[data-reply-toggle]').forEach(el => {
+                el.addEventListener('click', function () {
+                    const id = this.getAttribute('data-reply-toggle');
+                    const form = document.getElementById('reply-form-' + id);
+                    if (!form) return;
+                    const showing = form.style.display === 'flex';
+                    form.style.display = showing ? 'none' : 'flex';
+                });
+            });
+            root.querySelectorAll('[data-reply-submit]').forEach(el => {
+                el.addEventListener('click', async function () {
+                    const parentId = this.getAttribute('data-reply-submit');
+                    const textEl = document.getElementById('reply-text-' + parentId);
+                    const text = (textEl.value || '').trim();
+                    if (!text) { alert('返信内容を入力してください'); return; }
+                    let user = null;
+                    try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+                    if (!user) { alert('返信の投稿にはログインが必要です'); return; }
+                    this.disabled = true; this.textContent = '投稿中...';
+                    const res = await GegenPressAPI.comments.create(articleId, text, null, null, parentId);
+                    this.disabled = false; this.textContent = '返信を投稿';
+                    if (res && res.success) {
+                        textEl.value = '';
+                        loadComments();
+                    } else {
+                        alert((res && res.message) || '返信の投稿に失敗しました');
+                    }
+                });
+            });
         }
 
         // ==== 評価の集計（件数・平均をヘッダーとサイドバーに反映） ====
@@ -1309,6 +1457,22 @@
                 document.getElementById('sideAuthorOutlet').textContent = '';
                 document.getElementById('sideAuthorScore').textContent = (a.authorScore || 0) + '/100';
 
+                // 投稿したユーザー（記者とは別。ログインユーザー本人）を小さく表示
+                if (a.createdBy) {
+                    try {
+                        const uRes = await GegenPressAPI.users.get(a.createdBy);
+                        if (uRes && uRes.success && uRes.user) {
+                            const uname = uRes.user.username || '';
+                            if (uname) {
+                                const link = document.getElementById('postedByLink');
+                                link.href = 'gegen_press_user_profile.html?id=' + encodeURIComponent(a.createdBy);
+                                document.getElementById('postedByName').textContent = uname;
+                                link.style.display = 'block';
+                            }
+                        }
+                    } catch (e) { /* 取得できない場合は非表示のまま */ }
+                }
+
                 document.getElementById('articleTime').textContent = fmtDate(a.createdAt);
 
                 if (typeof a.trustScore === 'number') {
@@ -1329,6 +1493,16 @@
                     : '';
                 if (text || thumbHtml) {
                     bodyEl.innerHTML = thumbHtml + text.split(/\n+/).filter(Boolean).map(p => '<p>' + esc(p) + '</p>').join('');
+                }
+
+                // ハッシュタグ（クリックでハッシュタグ専用ページへ）
+                const tagsWrap = document.getElementById('articleTagsWrap');
+                if (a.tags && a.tags.length > 0) {
+                    tagsWrap.style.display = 'flex';
+                    tagsWrap.innerHTML = a.tags.map(t =>
+                        '<a href="gegen_press_hashtag.html?tag=' + encodeURIComponent(t) + '" ' +
+                        'style="background:#eef4ff; color:#1d3557; font-size:12.5px; font-weight:bold; padding:5px 12px; border-radius:14px; text-decoration:none;">#' + esc(t) + '</a>'
+                    ).join('');
                 }
 
                 loadRatings();
@@ -1367,7 +1541,7 @@
             }
         }
 
-        loadArticle();
+        loadArticle().then(initThumbButton);
     </script>
 </body>
 </html>

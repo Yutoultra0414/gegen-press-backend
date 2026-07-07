@@ -10,21 +10,7 @@
         body {
             font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
             background-color: #f5f5f5; color: #333;
-        
             font-size: 13px;
-        }
-        header {
-            background: #fff; padding: 14px 40px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 3px solid #e63946;
-        }
-        .logo { text-decoration: none; }
-        .header-nav { display: flex; align-items: center; gap: 18px; }
-        .nav-link { color: #333; text-decoration: none; font-size: 14px; font-weight: bold; }
-        .nav-link:hover { color: #e63946; }
-        .back-button {
-            background: #e63946; color: #fff; text-decoration: none;
-            padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: bold;
         }
         .container { max-width: 640px; margin: 30px auto; padding: 0 16px; }
         .card {
@@ -32,10 +18,10 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 16px;
         }
         .card h2 {
-            font-size: 16px; color: #e63946; margin-bottom: 16px;
+            font-size: 15px; color: #e63946; margin-bottom: 16px;
             border-left: 4px solid #e63946; padding-left: 10px;
         }
-        .account-row { display: flex; align-items: center; gap: 18px; }
+        .account-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
         .my-avatar {
             width: 88px; height: 88px; border-radius: 50%;
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
@@ -44,8 +30,18 @@
             overflow: hidden; flex-shrink: 0;
         }
         .my-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .account-info { min-width: 0; }
         .account-info h3 { font-size: 18px; margin-bottom: 4px; }
         .account-info p { font-size: 13px; color: #888; }
+        .status-message {
+            font-size: 13px; color: #444; margin-top: 8px; line-height: 1.6;
+            background: #f8f8f8; border-radius: 6px; padding: 8px 12px;
+        }
+        .x-link {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 12.5px; color: #1d9bf0; text-decoration: none; margin-top: 6px; font-weight: bold;
+        }
+        .x-link:hover { text-decoration: underline; }
         .btn {
             display: inline-block; border: none; border-radius: 6px;
             padding: 9px 16px; font-size: 13px; font-weight: bold; cursor: pointer;
@@ -62,15 +58,25 @@
         .menu-list a:hover { color: #e63946; }
         #notLoggedIn { text-align: center; padding: 40px 20px; }
         #notLoggedIn p { color: #666; font-size: 14px; margin-bottom: 18px; }
+        #notFound { text-align: center; padding: 40px 20px; color: #999; }
 
-        /* ===== コンパクトヘッダー（モバイル・小画面用の上書き） ===== */
-        @media (max-width: 768px) {
-            header { padding: 8px 14px !important; gap: 6px !important; }
-            .logo img { height: 26px !important; }
-            .nav-link { font-size: 12px !important; }
-            .back-button { padding: 5px 10px !important; font-size: 12px !important; white-space: nowrap !important; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; color: #333; margin-bottom: 5px; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px;
+            font-size: 13px; font-family: inherit;
         }
-    
+        .form-group textarea { min-height: 70px; resize: vertical; }
+        .form-hint { font-size: 11px; color: #999; margin-top: 4px; }
+
+        .authored-article {
+            display: block; padding: 10px 4px; border-bottom: 1px solid #eee;
+            text-decoration: none; color: inherit;
+        }
+        .authored-article:last-child { border-bottom: none; }
+        .authored-article-title { font-size: 13px; font-weight: bold; color: #1a0dab; margin-bottom: 3px; }
+        .authored-article-meta { font-size: 11px; color: #999; }
+
         /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
         html, body { max-width: 100%; overflow-x: hidden; }
         header.gp-header {
@@ -91,112 +97,42 @@
         .gp-logo { display: block; flex-shrink: 0; }
         .gp-logo img { height: 34px !important; width: auto; display: block; }
         .gp-nav {
-            display: flex;
-            align-items: stretch;
-            gap: 22px;
-            flex: 1;
-            min-width: 0;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
+            display: flex; align-items: stretch; gap: 22px; flex: 1; min-width: 0;
+            overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
         }
         .gp-nav::-webkit-scrollbar { display: none; }
         .gp-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            line-height: 1.15;
-            padding: 6px 2px;
-            white-space: nowrap;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-decoration: none; line-height: 1.15; padding: 6px 2px; white-space: nowrap;
         }
-        .gp-en {
-            font-size: 14px;
-            font-weight: 900;
-            letter-spacing: 0.5px;
-            color: #111;
-            text-transform: uppercase;
-        }
-        .gp-jp {
-            font-size: 10px;
-            color: #888;
-            font-weight: 600;
-            margin-top: 1px;
-        }
+        .gp-en { font-size: 14px; font-weight: 900; letter-spacing: 0.5px; color: #111; text-transform: uppercase; }
+        .gp-jp { font-size: 10px; color: #888; font-weight: 600; margin-top: 1px; }
         .gp-nav-item:hover .gp-en { color: #e63946; }
         .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
         .gp-nav-item.active .gp-en { color: #e63946; }
-        .gp-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-left: auto;
-            flex-shrink: 0;
-        }
+        .gp-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-shrink: 0; }
         .gp-mypage {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: #e63946;
-            color: #fff;
-            text-decoration: none;
-            padding: 5px 14px;
-            border-radius: 5px;
-            line-height: 1.15;
-            white-space: nowrap;
+            display: flex; flex-direction: column; align-items: center;
+            background: #e63946; color: #fff; text-decoration: none;
+            padding: 5px 14px; border-radius: 5px; line-height: 1.15; white-space: nowrap;
         }
         .gp-mypage .gp-en { color: #fff; font-size: 12px; }
         .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
         .gp-mypage:hover { background: #ff6b6b; }
-        header.gp-header .search-bar {
-            width: 150px !important;
-            margin: 0 !important;
-            padding: 6px 12px !important;
-            font-size: 13px !important;
-        }
-        /* 薄いページ名ストリップ */
-        .gp-page-strip {
-            background: #fff;
-            border-bottom: 1px solid #e5e5e5;
-            padding: 9px 24px;
-        }
-        .gp-page-strip h1 {
-            font-size: 16px;
-            font-weight: 900;
-            color: #333;
-            max-width: 1280px;
-            margin: 0 auto;
-            letter-spacing: 0.5px;
-        }
+        .gp-page-strip { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 9px 24px; }
+        .gp-page-strip h1 { font-size: 16px; font-weight: 900; color: #333; max-width: 1280px; margin: 0 auto; letter-spacing: 0.5px; }
         @media (max-width: 768px) {
-            /* ヘッダーはロゴ+マイページの行と、ナビの行に分けて折り返す。
-               横スクロールしないと押せない問題への対応。 */
-            header.gp-header {
-                flex-wrap: wrap !important;
-                padding: 8px 14px !important;
-                gap: 0 !important;
-                row-gap: 6px !important;
-            }
+            header.gp-header { flex-wrap: wrap !important; padding: 8px 14px !important; gap: 0 !important; row-gap: 6px !important; }
             .gp-logo { order: 1; }
             .gp-logo img { height: 26px !important; }
             .gp-actions { order: 2; margin-left: auto; }
             .gp-mypage { padding: 4px 10px; }
             .gp-mypage .gp-en { font-size: 10.5px; }
             .gp-nav {
-                order: 3;
-                flex: 1 1 100%;
-                width: 100%;
-                max-width: 100%;
-                overflow-x: visible;
-                flex-wrap: wrap;
-                justify-content: space-between;
-                gap: 6px 4px;
+                order: 3; flex: 1 1 100%; width: 100%; max-width: 100%;
+                overflow-x: visible; flex-wrap: wrap; justify-content: space-between; gap: 6px 4px;
             }
-            .gp-nav-item {
-                white-space: nowrap;
-                padding: 4px 2px;
-            }
+            .gp-nav-item { white-space: nowrap; padding: 4px 2px; }
             .gp-en { font-size: 11.5px; }
             .gp-jp { font-size: 9px; }
             header.gp-header .search-bar { display: none !important; }
@@ -220,33 +156,70 @@
             <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
         </div>
     </header>
+    <div class="gp-page-strip"><h1 id="pageStripTitle">マイページ</h1></div>
 
     <div class="container">
-        <!-- 未ログイン表示 -->
+        <!-- 未ログイン（自分のマイページを見ようとした場合のみ） -->
         <div class="card" id="notLoggedIn" style="display:none;">
             <p>マイページの利用にはログインが必要です。</p>
             <a href="gegen_press_login.html" class="btn btn-red">ログイン / 新規登録</a>
         </div>
 
-        <!-- ログイン済み表示 -->
-        <div id="loggedIn" style="display:none;">
+        <!-- 該当ユーザーが見つからない場合 -->
+        <div class="card" id="notFound" style="display:none;">
+            <p>このユーザーは見つかりませんでした。</p>
+        </div>
+
+        <!-- プロフィール表示 -->
+        <div id="profileView" style="display:none;">
             <div class="card">
-                <h2>アカウント</h2>
                 <div class="account-row">
                     <div class="my-avatar" id="myAvatar">?</div>
                     <div class="account-info">
                         <h3 id="myName">-</h3>
-                        <p id="myEmail">-</p>
+                        <p id="myEmail"></p>
+                        <div id="statusMessageView" class="status-message" style="display:none;"></div>
+                        <a id="xLinkView" class="x-link" href="#" target="_blank" rel="noopener" style="display:none;">𝕏 <span id="xHandleView"></span></a>
                     </div>
                 </div>
-                <div class="btn-row">
+                <div class="btn-row" id="ownActionsRow" style="display:none;">
                     <button class="btn btn-red" id="setMyIconBtn">アイコンを設定</button>
                     <input type="file" id="myIconFile" accept="image/*" style="display:none;">
+                    <button class="btn btn-white" id="editProfileBtn">プロフィールを編集</button>
                     <button class="btn btn-white" id="logoutBtn">ログアウト</button>
                 </div>
             </div>
 
+            <!-- 編集フォーム（本人のみ） -->
+            <div class="card" id="editCard" style="display:none;">
+                <h2>プロフィールを編集</h2>
+                <div class="form-group">
+                    <label>表示名</label>
+                    <input type="text" id="editUsername" placeholder="表示名">
+                </div>
+                <div class="form-group">
+                    <label>Xアカウント（ユーザーネーム）</label>
+                    <input type="text" id="editTwitter" placeholder="例: gegen_press （@は不要）">
+                    <p class="form-hint">プロフィールにXのリンクとして表示されます。</p>
+                </div>
+                <div class="form-group">
+                    <label>ステータスメッセージ</label>
+                    <textarea id="editStatus" placeholder="一言メッセージなど"></textarea>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-red" id="saveProfileBtn">保存する</button>
+                    <button class="btn btn-white" id="cancelEditBtn">キャンセル</button>
+                </div>
+            </div>
+
+            <!-- 投稿したニュース -->
             <div class="card">
+                <h2>投稿したニュース</h2>
+                <div id="authoredArticles"><p style="color:#999; font-size:12.5px;">読み込み中...</p></div>
+            </div>
+
+            <!-- メニュー（本人のみ） -->
+            <div class="card" id="menuCard" style="display:none;">
                 <h2>メニュー</h2>
                 <div class="menu-list">
                     <a href="gegen_press_add_reporter.html">記者を追加する</a>
@@ -259,6 +232,11 @@
 
     <script src="api-client.js"></script>
     <script>
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
         function getInitials(name) {
             if (!name) return '?';
             const parts = String(name).trim().split(/\s+/).filter(p => /[A-Za-z0-9\u00C0-\u024F\u3040-\u30FF\u4E00-\u9FFF]/.test(p.charAt(0)));
@@ -266,8 +244,18 @@
             const one = parts[0] || String(name).trim();
             return one.substring(0, 2).toUpperCase();
         }
+        function fmtDate(ts) {
+            try {
+                const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                if (!d || isNaN(d)) return '';
+                return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+            } catch (e) { return ''; }
+        }
 
-        let myUid = null;
+        const targetUid = new URLSearchParams(window.location.search).get('id');
+        let myUid = null;       // 今ログインしているユーザーのUID（いなければnull）
+        let profileUid = null;  // 表示対象のUID
+        let isOwnProfile = false;
 
         function fileToSquareJpeg(file, size) {
             return new Promise(function (resolve, reject) {
@@ -306,32 +294,98 @@
             }
         }
 
-        async function initMyPage() {
+        async function loadAuthoredArticles(uid) {
+            const wrap = document.getElementById('authoredArticles');
+            if (typeof GegenPressAPI === 'undefined') { wrap.innerHTML = ''; return; }
+            try {
+                const res = await GegenPressAPI.articles.getAll();
+                if (!res || !res.success) { wrap.innerHTML = '<p style="color:#999; font-size:12.5px;">読み込みに失敗しました。</p>'; return; }
+                const mine = (res.articles || []).filter(a => a.createdBy === uid);
+                if (mine.length === 0) {
+                    wrap.innerHTML = '<p style="color:#999; font-size:12.5px;">まだニュースを投稿していません。</p>';
+                    return;
+                }
+                mine.sort((a, b) => {
+                    const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                    const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                    return tb - ta;
+                });
+                wrap.innerHTML = mine.map(a =>
+                    '<a class="authored-article" href="gegen_press_article_detail.html?id=' + encodeURIComponent(a.id) + '">' +
+                        '<div class="authored-article-title">' + esc(a.title) + '</div>' +
+                        '<div class="authored-article-meta">' + esc(a.category || '') + ' ・ ' + esc(fmtDate(a.createdAt)) + '</div>' +
+                    '</a>'
+                ).join('');
+            } catch (e) {
+                wrap.innerHTML = '<p style="color:#999; font-size:12.5px;">読み込み中にエラーが発生しました。</p>';
+            }
+        }
+
+        function renderProfile(u, displayNameFallback) {
+            document.getElementById('profileView').style.display = 'block';
+            const name = (u && u.username) || displayNameFallback || '（名前未設定）';
+            document.getElementById('myName').textContent = name;
+            document.getElementById('pageStripTitle').textContent = isOwnProfile ? 'マイページ' : name + ' さんのページ';
+            document.title = (isOwnProfile ? 'マイページ' : name) + ' - Gegen Press!';
+
+            document.getElementById('myEmail').textContent = isOwnProfile ? ((u && u.email) || '') : '';
+
+            const statusEl = document.getElementById('statusMessageView');
+            if (u && u.statusMessage) {
+                statusEl.textContent = u.statusMessage;
+                statusEl.style.display = 'block';
+            }
+
+            const xLink = document.getElementById('xLinkView');
+            if (u && u.twitterHandle) {
+                const handle = String(u.twitterHandle).replace(/^@/, '').trim();
+                xLink.href = 'https://x.com/' + encodeURIComponent(handle);
+                document.getElementById('xHandleView').textContent = '@' + handle;
+                xLink.style.display = 'inline-flex';
+            }
+
+            renderMyAvatar(u && u.profileImage, name);
+
+            if (isOwnProfile) {
+                document.getElementById('ownActionsRow').style.display = 'flex';
+                document.getElementById('menuCard').style.display = 'block';
+                document.getElementById('editUsername').value = (u && u.username) || '';
+                document.getElementById('editTwitter').value = (u && u.twitterHandle) || '';
+                document.getElementById('editStatus').value = (u && u.statusMessage) || '';
+            }
+        }
+
+        async function initPage() {
             if (typeof GegenPressAPI === 'undefined') {
                 document.getElementById('notLoggedIn').style.display = 'block';
                 return;
             }
             let user = null;
             try { user = await GegenPressAPI._currentUser(); } catch (e) {}
-            if (!user) {
+            myUid = user ? user.uid : null;
+
+            profileUid = targetUid || myUid;
+            isOwnProfile = !!(myUid && profileUid === myUid);
+
+            if (!profileUid) {
+                // ?id= も無く、ログインもしていない → 自分のマイページなので要ログイン
                 document.getElementById('notLoggedIn').style.display = 'block';
                 return;
             }
-            myUid = user.uid;
-            document.getElementById('loggedIn').style.display = 'block';
-            document.getElementById('myName').textContent = user.displayName || '（名前未設定）';
-            document.getElementById('myEmail').textContent = user.email || '';
 
-            // 保存済みアイコンを読み込み
-            let profileImage = null;
+            let u = null;
             try {
-                const res = await GegenPressAPI.users.get(user.uid);
-                if (res && res.success && res.user) {
-                    profileImage = res.user.profileImage || null;
-                    if (res.user.username) document.getElementById('myName').textContent = res.user.username;
-                }
+                const res = await GegenPressAPI.users.get(profileUid);
+                if (res && res.success) u = res.user;
             } catch (e) {}
-            renderMyAvatar(profileImage, user.displayName || user.email);
+
+            if (!u && !isOwnProfile) {
+                document.getElementById('notFound').style.display = 'block';
+                return;
+            }
+
+            renderProfile(u, isOwnProfile ? (user && (user.displayName || user.email)) : null);
+            loadAuthoredArticles(profileUid);
         }
 
         document.getElementById('setMyIconBtn').addEventListener('click', () => {
@@ -359,6 +413,38 @@
             btn.disabled = false; btn.textContent = 'アイコンを設定';
         });
 
+        document.getElementById('editProfileBtn').addEventListener('click', () => {
+            document.getElementById('editCard').style.display = 'block';
+            document.getElementById('editCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        document.getElementById('cancelEditBtn').addEventListener('click', () => {
+            document.getElementById('editCard').style.display = 'none';
+        });
+        document.getElementById('saveProfileBtn').addEventListener('click', async function () {
+            if (!myUid) return;
+            const btn = this;
+            btn.disabled = true; btn.textContent = '保存中...';
+            const patch = {
+                username: document.getElementById('editUsername').value.trim() || null,
+                twitterHandle: document.getElementById('editTwitter').value.trim().replace(/^@/, '') || null,
+                statusMessage: document.getElementById('editStatus').value.trim() || null
+            };
+            try {
+                const res = await GegenPressAPI.users.update(myUid, patch);
+                if (res && res.success) {
+                    document.getElementById('editCard').style.display = 'none';
+                    const uRes = await GegenPressAPI.users.get(myUid);
+                    renderProfile(uRes && uRes.user, null);
+                    alert('プロフィールを更新しました');
+                } else {
+                    alert((res && res.message) || '保存に失敗しました');
+                }
+            } catch (e) {
+                alert('保存中にエラーが発生しました: ' + (e.message || e));
+            }
+            btn.disabled = false; btn.textContent = '保存する';
+        });
+
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             try { await GegenPressAPI.auth.logout(); } catch (e) {}
             try {
@@ -368,7 +454,7 @@
             window.location.href = 'gegen_press_top.html';
         });
 
-        initMyPage();
+        initPage();
     </script>
 </body>
 </html>
