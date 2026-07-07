@@ -540,6 +540,12 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">市場価値 <span class="optional-badge">任意</span></label>
+                    <p class="form-hint">例: 8000万ユーロ　※自動取得ではなく手入力です（transfermarkt等を参考に入力してください）</p>
+                    <input type="text" class="form-input" id="marketValue" placeholder="例: 8000万ユーロ">
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">国籍 <span class="optional-badge">任意</span></label>
                     <select class="form-input" id="nationalitySelect">
                         <option value="">選択してください</option>
@@ -785,6 +791,7 @@
                 }
             }
             document.getElementById('playerPosition').value = editingPlayer.position || '';
+            document.getElementById('marketValue').value = editingPlayer.marketValue || '';
             if (editingPlayer.nationality) {
                 const nsel = document.getElementById('nationalitySelect');
                 const nmatch = Array.from(nsel.options).find(o => o.value === editingPlayer.nationality);
@@ -944,6 +951,7 @@
                 name: name,
                 currentClub: document.getElementById('currentClub').value.trim() || null,
                 position: document.getElementById('playerPosition').value.trim() || null,
+                marketValue: document.getElementById('marketValue').value.trim() || null,
                 nationality: document.getElementById('nationality').value.trim() || null,
                 transferStatus: selectedTransferStatus,
                 fromClub: document.getElementById('fromClub').value.trim() || null,

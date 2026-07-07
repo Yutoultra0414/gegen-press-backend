@@ -245,6 +245,7 @@
                 <div class="profile-meta">
                     <div class="meta-item"><div class="meta-value" id="metaPosition">-</div><div class="meta-label">ポジション</div></div>
                     <div class="meta-item"><div class="meta-value" id="metaNationality">-</div><div class="meta-label">国籍</div></div>
+                    <div class="meta-item"><div class="meta-value" id="metaMarketValue">-</div><div class="meta-label">市場価値</div></div>
                 </div>
                 <a id="editPlayerLink" href="#" style="display:none; margin-top:12px; font-size:12.5px; color:#e63946; font-weight:bold; text-decoration:none; border:1px solid #e63946; border-radius:6px; padding:6px 14px;">選手情報を編集</a>
             </div>
@@ -332,6 +333,7 @@
             }
             document.getElementById('metaPosition').textContent = p.position || '-';
             document.getElementById('metaNationality').textContent = p.nationality || '-';
+            document.getElementById('metaMarketValue').textContent = p.marketValue || '-';
             document.getElementById('playerBio').textContent = p.bio || 'まだ紹介文が登録されていません。';
             renderAvatar(p);
 

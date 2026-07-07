@@ -525,6 +525,30 @@
         } catch (e) { return { success: false, message: String(e) }; }
       },
       getProfile: function (id) { return this.get(id); }
+    },
+
+    // ===== クラブ（ロゴ画像のみを保持する簡易コレクション。ドキュメントIDはクラブ名そのもの） =====
+    clubs: {
+      async getByName(name) {
+        try {
+          var fb = await _ready;
+          var doc = await fb.db.collection('clubs').doc(name).get();
+          if (!doc.exists) return { success: true, club: null };
+          var data = doc.data(); data.id = doc.id;
+          return { success: true, club: data };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async setLogo(name, logoDataUrl) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: false, message: 'ログインが必要です' };
+          var fb = await _ready;
+          await fb.db.collection('clubs').doc(name).set({
+            name: name, logo: logoDataUrl, updatedBy: u.uid, updatedAt: tsNow()
+          }, { merge: true });
+          return { success: true };
+        } catch (e) { return { success: false, message: String(e) }; }
+      }
     }
   };
 

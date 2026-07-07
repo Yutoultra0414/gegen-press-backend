@@ -225,6 +225,64 @@
             margin-bottom: 6px;
         }
 
+        /* ===== Breaking News（1件を大きく＋横に3件のカード） ===== */
+        .latest-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 18px;
+        }
+        .hero-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .hero-card:hover { box-shadow: 0 10px 26px rgba(230,57,70,0.18); transform: translateY(-2px); }
+        .hero-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.9); font-size: 13px; font-weight: bold;
+            overflow: hidden; position: relative;
+        }
+        .hero-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .cat-tag {
+            position: absolute; top: 10px; left: 10px;
+            background: #e63946; color: #fff; font-size: 11px; font-weight: bold;
+            padding: 4px 10px; border-radius: 3px; letter-spacing: 0.5px;
+        }
+        .hero-body { padding: 14px 16px 16px; }
+        .hero-title { font-size: 18px; font-weight: 900; line-height: 1.35; color: #000; margin-bottom: 8px; }
+        .card-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #888; }
+        .side-list { display: flex; flex-direction: column; gap: 12px; }
+        .side-card {
+            display: flex; gap: 12px; text-decoration: none; color: inherit;
+            background: #fff; border-radius: 8px; padding: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: box-shadow 0.2s ease; cursor: pointer;
+        }
+        .side-card:hover { box-shadow: 0 6px 16px rgba(230,57,70,0.15); }
+        .side-thumb {
+            width: 96px; height: 72px; flex-shrink: 0; border-radius: 5px; overflow: hidden;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.85); font-size: 10px; font-weight: bold;
+        }
+        .side-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .side-body { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+        .side-title {
+            font-size: 13px; font-weight: 700; line-height: 1.35; color: #000; margin-bottom: 6px;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        @media (max-width: 768px) {
+            .latest-grid { grid-template-columns: 1fr; }
+        }
+
         .pickup-card {
             background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
             border: 2px solid #e63946;
@@ -849,85 +907,8 @@
     <section class="pickup-section">
         <div class="container">
             <h2 class="section-title">Breaking News</h2>
-
-            <div class="pickup-articles" id="pickupArticles">
-                <!-- ピックアップ1 -->
-                <div class="pickup-card" data-article-id="art_001">
-                    <div class="pickup-card-content">
-                        <div class="pickup-label">速報</div>
-                        <h3 class="pickup-title">マンチェスター・シティが超大型補強を発表</h3>
-                        <div class="pickup-meta">
-                            <div class="pickup-author">
-                                <div class="author-avatar">F</div>
-                                <div class="author-info">
-                                    <h4>Fabrizio Romano</h4>
-                                    <p>@FabrizioRomano</p>
-                                </div>
-                            </div>
-                            <div class="pickup-time">2時間前</div>
-                        </div>
-                        <div class="pickup-description">
-                            プレミアリーグの雄、マンチェスター・シティが来シーズンに向けた大型補強を発表しました。複数の欧州トップリーグの有力選手が加入予定です。
-                        </div>
-                        <div class="pickup-rating">
-                            <div class="stars">
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                            </div>
-                            <span class="rating-text">信頼度: 98%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ピックアップ2 -->
-                <div class="pickup-card" data-article-id="art_004">
-                    <div class="pickup-card-content">
-                        <div class="pickup-label">独占</div>
-                        <h3 class="pickup-title">レアル・マドリー、日本の若き才能に興味</h3>
-                        <div class="pickup-meta">
-                            <div class="pickup-author">
-                                <div class="author-avatar">M</div>
-                                <div class="author-info">
-                                    <h4>Marca Sports</h4>
-                                    <p>@MarcaDeporte</p>
-                                </div>
-                            </div>
-                            <div class="pickup-time">30分前</div>
-                        </div>
-                        <div class="pickup-description">
-                            スペインの名門レアル・マドリーが、日本代表の有望な若き才能に関心を示しているという独占情報です。契約交渉が進行中との報道。
-                        </div>
-                        <div class="pickup-rating">
-                            <div class="stars">
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star empty">★</span>
-                                <span class="star empty">★</span>
-                            </div>
-                            <span class="rating-text">信頼度: 72%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 記者一覧セクション -->
-    <section class="reporters-section">
-        <div class="container">
-            <h2 class="section-title">トップ記者たち</h2>
-
-            <div class="reporters-grid" id="reportersGrid"></div>
-
-            <!-- ランキングへの導線 -->
-            <div style="text-align: center; margin-top: 40px;">
-                <a href="gegen_press_ranking.html" style="display: inline-block; background: linear-gradient(135deg, #e63946 0%, #a4161a 100%); color: #fff; padding: 14px 40px; border-radius: 6px; font-weight: bold; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; transition: all 0.3s ease;"
-                   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(230,57,70,0.3)';"
-                   onmouseout="this.style.transform=''; this.style.boxShadow='';">記者ランキングをすべて見る</a>
+            <div class="latest-grid" id="pickupArticles">
+                <p style="color:#999; font-size:13px;">読み込み中...</p>
             </div>
         </div>
     </section>
@@ -1067,69 +1048,48 @@
         async function loadTopPage() {
             if (typeof GegenPressAPI === 'undefined') return;
 
-            // 記者一覧（トップ記者・ハンドル参照用）
-            let reporterMap = {};
-            try {
-                const rres = await GegenPressAPI.reporters.getRanking();
-                if (rres && rres.success && rres.ranking && rres.ranking.length > 0) {
-                    rres.ranking.forEach(r => { reporterMap[r.id] = r; });
-
-                    const grid = document.getElementById('reportersGrid');
-                    grid.innerHTML = '';
-                    rres.ranking.slice(0, 8).forEach(r => {
-                        const div = document.createElement('div');
-                        div.className = 'reporter-row';
-                        div.setAttribute('data-reporter-id', r.id);
-                        const rating = (typeof r.averageRating === 'number') ? r.averageRating.toFixed(1) : '-';
-                        const avatarInner = r.profileImage
-                            ? '<img src="' + r.profileImage + '" alt="">'
-                            : esc(getInitials(r.name));
-                        const g = avatarColor(r.name);
-                        const avatarStyleAttr = r.profileImage ? '' : ('background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%);');
-                        div.innerHTML =
-                            '<div class="reporter-row-avatar" style="' + avatarStyleAttr + '">' + avatarInner + '</div>' +
-                            '<div class="reporter-row-name">' +
-                                '<h3>' + esc(r.name) + '</h3>' +
-                                '<p>' + esc(r.mediaOutlet || '') + '</p>' +
-                            '</div>' +
-                            '<div class="reporter-row-stat"><div class="val">' + esc(rating) + '</div><div class="lbl">評価</div></div>' +
-                            '<div class="reporter-row-stat"><div class="val">' + (r.articlesCount || 0) + '</div><div class="lbl">ニュース数</div></div>';
-                        div.addEventListener('click', () => goReporter(r.id));
-                        grid.appendChild(div);
-                    });
-                }
-            } catch (e) {
-                console.warn('記者の読み込みに失敗、見本を表示します:', e);
-            }
-
-            // 速報（閲覧数の多いニュース 上位10件・横スクロール）
+            // Breaking News（閲覧数の多いニュースから、1件を大きく＋3件を横に）
             try {
                 const ares = await GegenPressAPI.articles.getAll();
+                const wrap = document.getElementById('pickupArticles');
                 if (ares && ares.success && ares.articles && ares.articles.length > 0) {
-                    const wrap = document.getElementById('pickupArticles');
-                    wrap.innerHTML = '';
-                    ares.articles.slice(0, 10).forEach(a => {
-                        const div = document.createElement('div');
-                        div.className = 'pickup-card';
-                        div.setAttribute('data-article-id', a.id);
-                        div.style.cursor = 'pointer';
+                    const list = ares.articles.slice(0, 4);
+                    const heroA = list[0];
+                    const restA = list.slice(1, 4);
+
+                    function thumbHtmlFor(a) {
                         const pos = (a.imagePosition && typeof a.imagePosition.x === 'number')
                             ? (a.imagePosition.x + '% ' + a.imagePosition.y + '%') : '50% 50%';
-                        const thumb = a.image
-                            ? '<div class="pickup-thumb"><img src="' + a.image + '" alt="" style="object-position:' + pos + ';"></div>'
-                            : '<div class="pickup-thumb">' + esc(a.category || 'Gegen Press!') + '</div>';
-                        div.innerHTML =
-                            thumb +
-                            '<div class="pickup-card-content" style="padding:10px 12px 12px;">' +
-                                '<span class="pickup-category-tag">' + esc(a.category || '速報') + '</span>' +
-                                '<h3 class="pickup-title" style="font-size:13px; line-height:1.45; margin-bottom:0;">' + esc(a.title) + '</h3>' +
-                            '</div>';
-                        div.addEventListener('click', () => goArticle(a.id));
-                        wrap.appendChild(div);
+                        return a.image
+                            ? '<img src="' + a.image + '" alt="" style="object-position:' + pos + ';">'
+                            : esc(a.category || 'Gegen Press!');
+                    }
+
+                    const heroHtml =
+                        '<a class="hero-card" data-article-id="' + esc(heroA.id) + '">' +
+                            '<div class="hero-thumb"><span class="cat-tag">' + esc(heroA.category || '速報') + '</span>' + thumbHtmlFor(heroA) + '</div>' +
+                            '<div class="hero-body">' +
+                                '<div class="hero-title">' + esc(heroA.title) + '</div>' +
+                                '<div class="card-meta">' + esc(heroA.authorName || '') + '</div>' +
+                            '</div>' +
+                        '</a>';
+                    const sideHtml = '<div class="side-list">' + restA.map(a =>
+                        '<a class="side-card" data-article-id="' + esc(a.id) + '">' +
+                            '<div class="side-thumb">' + thumbHtmlFor(a) + '</div>' +
+                            '<div class="side-body"><div class="side-title">' + esc(a.title) + '</div></div>' +
+                        '</a>'
+                    ).join('') + '</div>';
+
+                    wrap.innerHTML = heroHtml + sideHtml;
+                    wrap.querySelectorAll('[data-article-id]').forEach(el => {
+                        el.addEventListener('click', () => goArticle(el.getAttribute('data-article-id')));
                     });
+                } else {
+                    wrap.innerHTML = '<p style="color:#999; font-size:13px;">まだニュースが投稿されていません。</p>';
                 }
             } catch (e) {
-                console.warn('ニュースの読み込みに失敗、見本を表示します:', e);
+                console.warn('ニュースの読み込みに失敗しました:', e);
+                document.getElementById('pickupArticles').innerHTML = '<p style="color:#999; font-size:13px;">読み込みに失敗しました。</p>';
             }
         }
         loadTopPage();
@@ -1155,6 +1115,30 @@
                     window.location.href = 'gegen_press_club_profile.html?name=' + encodeURIComponent(this.getAttribute('data-club'));
                 });
             });
+            upgradeClubBadgesWithLogos(root);
+        }
+
+        // ユーザーがアップロード済みのクラブロゴがあれば、略称バッジを実画像に差し替える
+        const _clubLogoCache = {};
+        async function upgradeClubBadgesWithLogos(root) {
+            if (typeof GegenPressAPI === 'undefined' || !GegenPressAPI.clubs) return;
+            const names = new Set();
+            root.querySelectorAll('.club-badge[data-club]').forEach(el => names.add(el.getAttribute('data-club')));
+            for (const name of names) {
+                try {
+                    if (!(name in _clubLogoCache)) {
+                        const res = await GegenPressAPI.clubs.getByName(name);
+                        _clubLogoCache[name] = (res && res.success && res.club && res.club.logo) ? res.club.logo : null;
+                    }
+                    const logo = _clubLogoCache[name];
+                    if (logo) {
+                        root.querySelectorAll('.club-badge[data-club="' + CSS.escape(name) + '"]').forEach(el => {
+                            el.style.background = 'none';
+                            el.innerHTML = '<img src="' + logo + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                        });
+                    }
+                } catch (e) { /* ロゴ取得に失敗した場合は略称バッジのまま表示 */ }
+            }
         }
 
         // ==== 直近の移籍（fromClub → toClub が設定されている選手を新しい順に） ====
@@ -1231,7 +1215,11 @@
                                 '<div style="font-size:13px; font-weight:bold; color:#1a0dab;">' + esc(p.name) + '</div>' +
                                 '<div style="font-size:11px; color:#888;">' + esc(p.currentClub || '') + '</div>' +
                             '</div>' +
-                            badge +
+                            '<div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">' +
+                                (p.marketValue ? '<span style="font-size:11.5px; font-weight:bold; color:#333;">' + esc(p.marketValue) + '</span>' : '') +
+                                clubBadgeHtml(p.currentClub, 28) +
+                                badge +
+                            '</div>' +
                         '</div>'
                     );
                 }).join('');
@@ -1240,6 +1228,7 @@
                         window.location.href = 'gegen_press_player_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
                     });
                 });
+                bindClubBadges(wrap);
             } catch (e) {
                 wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中にエラーが発生しました。</div>';
             }
