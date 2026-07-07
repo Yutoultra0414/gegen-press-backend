@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クラブ情報 - Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Hiragino Sans', 'Meiryo', 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
+
+        .club-header {
+            background: linear-gradient(135deg, #1d3557 0%, #14213d 100%);
+            padding: 20px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .club-header::before {
+            content: ''; position: absolute; top: -50px; right: -100px;
+            width: 300px; height: 300px; background-color: rgba(255,255,255,0.08); border-radius: 50%;
+        }
+        .club-header-content {
+            max-width: 900px; margin: 0 auto; display: flex; align-items: center; gap: 16px;
+            position: relative; z-index: 1;
+        }
+        .club-badge-lg {
+            width: 72px; height: 72px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 900; color: #fff;
+            border: 3px solid rgba(255,255,255,0.85); flex-shrink: 0;
+        }
+        .club-title h1 { font-size: 19px; color: #fff; margin-bottom: 3px; }
+        .club-title .sub { font-size: 12px; color: #fff; opacity: 0.9; }
+        .club-badges { display: flex; gap: 6px; margin-top: 6px; }
+        .club-badges span {
+            font-size: 10px; font-weight: bold; padding: 3px 9px; border-radius: 4px;
+            background: rgba(255,255,255,0.15); color: #fff;
+        }
+
+        .content-wrap { max-width: 900px; margin: 0 auto; padding: 18px 40px; }
+        .card { background: #fff; border-radius: 8px; padding: 16px 18px; margin-bottom: 14px; border: 1px solid #eee; }
+        .card h2 { font-size: 13px; color: #e63946; margin-bottom: 10px; border-left: 4px solid #e63946; padding-left: 8px; }
+        .empty-note { font-size: 12px; color: #999; padding: 10px 0; }
+
+        .squad-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 4px; border-bottom: 1px solid #f0f0f0; text-decoration: none; color: inherit; cursor: pointer;
+        }
+        .squad-row:last-child { border-bottom: none; }
+        .squad-avatar {
+            width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 900; color: #fff; overflow: hidden;
+        }
+        .squad-name { font-size: 12.5px; font-weight: bold; color: #1a0dab; }
+        .squad-position { font-size: 11px; color: #888; }
+
+        .transfer-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 4px; border-bottom: 1px solid #f0f0f0;
+        }
+        .transfer-row:last-child { border-bottom: none; }
+        .transfer-badge { font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; }
+        .transfer-badge.rumor { background: #fff3cd; color: #856404; }
+        .transfer-badge.completed { background: #d4edda; color: #155724; }
+
+        /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
+        header.gp-header {
+            background: #fff !important;
+            border-bottom: 3px solid #e63946 !important;
+            padding: 6px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav {
+            display: flex; align-items: stretch; gap: 22px; flex: 1; min-width: 0;
+            overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-decoration: none; line-height: 1.15; padding: 6px 2px; white-space: nowrap;
+        }
+        .gp-en { font-size: 13px; font-weight: 900; letter-spacing: 0.5px; color: #111; text-transform: uppercase; }
+        .gp-jp { font-size: 9px; color: #888; font-weight: 600; margin-top: 1px; }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-shrink: 0; }
+        .gp-mypage {
+            display: flex; flex-direction: column; align-items: center;
+            background: #e63946; color: #fff; text-decoration: none;
+            padding: 5px 14px; border-radius: 5px; line-height: 1.15; white-space: nowrap;
+        }
+        .gp-mypage .gp-en { color: #fff; font-size: 11px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #ff6b6b; }
+        @media (max-width: 768px) {
+            header.gp-header { flex-wrap: wrap !important; padding: 8px 14px !important; gap: 0 !important; row-gap: 6px !important; }
+            .gp-logo { order: 1; }
+            .gp-logo img { height: 26px !important; }
+            .gp-actions { order: 2; margin-left: auto; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10px; }
+            .gp-nav {
+                order: 3; flex: 1 1 100%; width: 100%; max-width: 100%;
+                overflow-x: visible; flex-wrap: wrap; justify-content: space-between; gap: 6px 4px;
+            }
+            .gp-nav-item { white-space: nowrap; padding: 4px 2px; }
+            .gp-en { font-size: 11px; }
+            .gp-jp { font-size: 8.5px; }
+            .club-header { padding: 14px 16px; }
+            .club-badge-lg { width: 56px; height: 56px; font-size: 17px; }
+            .club-title h1 { font-size: 16px; }
+            .content-wrap { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="gp-header">
+        <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
+            <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <a class="gp-nav-item active" href="gegen_press_players.html"><span class="gp-en">PLAYERS</span><span class="gp-jp">選手一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_add_reporter.html"><span class="gp-en">ADD REPORTER</span><span class="gp-jp">記者を追加</span></a>
+            <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
+        </nav>
+        <div class="gp-actions">
+            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
+        </div>
+    </header>
+
+    <section class="club-header">
+        <div class="club-header-content">
+            <div class="club-badge-lg" id="clubBadgeLg">?</div>
+            <div class="club-title">
+                <h1 id="clubName">読み込み中...</h1>
+                <div class="sub" id="clubSub"></div>
+                <div class="club-badges" id="clubBadges"></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="content-wrap">
+        <div class="card">
+            <h2>在籍選手</h2>
+            <div id="squadList"><p class="empty-note">読み込み中...</p></div>
+        </div>
+        <div class="card">
+            <h2>直近の移籍動向</h2>
+            <div id="transferList"><p class="empty-note">読み込み中...</p></div>
+        </div>
+        <div class="card">
+            <h2>このページについて</h2>
+            <p class="empty-note">
+                このクラブページは、選手データベースに登録されている情報（在籍選手・移籍情報）から自動的に生成しています。
+                クラブのロゴは画像ではなく、クラブ名から自動生成した色付きの略称バッジです。監督やスタジアムなどの情報は現時点でデータベースに保持していないため表示していません。
+            </p>
+        </div>
+    </div>
+
+    <script src="clubs-data.js" onerror="console.warn('clubs-data.js 未読込')"></script>
+    <script src="api-client.js" onerror="console.warn('api-client.js 未読込')"></script>
+    <script>
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function getInitials(name) {
+            if (!name) return '?';
+            return String(name).trim().substring(0, 2).toUpperCase();
+        }
+        const PALETTE = [
+            ['#e63946', '#a4161a'], ['#1d3557', '#14213d'], ['#2a9d8f', '#1f7a6f'],
+            ['#e76f51', '#c44a30'], ['#6a4c93', '#4e3470'], ['#457b9d', '#2f5a73'],
+            ['#588157', '#3a5a3a'], ['#bc6c25', '#8a4e16']
+        ];
+        function colorFor(name) {
+            let h = 0; const s = name || '';
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return PALETTE[h % PALETTE.length];
+        }
+        function smallBadge(name) {
+            const g = colorFor(name);
+            return '<div class="squad-avatar" style="background:linear-gradient(135deg,' + g[0] + ' 0%,' + g[1] + ' 100%);">' + esc(getInitials(name)) + '</div>';
+        }
+
+        const clubName = new URLSearchParams(window.location.search).get('name');
+
+        function renderHeader() {
+            document.getElementById('clubName').textContent = clubName || 'クラブが指定されていません';
+            document.title = (clubName || 'クラブ情報') + ' - Gegen Press!';
+            if (!clubName) return;
+            const g = colorFor(clubName);
+            document.getElementById('clubBadgeLg').style.background = 'linear-gradient(135deg,' + g[0] + ' 0%,' + g[1] + ' 100%)';
+            document.getElementById('clubBadgeLg').textContent = getInitials(clubName);
+
+            // clubs-data.js に登録されているクラブであれば、リーグ・国を表示
+            if (typeof GegenPressClubsData !== 'undefined') {
+                const found = GegenPressClubsData.CLUBS.find(c => c.name === clubName);
+                if (found) {
+                    document.getElementById('clubBadges').innerHTML =
+                        '<span>' + esc(found.country) + '</span><span>' + esc(found.league) + '</span>';
+                } else {
+                    document.getElementById('clubSub').textContent = 'リーグ・国の情報は登録されていません（手作りのクラブ一覧にまだ含まれていないクラブです）';
+                }
+            }
+        }
+        renderHeader();
+
+        async function loadClubData() {
+            const squadEl = document.getElementById('squadList');
+            const transferEl = document.getElementById('transferList');
+            if (!clubName) {
+                squadEl.innerHTML = '<p class="empty-note">クラブが指定されていません。</p>';
+                transferEl.innerHTML = '';
+                return;
+            }
+            if (typeof GegenPressAPI === 'undefined') {
+                squadEl.innerHTML = '<p class="empty-note">読み込めませんでした。</p>';
+                return;
+            }
+            try {
+                const res = await GegenPressAPI.players.getAll();
+                if (!res || !res.success || !res.players) {
+                    squadEl.innerHTML = '<p class="empty-note">読み込みに失敗しました。</p>';
+                    return;
+                }
+                const players = res.players;
+
+                // 在籍選手
+                const squad = players.filter(p => p.currentClub === clubName);
+                if (squad.length === 0) {
+                    squadEl.innerHTML = '<p class="empty-note">このクラブの在籍選手はまだ登録されていません。</p>';
+                } else {
+                    squadEl.innerHTML = squad.map(p =>
+                        '<a class="squad-row" href="gegen_press_player_profile.html?id=' + encodeURIComponent(p.id) + '">' +
+                            (p.profileImage
+                                ? '<div class="squad-avatar" style="overflow:hidden;"><img src="' + p.profileImage + '" style="width:100%;height:100%;object-fit:cover;"></div>'
+                                : smallBadge(p.name)) +
+                            '<div>' +
+                                '<div class="squad-name">' + esc(p.name) + '</div>' +
+                                '<div class="squad-position">' + esc(p.position || '-') + (p.nationality ? ' ・ ' + esc(p.nationality) : '') + '</div>' +
+                            '</div>' +
+                        '</a>'
+                    ).join('');
+                }
+
+                // 直近の移籍動向（このクラブが絡む移籍のみ）
+                const transfers = players.filter(p => p.transferStatus && (p.fromClub === clubName || p.toClub === clubName));
+                if (transfers.length === 0) {
+                    transferEl.innerHTML = '<p class="empty-note">このクラブが関わる移籍情報はまだ登録されていません。</p>';
+                } else {
+                    transferEl.innerHTML = transfers.map(p => {
+                        const badge = p.transferStatus === 'rumor'
+                            ? '<span class="transfer-badge rumor">移籍の噂</span>'
+                            : '<span class="transfer-badge completed">移籍決定</span>';
+                        return (
+                            '<div class="transfer-row">' +
+                                '<a href="gegen_press_player_profile.html?id=' + encodeURIComponent(p.id) + '" style="font-size:12.5px; font-weight:bold; color:#1a0dab; text-decoration:none; flex-shrink:0;">' + esc(p.name) + '</a>' +
+                                '<span style="font-size:11.5px; color:#888; flex:1; min-width:0;">' + esc(p.fromClub || '不明') + ' → ' + esc(p.toClub || '不明') +
+                                    (p.transferFee ? ' ・ ' + esc(p.transferFee) : '') + '</span>' +
+                                badge +
+                            '</div>'
+                        );
+                    }).join('');
+                }
+            } catch (e) {
+                squadEl.innerHTML = '<p class="empty-note">読み込み中にエラーが発生しました。</p>';
+            }
+        }
+        loadClubData();
+    </script>
+</body>
+</html>

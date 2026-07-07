@@ -16,6 +16,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f5f5;
             color: #333;
+        
+            font-size: 13px;
         }
 
         /* ヘッダー */
@@ -162,7 +164,7 @@
         }
 
         .section-title {
-            font-size: 19px;
+            font-size: 16px;
             font-weight: 900;
             color: #e63946;
             margin-bottom: 14px;
@@ -846,7 +848,7 @@
     <!-- ピックアップセクション -->
     <section class="pickup-section">
         <div class="container">
-            <h2 class="section-title">今注目の速報</h2>
+            <h2 class="section-title">Breaking News</h2>
 
             <div class="pickup-articles" id="pickupArticles">
                 <!-- ピックアップ1 -->
@@ -933,12 +935,23 @@
     <!-- 選手・移籍情報（暫定デザイン。参考画像2枚目が届いたら本デザインに差し替え予定） -->
     <section class="reporters-section" style="background:#f5f5f5;">
         <div style="max-width:1200px; margin:0 auto;">
-            <h2 class="section-title">話題になっている選手・移籍</h2>
+            <h2 class="section-title">話題の選手</h2>
             <div id="playersSection" style="border:1px solid #e3e3e3; border-radius:6px; overflow:hidden; background:#fff;">
                 <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
             </div>
             <div style="text-align:center; margin-top:16px;">
                 <a href="gegen_press_players.html" style="display:inline-block; background:linear-gradient(135deg, #e63946 0%, #a4161a 100%); color:#fff; padding:10px 28px; border-radius:6px; font-weight:bold; text-decoration:none; font-size:13px;">選手一覧をすべて見る</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 直近の移籍 -->
+    <section class="reporters-section" style="background:#fff;">
+        <div style="max-width:1200px; margin:0 auto;">
+            <h2 class="section-title">直近の移籍</h2>
+            <p style="font-size:11.5px; color:#999; margin:-8px 0 12px;">※ クラブのマークは画像ロゴではなく、クラブ名から自動生成した色付きの略称バッジです。マークをタップするとクラブページに移動します。</p>
+            <div id="transfersSection" style="border:1px solid #e3e3e3; border-radius:6px; overflow:hidden; background:#fff;">
+                <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
             </div>
         </div>
     </section>
@@ -1121,6 +1134,72 @@
         }
         loadTopPage();
         loadPlayersSection();
+        loadTransfersSection();
+
+        // クラブ名から色付きの略称バッジHTMLを作る（本物のクラブロゴ画像は用意できていないための代替表現）
+        function clubBadgeHtml(clubName, size) {
+            size = size || 34;
+            if (!clubName) {
+                return '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:10px;color:#999;flex-shrink:0;">?</div>';
+            }
+            const g = avatarColor(clubName);
+            return '<div class="club-badge" data-club="' + esc(clubName) + '" title="' + esc(clubName) + '" ' +
+                'style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;' +
+                'font-size:' + Math.round(size * 0.32) + 'px;font-weight:900;color:#fff;cursor:pointer;background:linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%);">' +
+                esc(getInitials(clubName)) + '</div>';
+        }
+        function bindClubBadges(root) {
+            root.querySelectorAll('.club-badge').forEach(el => {
+                el.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    window.location.href = 'gegen_press_club_profile.html?name=' + encodeURIComponent(this.getAttribute('data-club'));
+                });
+            });
+        }
+
+        // ==== 直近の移籍（fromClub → toClub が設定されている選手を新しい順に） ====
+        async function loadTransfersSection() {
+            const wrap = document.getElementById('transfersSection');
+            if (typeof GegenPressAPI === 'undefined') return;
+            try {
+                const res = await GegenPressAPI.players.getAll();
+                if (!res || !res.success || !res.players) {
+                    wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込みに失敗しました。</div>';
+                    return;
+                }
+                const list = res.players.filter(p => p.transferStatus && (p.fromClub || p.toClub));
+                if (list.length === 0) {
+                    wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">まだ移籍情報が登録されていません。</div>';
+                    return;
+                }
+                list.sort((a, b) => {
+                    const ta = a.updatedAt && a.updatedAt.toMillis ? a.updatedAt.toMillis() : 0;
+                    const tb = b.updatedAt && b.updatedAt.toMillis ? b.updatedAt.toMillis() : 0;
+                    return tb - ta;
+                });
+                wrap.innerHTML = list.slice(0, 10).map(p => {
+                    const badge = p.transferStatus === 'rumor'
+                        ? '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:4px;background:#fff3cd;color:#856404;flex-shrink:0;">移籍の噂</span>'
+                        : '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:4px;background:#d4edda;color:#155724;flex-shrink:0;">移籍決定</span>';
+                    return (
+                        '<div style="display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid #eee;">' +
+                            clubBadgeHtml(p.fromClub, 34) +
+                            '<span style="color:#ccc; font-size:13px; flex-shrink:0;">→</span>' +
+                            clubBadgeHtml(p.toClub, 34) +
+                            '<div style="flex:1; min-width:0; margin-left:4px;">' +
+                                '<a href="gegen_press_player_profile.html?id=' + encodeURIComponent(p.id) + '" style="font-size:13px; font-weight:bold; color:#1a0dab; text-decoration:none;">' + esc(p.name) + '</a>' +
+                                '<div style="font-size:11px; color:#888;">' + esc(p.fromClub || '不明') + ' → ' + esc(p.toClub || '不明') +
+                                    (p.transferFee ? ' ・ ' + esc(p.transferFee) : '') + '</div>' +
+                            '</div>' +
+                            badge +
+                        '</div>'
+                    );
+                }).join('');
+                bindClubBadges(wrap);
+            } catch (e) {
+                wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中にエラーが発生しました。</div>';
+            }
+        }
 
         // ==== 選手・移籍情報（暫定：全選手から移籍の噂/決定を優先表示） ====
         async function loadPlayersSection() {

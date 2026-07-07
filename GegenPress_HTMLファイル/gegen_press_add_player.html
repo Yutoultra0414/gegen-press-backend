@@ -12,6 +12,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f5f5;
             color: #333;
+        
+            font-size: 13px;
         }
 
         /* ヘッダー */
@@ -609,6 +611,12 @@
             }
         }
         checkLoginState();
+
+        function escapeHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
 
         // =========================================================
         // クラブ / 国籍ドロップダウンの初期化
