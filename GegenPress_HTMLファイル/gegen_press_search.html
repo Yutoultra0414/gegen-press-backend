@@ -465,24 +465,144 @@
                 font-size: 13px !important;
             }
         }
+    
+        /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        header.gp-header {
+            background: #fff !important;
+            border-bottom: 3px solid #e63946 !important;
+            padding: 6px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav {
+            display: flex;
+            align-items: stretch;
+            gap: 22px;
+            flex: 1;
+            min-width: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            line-height: 1.15;
+            padding: 6px 2px;
+            white-space: nowrap;
+        }
+        .gp-en {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            color: #111;
+            text-transform: uppercase;
+        }
+        .gp-jp {
+            font-size: 10px;
+            color: #888;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .gp-mypage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #e63946;
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 14px;
+            border-radius: 5px;
+            line-height: 1.15;
+            white-space: nowrap;
+        }
+        .gp-mypage .gp-en { color: #fff; font-size: 12px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #ff6b6b; }
+        header.gp-header .search-bar {
+            width: 150px !important;
+            margin: 0 !important;
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+        }
+        /* 薄いページ名ストリップ */
+        .gp-page-strip {
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 9px 24px;
+        }
+        .gp-page-strip h1 {
+            font-size: 16px;
+            font-weight: 900;
+            color: #333;
+            max-width: 1280px;
+            margin: 0 auto;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 768px) {
+            header.gp-header {
+                padding: 4px 10px !important;
+                gap: 12px !important;
+                flex-wrap: nowrap !important;
+            }
+            .gp-logo img { height: 26px !important; }
+            .gp-nav { gap: 14px; }
+            .gp-en { font-size: 12px; }
+            .gp-jp { font-size: 9px; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10.5px; }
+            header.gp-header .search-bar { display: none !important; }
+            .gp-page-strip { padding: 8px 14px; }
+            .gp-page-strip h1 { font-size: 14.5px; }
+        }
+    
     </style>
 </head>
 <body>
     <!-- ヘッダー -->
-    <header>
-        <a href="gegen_press_top.html" class="logo"><img src="logo.png" alt="Gegen Press!" style="height:46px;width:auto;display:block;"></a>
-        <div class="header-nav">
-            <a href="gegen_press_top.html" class="nav-link">ホーム</a>
-            <a href="gegen_press_ranking.html" class="nav-link">ランキング</a>
-            <a href="gegen_press_add_reporter.html" class="nav-link">記者を追加</a>
-            <a href="gegen_press_top.html"><button class="back-button">トップに戻る</button></a>
+    <header class="gp-header">
+        <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
+            <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <a class="gp-nav-item" href="gegen_press_players.html"><span class="gp-en">PLAYERS</span><span class="gp-jp">選手一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_add_reporter.html"><span class="gp-en">ADD REPORTER</span><span class="gp-jp">記者を追加</span></a>
+            <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
+        </nav>
+        <div class="gp-actions">
+            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
         </div>
     </header>
 
     <!-- 検索ヘッダー -->
     <section class="search-header">
         <div class="search-header-content">
-            <input type="text" class="search-box" id="searchInput" value="" placeholder="記事や記者名で検索...">
+            <input type="text" class="search-box" id="searchInput" value="" placeholder="ニュースや記者名で検索...">
             <div class="search-info">
                 検索結果: <span class="search-result-count" id="resultCount">0件</span>
                 <span style="margin-left: 15px; font-size: 13px;">記者が見つからない場合は <a href="gegen_press_add_reporter.html" style="color: #e63946; font-weight: bold; text-decoration: none;">記者を追加</a> できます</span>
@@ -708,7 +828,7 @@
             if (pg) pg.style.display = 'none'; // 見せかけのページ送りは実データ表示時には隠す
 
             if (sorted.length === 0) {
-                resultsList.innerHTML = '<p style="color:#999; padding:20px 0;">該当する記事が見つかりませんでした。</p>';
+                resultsList.innerHTML = '<p style="color:#999; padding:20px 0;">該当するニュースが見つかりませんでした。</p>';
                 return;
             }
             resultsList.innerHTML = sorted.map(a => {

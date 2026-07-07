@@ -63,7 +63,7 @@
             background-color: #ff6b6b;
         }
 
-        /* 記事ヘッダー */
+        /* ニュースヘッダー */
         .article-header {
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
             padding: 60px 40px;
@@ -179,7 +179,7 @@
             padding: 60px 40px;
         }
 
-        /* 記事本文 */
+        /* ニュース本文 */
         .article-content {
             font-size: 16px;
             line-height: 1.8;
@@ -605,16 +605,141 @@
                 font-size: 13px !important;
             }
         }
+    
+        /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        header.gp-header {
+            background: #fff !important;
+            border-bottom: 3px solid #e63946 !important;
+            padding: 6px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav {
+            display: flex;
+            align-items: stretch;
+            gap: 22px;
+            flex: 1;
+            min-width: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            line-height: 1.15;
+            padding: 6px 2px;
+            white-space: nowrap;
+        }
+        .gp-en {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            color: #111;
+            text-transform: uppercase;
+        }
+        .gp-jp {
+            font-size: 10px;
+            color: #888;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .gp-mypage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #e63946;
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 14px;
+            border-radius: 5px;
+            line-height: 1.15;
+            white-space: nowrap;
+        }
+        .gp-mypage .gp-en { color: #fff; font-size: 12px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #ff6b6b; }
+        header.gp-header .search-bar {
+            width: 150px !important;
+            margin: 0 !important;
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+        }
+        /* 薄いページ名ストリップ */
+        .gp-page-strip {
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 9px 24px;
+        }
+        .gp-page-strip h1 {
+            font-size: 16px;
+            font-weight: 900;
+            color: #333;
+            max-width: 1280px;
+            margin: 0 auto;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 768px) {
+            header.gp-header {
+                padding: 4px 10px !important;
+                gap: 12px !important;
+                flex-wrap: nowrap !important;
+            }
+            .gp-logo img { height: 26px !important; }
+            .gp-nav { gap: 14px; }
+            .gp-en { font-size: 12px; }
+            .gp-jp { font-size: 9px; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10.5px; }
+            header.gp-header .search-bar { display: none !important; }
+            .gp-page-strip { padding: 8px 14px; }
+            .gp-page-strip h1 { font-size: 14.5px; }
+        }
+    
     </style>
 </head>
 <body>
     <!-- ヘッダー -->
-    <header>
-        <a href="gegen_press_top.html" class="logo"><img src="logo.png" alt="Gegen Press!" style="height:46px;width:auto;display:block;"></a>
-        <a href="gegen_press_top.html"><button class="back-button">トップに戻る</button></a>
+    <header class="gp-header">
+        <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
+            <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <a class="gp-nav-item" href="gegen_press_players.html"><span class="gp-en">PLAYERS</span><span class="gp-jp">選手一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_add_reporter.html"><span class="gp-en">ADD REPORTER</span><span class="gp-jp">記者を追加</span></a>
+            <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
+        </nav>
+        <div class="gp-actions">
+            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
+        </div>
     </header>
 
-    <!-- 記事ヘッダー -->
+    <!-- ニュースヘッダー -->
     <section class="article-header">
         <div class="article-header-content">
             <h1 class="article-title" id="articleTitle">マンチェスター・シティが超大型補強を発表</h1>
@@ -645,7 +770,7 @@
     <!-- メインコンテンツ -->
     <div class="container">
         <main>
-            <!-- 記事本文 -->
+            <!-- ニュース本文 -->
             <article class="article-content" id="articleContent">
                 <p>
                     プレミアリーグの強豪、マンチェスター・シティが2024-25シーズンに向けた大規模な補強計画を発表しました。複数の欧州トップリーグの有力選手が加入予定となっており、同クラブの攻守の両面での強化が期待されます。
@@ -675,11 +800,11 @@
 
             <!-- コメントセクション -->
             <section class="comments-section">
-                <h2 class="comments-title" id="ratingCountTitle">この記事への評価 (34)</h2>
+                <h2 class="comments-title" id="ratingCountTitle">このニュースへの評価 (34)</h2>
 
                 <!-- 信ぴょう性評価フォーム（ログインなしでOK） -->
                 <div class="comment-form" style="background: linear-gradient(135deg, rgba(230, 57, 70, 0.05) 0%, transparent 100%); border: 2px solid #e63946;">
-                    <h3 style="font-size: 16px; color: #e63946; margin-bottom: 15px; font-weight: bold;">この記事の信ぴょう性を評価</h3>
+                    <h3 style="font-size: 16px; color: #e63946; margin-bottom: 15px; font-weight: bold;">このニュースの信ぴょう性を評価</h3>
                     <p style="font-size: 12px; color: #999; margin-bottom: 15px;">ログインなしで投稿できます</p>
                     
                     <div class="form-group">
@@ -726,9 +851,9 @@
 
         <!-- サイドバー -->
         <aside class="sidebar">
-            <!-- 記事情報 -->
+            <!-- ニュース情報 -->
             <div class="sidebar-box">
-                <h3>記事情報</h3>
+                <h3>ニュース情報</h3>
                 <div class="info-item">
                     <div class="info-label">閲覧数</div>
                     <div class="info-value" id="infoViews">2,450</div>
@@ -771,9 +896,9 @@
                 </div>
             </div>
 
-            <!-- 関連記事 -->
+            <!-- 関連ニュース -->
             <div class="sidebar-box">
-                <h3>関連記事</h3>
+                <h3>関連ニュース</h3>
                 <div id="relatedArticles">
                     <p style="color:#999; font-size:13px;">読み込み中...</p>
                 </div>
@@ -853,11 +978,11 @@
             });
         }
 
-        // ==== 記事IDの取得 ====
+        // ==== ニュースIDの取得 ====
         const params = new URLSearchParams(window.location.search);
         const articleId = params.get('id') || 'art_001'; // 指定が無ければ見本のまま
 
-        let currentArticle = null; // Firestoreから読み込んだ記事データ
+        let currentArticle = null; // Firestoreから読み込んだニュースデータ
 
         // ==== 評価投稿（ログイン不要・Firestoreに保存） ====
         const ratingSubmitBtn = document.getElementById('ratingSubmit');
@@ -960,7 +1085,7 @@
                         alert('サムネイルを設定しました');
                     } else {
                         alert((res && res.message && String(res.message).indexOf('permission') >= 0)
-                            ? 'この記事のサムネイルを変更する権限がありません（記事の投稿者、または管理者のみ変更できます）'
+                            ? 'このニュースのサムネイルを変更する権限がありません（ニュースの投稿者、または管理者のみ変更できます）'
                             : ((res && res.message) || 'サムネイルの保存に失敗しました'));
                     }
                 } catch (e) {
@@ -1052,13 +1177,13 @@
             }
         }
 
-        // ==== 記事本体の読み込み ====
+        // ==== ニュース本体の読み込み ====
         async function loadArticle() {
             if (typeof GegenPressAPI === 'undefined') return; // 見本のまま
             try {
                 const res = await GegenPressAPI.articles.getById(articleId);
                 if (!res || !res.success || !res.article) {
-                    console.warn('記事の読み込みに失敗、見本データを表示します:', res && res.message);
+                    console.warn('ニュースの読み込みに失敗、見本データを表示します:', res && res.message);
                     return;
                 }
                 const a = res.article;
@@ -1103,11 +1228,11 @@
                 loadComments();
                 loadRelated(a);
             } catch (e) {
-                console.warn('記事読み込みエラー、見本データを表示します:', e);
+                console.warn('ニュース読み込みエラー、見本データを表示します:', e);
             }
         }
 
-        // ==== 関連記事（同じ記者の他の記事、最大4件） ====
+        // ==== 関連ニュース（同じ記者の他のニュース、最大4件） ====
         async function loadRelated(article) {
             const wrap = document.getElementById('relatedArticles');
             if (typeof GegenPressAPI === 'undefined') { wrap.innerHTML = ''; return; }
@@ -1116,7 +1241,7 @@
                 if (!res || !res.success) { wrap.innerHTML = ''; return; }
                 const others = (res.articles || []).filter(a => a.id !== articleId).slice(0, 4);
                 if (others.length === 0) {
-                    wrap.innerHTML = '<p style="color:#999; font-size:13px;">関連記事はありません。</p>';
+                    wrap.innerHTML = '<p style="color:#999; font-size:13px;">関連ニュースはありません。</p>';
                     return;
                 }
                 wrap.innerHTML = others.map(a =>

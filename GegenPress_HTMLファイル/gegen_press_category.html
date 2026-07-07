@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>カテゴリ一覧 | Gegen Press!</title>
+    <title>ニュース一覧 | Gegen Press!</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
         * {
@@ -83,7 +83,7 @@
         /* ページタイトル */
         .page-title-section {
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
-            padding: 60px 40px;
+            padding: 34px 40px;
             position: relative;
             overflow: hidden;
         }
@@ -100,330 +100,396 @@
         }
 
         .page-title-content {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
             position: relative;
             z-index: 1;
         }
 
         .page-title {
-            font-size: 48px;
+            font-size: 30px;
             font-weight: 900;
-            margin-bottom: 15px;
             letter-spacing: 2px;
             color: #fff;
         }
 
         .page-subtitle {
-            font-size: 18px;
+            font-size: 14px;
             opacity: 0.9;
             color: #fff;
+            margin-top: 4px;
         }
 
         /* コンテナ */
         .container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 60px 40px;
+            padding: 30px 40px 60px;
             display: grid;
-            grid-template-columns: 220px 1fr;
-            gap: 40px;
+            grid-template-columns: 200px 1fr;
+            gap: 32px;
+            align-items: start;
         }
 
-        /* サイドバー - カテゴリ */
+        /* サイドバー（クイックリンク方式） */
         .sidebar {
             display: flex;
             flex-direction: column;
-            gap: 25px;
-            height: fit-content;
+            gap: 22px;
             position: sticky;
-            top: 100px;
+            top: 90px;
         }
 
-        .category-box {
-            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .category-box h3 {
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #e63946;
+        .quicklink-box h3 {
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #999;
             text-transform: uppercase;
             letter-spacing: 1px;
+            padding-left: 2px;
         }
 
-        .category-list {
+        .quicklink-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
         }
 
-        .category-item {
-            padding: 10px 12px;
-            background-color: transparent;
-            border: 2px solid transparent;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
+        .quicklink-item {
+            display: block;
+            padding: 8px 2px;
+            font-size: 14px;
             font-weight: 600;
-            color: #666;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #333;
+            text-decoration: none;
+            border-bottom: 1px solid #e5e5e5;
+            transition: color 0.2s ease;
         }
 
-        .category-item:hover {
-            border-color: #e63946;
+        .quicklink-item:hover,
+        .quicklink-item.active {
             color: #e63946;
-            background-color: rgba(230, 57, 70, 0.05);
         }
 
-        .category-item.active {
-            background-color: #e63946;
-            border-color: #e63946;
-            color: #fff;
+        .quicklink-item .count {
+            float: right;
+            color: #999;
+            font-weight: 400;
+            font-size: 12px;
         }
 
         /* メインコンテンツ */
         .main-content {
             display: flex;
             flex-direction: column;
+            gap: 46px;
+            min-width: 0;
         }
 
-        /* カテゴリヘッダー */
-        .category-header {
-            margin-bottom: 40px;
-            padding-bottom: 25px;
-            border-bottom: 2px solid #ddd;
-        }
-
-        .category-name {
-            font-size: 32px;
+        .section-title {
+            font-size: 15px;
             font-weight: 900;
             color: #e63946;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .category-description {
-            font-size: 14px;
-            color: #999;
-            line-height: 1.6;
-        }
-
-        .category-stats {
-            display: flex;
-            gap: 25px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #e63946;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: #999;
+            margin-bottom: 14px;
             text-transform: uppercase;
             letter-spacing: 1px;
-        }
-
-        /* ソート・フィルター */
-        .sort-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #ddd;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .sort-label {
-            font-size: 13px;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .sort-select {
-            background-color: #fff;
-            border: 2px solid #ddd;
-            color: #333;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.3s ease;
-        }
-
-        .sort-select:hover {
-            border-color: #e63946;
-        }
-
-        .sort-select:focus {
-            outline: none;
-            border-color: #e63946;
-        }
-
-        /* 記事一覧 */
-        .articles-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .article-card {
-            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
-            border: 2px solid #ddd;
             border-left: 4px solid #e63946;
-            border-radius: 6px;
-            padding: 25px;
-            transition: all 0.3s ease;
+            padding-left: 10px;
+        }
+
+        .empty-note {
+            font-size: 13px;
+            color: #999;
+            padding: 16px 0;
+        }
+
+        /* ===== 直近のニュース（トップの画像メインのグリッド） ===== */
+        .latest-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 18px;
+        }
+
+        .hero-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
             cursor: pointer;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
 
-        .article-card:hover {
-            border-color: #e63946;
-            box-shadow: 0 8px 20px rgba(230, 57, 70, 0.1);
-            transform: translateX(5px);
+        .hero-card:hover {
+            box-shadow: 0 10px 26px rgba(230,57,70,0.18);
+            transform: translateY(-2px);
         }
 
-        .article-header {
+        .hero-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .article-title {
-            font-size: 18px;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
             font-weight: bold;
-            color: #000;
-            margin-bottom: 8px;
+            overflow: hidden;
+            position: relative;
         }
 
-        .article-label {
-            background-color: #e63946;
+        .hero-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .cat-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #e63946;
             color: #fff;
-            padding: 6px 12px;
-            border-radius: 4px;
             font-size: 11px;
             font-weight: bold;
-            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 3px;
             letter-spacing: 0.5px;
         }
 
-        .article-meta {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
+        .hero-body {
+            padding: 16px 18px 18px;
         }
 
-        .article-author {
+        .hero-title {
+            font-size: 20px;
+            font-weight: 900;
+            line-height: 1.35;
+            color: #000;
+            margin-bottom: 10px;
+        }
+
+        .card-meta {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 13px;
-            color: #333;
+            font-size: 12px;
+            color: #888;
         }
 
-        .author-avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+        .card-meta .author-dot {
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 10px;
             font-weight: bold;
-            font-size: 14px;
             color: #fff;
+            flex-shrink: 0;
         }
 
-        .article-time {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .article-score {
-            background-color: #e63946;
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .article-description {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 12px;
-        }
-
-        .article-footer {
+        /* 右側：サイド小ニュースリスト */
+        .side-list {
             display: flex;
-            gap: 20px;
-            font-size: 12px;
-            color: #999;
-            border-top: 1px solid #ddd;
-            padding-top: 12px;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        /* ページネーション */
-        .pagination {
+        .side-card {
             display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .pagination-btn {
-            background-color: #fff;
-            color: #333;
-            border: 2px solid #ddd;
-            padding: 12px 16px;
-            border-radius: 4px;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: box-shadow 0.2s ease;
             cursor: pointer;
+        }
+
+        .side-card:hover {
+            box-shadow: 0 6px 16px rgba(230,57,70,0.15);
+        }
+
+        .side-thumb {
+            width: 96px;
+            height: 72px;
+            flex-shrink: 0;
+            border-radius: 5px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.85);
+            font-size: 10px;
             font-weight: bold;
-            transition: all 0.3s ease;
+        }
+
+        .side-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .side-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .side-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: #000;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* ===== リーグ別セクション（NFL Nation 風） ===== */
+        .league-section {
+            scroll-margin-top: 90px;
+        }
+
+        .league-feature {
+            display: flex;
+            gap: 18px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            margin-bottom: 14px;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .league-feature:hover {
+            box-shadow: 0 10px 24px rgba(230,57,70,0.16);
+        }
+
+        .league-feature-thumb {
+            width: 38%;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.85);
+            font-size: 12px;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .league-feature-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .league-feature-body {
+            flex: 1;
+            padding: 16px 18px 16px 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .league-feature-title {
+            font-size: 18px;
+            font-weight: 900;
+            line-height: 1.35;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .league-feature-desc {
             font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        .pagination-btn:hover {
-            border-color: #e63946;
-            color: #e63946;
+        /* リーグセクションの小カード横並び */
+        .league-row {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 6px;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
         }
 
-        .pagination-btn.active {
-            background-color: #e63946;
-            border-color: #e63946;
-            color: #fff;
+        .league-card {
+            flex: 0 0 200px;
+            max-width: 200px;
+            scroll-snap-align: start;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease;
         }
 
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .league-card:hover {
+            box-shadow: 0 8px 18px rgba(230,57,70,0.15);
+        }
+
+        .league-card-thumb {
+            width: 100%;
+            height: 112px;
+            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.85);
+            font-size: 10px;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .league-card-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .league-card-body {
+            padding: 10px 11px 12px;
+        }
+
+        .league-card-title {
+            font-size: 12.5px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: #000;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 6px;
         }
 
         /* レスポンシブ */
@@ -434,71 +500,35 @@
 
             .sidebar {
                 position: static;
+                order: -1;
             }
 
-            .category-box {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
-
-            .category-box h3 {
-                margin-bottom: 0;
-                min-width: 100px;
-            }
-
-            .category-list {
+            .quicklink-list {
                 flex-direction: row;
-                flex-wrap: wrap;
+                overflow-x: auto;
+                gap: 16px;
+                -webkit-overflow-scrolling: touch;
             }
 
-            .category-item {
-                flex-shrink: 0;
+            .quicklink-item {
+                border-bottom: none;
+                border-bottom: 2px solid transparent;
+                white-space: nowrap;
+                padding: 8px 2px 10px;
+            }
+
+            .quicklink-item:hover,
+            .quicklink-item.active {
+                border-bottom-color: #e63946;
+            }
+
+            .quicklink-item .count { display: none; }
+
+            .latest-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 15px;
-                padding: 15px 20px;
-            }
-
-            .logo {
-                font-size: 24px;
-            }
-
-            .page-title-section {
-                padding: 40px 20px;
-            }
-
-            .page-title {
-                font-size: 32px;
-            }
-
-            .container {
-                padding: 40px 20px;
-            }
-
-            .category-name {
-                font-size: 24px;
-            }
-
-            .article-header {
-                flex-direction: column;
-            }
-
-            .article-meta {
-                gap: 10px;
-            }
-
-            .sort-section {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    
-        /* ===== コンパクトヘッダー（モバイル・小画面用の上書き） ===== */
         @media (max-width: 768px) {
             header {
                 flex-direction: row !important;
@@ -524,106 +554,206 @@
                 font-size: 12px !important;
                 white-space: nowrap !important;
             }
-            .search-bar {
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 6px 12px !important;
-                font-size: 13px !important;
+
+            .page-title-section { padding: 20px 16px; }
+            .page-title { font-size: 22px; }
+            .page-subtitle { font-size: 12.5px; }
+
+            .container {
+                padding: 16px 0 40px;
+                gap: 20px;
             }
+
+            .quicklink-box { padding: 0 16px; }
+
+            .main-content { padding: 0 12px; gap: 34px; }
+
+            /* 画像を画面幅いっぱいに（モバイルは画像を最優先） */
+            .hero-card, .league-feature {
+                margin: 0 -12px;
+                border-radius: 0;
+                width: calc(100% + 24px);
+            }
+
+            .hero-thumb { aspect-ratio: 16 / 10; }
+
+            .hero-body { padding: 14px 16px 18px; }
+            .hero-title { font-size: 18px; }
+
+            .league-feature {
+                flex-direction: column;
+            }
+            .league-feature-thumb {
+                width: 100%;
+                height: 200px;
+            }
+            .league-feature-body { padding: 14px 16px 16px; }
+
+            .side-card { margin: 0; border-radius: 6px; }
+
+            .section-title { margin: 0 4px 12px; }
         }
+    
+        /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        header.gp-header {
+            background: #fff !important;
+            border-bottom: 3px solid #e63946 !important;
+            padding: 6px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav {
+            display: flex;
+            align-items: stretch;
+            gap: 22px;
+            flex: 1;
+            min-width: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            line-height: 1.15;
+            padding: 6px 2px;
+            white-space: nowrap;
+        }
+        .gp-en {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            color: #111;
+            text-transform: uppercase;
+        }
+        .gp-jp {
+            font-size: 10px;
+            color: #888;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .gp-mypage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #e63946;
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 14px;
+            border-radius: 5px;
+            line-height: 1.15;
+            white-space: nowrap;
+        }
+        .gp-mypage .gp-en { color: #fff; font-size: 12px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #ff6b6b; }
+        header.gp-header .search-bar {
+            width: 150px !important;
+            margin: 0 !important;
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+        }
+        /* 薄いページ名ストリップ */
+        .gp-page-strip {
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 9px 24px;
+        }
+        .gp-page-strip h1 {
+            font-size: 16px;
+            font-weight: 900;
+            color: #333;
+            max-width: 1280px;
+            margin: 0 auto;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 768px) {
+            header.gp-header {
+                padding: 4px 10px !important;
+                gap: 12px !important;
+                flex-wrap: nowrap !important;
+            }
+            .gp-logo img { height: 26px !important; }
+            .gp-nav { gap: 14px; }
+            .gp-en { font-size: 12px; }
+            .gp-jp { font-size: 9px; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10.5px; }
+            header.gp-header .search-bar { display: none !important; }
+            .gp-page-strip { padding: 8px 14px; }
+            .gp-page-strip h1 { font-size: 14.5px; }
+        }
+    
     </style>
 </head>
 <body>
     <!-- ヘッダー -->
-    <header>
-        <a href="gegen_press_top.html" class="logo"><img src="logo.png" alt="Gegen Press!" style="height:46px;width:auto;display:block;"></a>
-        <div class="header-nav">
-            <a href="gegen_press_top.html" class="nav-link">ホーム</a>
-            <a href="#" class="nav-link">カテゴリ</a>
-            <a href="gegen_press_ranking.html" class="nav-link">ランキング</a>
-            <a href="gegen_press_add_reporter.html" class="nav-link">記者を追加</a>
-            <a href="gegen_press_write_article.html" class="nav-link">記事を投稿</a>
-            <a href="gegen_press_players.html" class="nav-link">選手一覧</a>
-            <a href="gegen_press_top.html"><button class="back-button">トップに戻る</button></a>
+    <header class="gp-header">
+        <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
+            <a class="gp-nav-item active" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <a class="gp-nav-item" href="gegen_press_players.html"><span class="gp-en">PLAYERS</span><span class="gp-jp">選手一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_add_reporter.html"><span class="gp-en">ADD REPORTER</span><span class="gp-jp">記者を追加</span></a>
+            <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
+        </nav>
+        <div class="gp-actions">
+            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
         </div>
     </header>
 
     <!-- ページタイトル -->
-    <section class="page-title-section">
-        <div class="page-title-content">
-            <h1 class="page-title">カテゴリ一覧</h1>
-            <p class="page-subtitle">専門分野別に記事を分類。あなたに必要な情報を見つけよう</p>
-        </div>
-    </section>
+    <div class="gp-page-strip"><h1>ニュース一覧</h1></div>
 
     <!-- メインコンテンツ -->
     <div class="container">
-        <!-- サイドバー -->
+        <!-- サイドバー（クイックリンク） -->
         <aside class="sidebar">
-            <div class="category-box">
-                <h3>カテゴリ選択</h3>
-                <div class="category-list">
-                    <button class="category-item active" data-category="all">すべて</button>
-                    <button class="category-item" data-category="移籍情報">移籍情報</button>
-                    <button class="category-item" data-category="プレミアリーグ">プレミアリーグ</button>
-                    <button class="category-item" data-category="ラリーガ">ラリーガ</button>
-                    <button class="category-item" data-category="セリエA">セリエA</button>
-                    <button class="category-item" data-category="リーグアン">リーグアン</button>
-                    <button class="category-item" data-category="ブンデスリーガ">ブンデスリーガ</button>
+            <div class="quicklink-box">
+                <h3>ジャンプ</h3>
+                <div class="quicklink-list" id="quicklinkList">
+                    <a href="#sec-latest" class="quicklink-item active">直近のニュース</a>
                 </div>
             </div>
         </aside>
 
-        <!-- メインコンテンツ -->
-        <main class="main-content">
-            <!-- カテゴリヘッダー -->
-            <div class="category-header">
-                <div class="category-name" id="catName">すべて</div>
-                <p class="category-description" id="catDesc">
-                    全カテゴリの記事を表示しています。
-                </p>
-                <div class="category-stats">
-                    <div class="stat-item">
-                        <div class="stat-value" id="statCount">0</div>
-                        <div class="stat-label">記事数</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="statTrust">-</div>
-                        <div class="stat-label">平均信ぴょう性</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="statViews">0</div>
-                        <div class="stat-label">総閲覧数</div>
-                    </div>
+        <!-- メイン -->
+        <main class="main-content" id="mainContent">
+            <!-- 直近のニュース -->
+            <section class="league-section" id="sec-latest">
+                <div class="section-title">直近のニュース</div>
+                <div class="latest-grid" id="latestGrid">
+                    <p class="empty-note">読み込み中...</p>
                 </div>
-            </div>
+            </section>
 
-            <!-- ソート -->
-            <div class="sort-section">
-                <span class="sort-label">並び替え:</span>
-                <select class="sort-select" id="sortSelect">
-                    <option>最新順</option>
-                    <option>関連度順</option>
-                    <option>信頼度が高い順</option>
-                    <option>人気順</option>
-                </select>
-            </div>
-
-            <!-- 記事一覧 -->
-            <div class="articles-list" id="articlesList">
-                <p style="color:#999; padding:20px 0;">読み込み中...</p>
-            </div>
-
-            <!-- ページネーション -->
-            <div class="pagination">
-                <button class="pagination-btn" disabled>前へ</button>
-                <button class="pagination-btn active">1</button>
-                <button class="pagination-btn">2</button>
-                <button class="pagination-btn">3</button>
-                <button class="pagination-btn">4</button>
-                <button class="pagination-btn">5</button>
-                <button class="pagination-btn">次へ</button>
-            </div>
+            <!-- リーグ別セクションはJSで生成 -->
+            <div id="leagueSections"></div>
         </main>
     </div>
 
@@ -653,7 +783,7 @@
         }
         function avatarStyle(name) {
             const g = avatarColor(name);
-            return 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
+            return 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%);';
         }
         function fmtDate(ts) {
             try {
@@ -662,127 +792,174 @@
                 return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
             } catch (e) { return ''; }
         }
-
-        const CATEGORY_DESC = {
-            'all': '全カテゴリの記事を表示しています。',
-            '移籍情報': '世界中のサッカークラブの選手移籍に関する最新ニュース。契約交渉、移籍金、選手のコメントなど、移籍に関するすべての情報をお届けします。',
-            'プレミアリーグ': 'イングランド・プレミアリーグの試合結果、順位争い、クラブの最新動向をお届けします。',
-            'ラリーガ': 'スペイン・ラリーガの最新情報。レアル・マドリー、バルセロナをはじめとするクラブの動向を追います。',
-            'セリエA': 'イタリア・セリエAの最新情報。ユベントス、ミラン勢などの動向をお届けします。',
-            'リーグアン': 'フランス・リーグアンの最新情報。PSGをはじめとするクラブの動向を追います。',
-            'ブンデスリーガ': 'ドイツ・ブンデスリーガの最新情報。バイエルンなど各クラブの動向をお届けします。'
-        };
-
-        let allArticles = [];
-        let currentCategory = 'all';
-
-        const categoryButtons = document.querySelectorAll('.category-item');
-        categoryButtons.forEach(btn => {
-            btn.addEventListener('click', function () {
-                categoryButtons.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentCategory = this.getAttribute('data-category');
-                renderCategory();
-            });
-        });
-
-        document.getElementById('sortSelect').addEventListener('change', renderCategory);
-
-        function sortArticles(list, mode) {
-            const arr = list.slice();
-            if (mode === '信頼度が高い順') arr.sort((a, b) => (b.trustScore || 0) - (a.trustScore || 0));
-            else if (mode === '人気順') arr.sort((a, b) => (b.views || 0) - (a.views || 0));
-            else arr.sort((a, b) => {
+        function sortByDateDesc(list) {
+            return list.slice().sort((a, b) => {
                 const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
                 const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
                 return tb - ta;
             });
-            return arr;
         }
 
-        function renderCategory() {
-            const listEl = document.getElementById('articlesList');
-            const filtered = currentCategory === 'all'
-                ? allArticles
-                : allArticles.filter(a => (a.category || '') === currentCategory);
-            const sorted = sortArticles(filtered, document.getElementById('sortSelect').value);
+        // 表示するリーグと表示順（ユーザー指定）
+        const LEAGUES = ['プレミアリーグ', 'ラリーガ', 'Jリーグ', 'セリエA', 'ブンデスリーガ', 'リーグアン', 'その他'];
 
-            // ヘッダー更新（実データから計算）
-            document.getElementById('catName').textContent = currentCategory === 'all' ? 'すべて' : currentCategory;
-            document.getElementById('catDesc').textContent = CATEGORY_DESC[currentCategory] || '';
-            document.getElementById('statCount').textContent = filtered.length;
-            const trustAvg = filtered.length
-                ? (filtered.reduce((s, a) => s + (a.trustScore || 0), 0) / filtered.length).toFixed(1) : '-';
-            document.getElementById('statTrust').textContent = trustAvg;
-            document.getElementById('statViews').textContent =
-                filtered.reduce((s, a) => s + (a.views || 0), 0).toLocaleString();
+        // ニュースの category が上記6リーグのいずれにも一致しない場合は「その他」に分類する
+        // （例：既存シードデータの「移籍情報」カテゴリはここでは独立枠を用意していないため、
+        // 「その他」に含める形にしています。この振り分けルールでよいか、あとで確認してください）
+        function bucketOf(category) {
+            const c = category || '';
+            return LEAGUES.slice(0, 6).indexOf(c) !== -1 ? c : 'その他';
+        }
 
-            if (sorted.length === 0) {
-                listEl.innerHTML = '<p style="color:#999; padding:20px 0;">このカテゴリの記事はまだありません。</p>';
-                return;
+        function thumbHtml(article) {
+            if (article.image) {
+                return '<img src="' + article.image + '" alt="">';
             }
-            listEl.innerHTML = sorted.map(a => {
-                const rating = (typeof a.averageRating === 'number') ? a.averageRating.toFixed(1) : '-';
-                return (
-                    '<div class="article-card" style="cursor:pointer;" data-id="' + esc(a.id) + '">' +
-                        '<div class="article-header">' +
-                            '<div>' +
-                                '<div class="article-title">' + esc(a.title) + '</div>' +
-                                '<div class="article-meta">' +
-                                    '<div class="article-author">' +
-                                        '<div class="author-avatar" style="' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</div>' +
-                                        '<span>' + esc(a.authorName || '') + '</span>' +
-                                    '</div>' +
-                                    '<span class="article-time">' + esc(fmtDate(a.createdAt)) + '</span>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="article-label">' + esc(a.category || '') + '</div>' +
-                        '</div>' +
-                        '<div class="article-description">' + esc(a.description || '') + '</div>' +
-                        '<div class="article-footer">' +
-                            '<span>閲覧数: ' + (a.views || 0).toLocaleString() + '</span>' +
-                            '<span>評価: <strong style="color: #e63946;">' + rating + '/5.0</strong></span>' +
-                        '</div>' +
-                    '</div>'
-                );
-            }).join('');
-            listEl.querySelectorAll('.article-card').forEach(el => {
+            return esc(article.category || 'Gegen Press!');
+        }
+
+        function metaHtml(a) {
+            return (
+                '<div class="card-meta">' +
+                    '<span class="author-dot" style="' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</span>' +
+                    '<span>' + esc(a.authorName || '') + '</span>' +
+                    '<span>・</span>' +
+                    '<span>' + esc(fmtDate(a.createdAt)) + '</span>' +
+                '</div>'
+            );
+        }
+
+        function heroCardHtml(a) {
+            return (
+                '<a class="hero-card" data-id="' + esc(a.id) + '">' +
+                    '<div class="hero-thumb">' +
+                        '<span class="cat-tag">' + esc(a.category || '') + '</span>' +
+                        thumbHtml(a) +
+                    '</div>' +
+                    '<div class="hero-body">' +
+                        '<div class="hero-title">' + esc(a.title) + '</div>' +
+                        metaHtml(a) +
+                    '</div>' +
+                '</a>'
+            );
+        }
+
+        function sideCardHtml(a) {
+            return (
+                '<a class="side-card" data-id="' + esc(a.id) + '">' +
+                    '<div class="side-thumb">' + thumbHtml(a) + '</div>' +
+                    '<div class="side-body">' +
+                        '<div class="side-title">' + esc(a.title) + '</div>' +
+                        metaHtml(a) +
+                    '</div>' +
+                '</a>'
+            );
+        }
+
+        function leagueFeatureHtml(a) {
+            return (
+                '<a class="league-feature" data-id="' + esc(a.id) + '">' +
+                    '<div class="league-feature-thumb">' + thumbHtml(a) + '</div>' +
+                    '<div class="league-feature-body">' +
+                        '<div class="league-feature-title">' + esc(a.title) + '</div>' +
+                        '<div class="league-feature-desc">' + esc(a.description || '') + '</div>' +
+                        metaHtml(a) +
+                    '</div>' +
+                '</a>'
+            );
+        }
+
+        function leagueCardHtml(a) {
+            return (
+                '<a class="league-card" data-id="' + esc(a.id) + '">' +
+                    '<div class="league-card-thumb">' + thumbHtml(a) + '</div>' +
+                    '<div class="league-card-body">' +
+                        '<div class="league-card-title">' + esc(a.title) + '</div>' +
+                        metaHtml(a) +
+                    '</div>' +
+                '</a>'
+            );
+        }
+
+        function attachClickHandlers(root) {
+            root.querySelectorAll('[data-id]').forEach(el => {
                 el.addEventListener('click', () => {
                     window.location.href = 'gegen_press_article_detail.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
                 });
             });
         }
 
+        function renderLatest(articles) {
+            const grid = document.getElementById('latestGrid');
+            const sorted = sortByDateDesc(articles);
+            if (sorted.length === 0) {
+                grid.innerHTML = '<p class="empty-note">まだニュースがありません。</p>';
+                return;
+            }
+            const hero = sorted[0];
+            const rest = sorted.slice(1, 4);
+            grid.innerHTML = (
+                heroCardHtml(hero) +
+                '<div class="side-list">' + rest.map(sideCardHtml).join('') + '</div>'
+            );
+            attachClickHandlers(grid);
+        }
+
+        function renderLeagueSections(articles) {
+            const wrap = document.getElementById('leagueSections');
+            const quicklinkList = document.getElementById('quicklinkList');
+            const grouped = {};
+            LEAGUES.forEach(l => grouped[l] = []);
+            articles.forEach(a => grouped[bucketOf(a.category)].push(a));
+
+            let html = '';
+            let linksHtml = '<a href="#sec-latest" class="quicklink-item active">直近のニュース</a>';
+
+            LEAGUES.forEach((league, idx) => {
+                const anchor = 'sec-league-' + idx;
+                const list = sortByDateDesc(grouped[league]);
+                linksHtml += '<a href="#' + anchor + '" class="quicklink-item">' + esc(league) +
+                    '<span class="count">' + list.length + '</span></a>';
+
+                html += '<section class="league-section" id="' + anchor + '">';
+                html += '<div class="section-title">' + esc(league) + '</div>';
+                if (list.length === 0) {
+                    html += '<p class="empty-note">このカテゴリのニュースはまだありません。</p>';
+                } else {
+                    html += leagueFeatureHtml(list[0]);
+                    const rowItems = list.slice(1, 5);
+                    if (rowItems.length > 0) {
+                        html += '<div class="league-row">' + rowItems.map(leagueCardHtml).join('') + '</div>';
+                    }
+                }
+                html += '</section>';
+            });
+
+            wrap.innerHTML = html;
+            quicklinkList.innerHTML = linksHtml;
+            attachClickHandlers(wrap);
+        }
+
         async function loadCategoryPage() {
-            const listEl = document.getElementById('articlesList');
-            const pg = document.querySelector('.pagination');
-            if (pg) pg.style.display = 'none'; // 見せかけのページ送りは隠す
+            const grid = document.getElementById('latestGrid');
             if (typeof GegenPressAPI === 'undefined') {
-                listEl.innerHTML = '<p style="color:#999; padding:20px 0;">記事を読み込めませんでした。</p>';
+                grid.innerHTML = '<p class="empty-note">ニュースを読み込めませんでした。</p>';
                 return;
             }
             try {
                 const res = await GegenPressAPI.articles.getAll();
                 if (!res || !res.success) {
-                    listEl.innerHTML = '<p style="color:#999; padding:20px 0;">記事の読み込みに失敗しました。</p>';
+                    grid.innerHTML = '<p class="empty-note">ニュースの読み込みに失敗しました。</p>';
                     return;
                 }
-                allArticles = res.articles || [];
-                // URLの ?cat= があれば初期カテゴリに反映
-                const cat = new URLSearchParams(window.location.search).get('cat');
-                if (cat && CATEGORY_DESC[cat]) {
-                    currentCategory = cat;
-                    categoryButtons.forEach(b => {
-                        b.classList.toggle('active', b.getAttribute('data-category') === cat);
-                    });
-                }
-                renderCategory();
+                const articles = res.articles || [];
+                renderLatest(articles);
+                renderLeagueSections(articles);
             } catch (e) {
-                listEl.innerHTML = '<p style="color:#999; padding:20px 0;">記事の読み込み中にエラーが発生しました。</p>';
+                grid.innerHTML = '<p class="empty-note">ニュースの読み込み中にエラーが発生しました。</p>';
             }
         }
         loadCategoryPage();
-    </script>
     </script>
 </body>
 </html>
