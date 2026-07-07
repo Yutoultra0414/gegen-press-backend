@@ -969,6 +969,7 @@
             <div class="profile-info">
                 <div class="creator-badge" id="creatorBadge">あなたが追加した記者</div>
                 <h1 id="reporterNameHeading">Fabrizio Romano</h1>
+                <div id="reporterNameRomaji" style="font-size:12px; color:#fff; opacity:0.85; display:none; margin-top:-4px;"></div>
                 <div class="subtitle" id="reporterSubtitle">世界の移籍情報スペシャリスト</div>
                 
                 <div class="profile-meta">
@@ -1526,6 +1527,11 @@
         function renderReporterHeader(r) {
             if (r.name) {
                 document.getElementById('reporterNameHeading').textContent = r.name;
+            }
+            const romajiEl = document.getElementById('reporterNameRomaji');
+            if (r.nameRomaji) {
+                romajiEl.textContent = r.nameRomaji;
+                romajiEl.style.display = 'block';
             }
             renderAvatar(document.getElementById('profileAvatar'), r);
             const subtitle = r.mediaOutlet || r.bio || '';

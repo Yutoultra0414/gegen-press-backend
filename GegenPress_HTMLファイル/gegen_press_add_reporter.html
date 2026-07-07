@@ -518,6 +518,12 @@
                     <div class="duplicate-result" id="duplicateResult"></div>
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label">記者名（ローマ字/英語表記） <span class="optional-badge">任意</span></label>
+                    <p class="form-hint">日本語の記者名を登録する場合、ローマ字表記もあわせて入力できます。</p>
+                    <input type="text" class="form-input" id="nameRomaji" placeholder="例: Taro Yamada">
+                </div>
+
                 <!-- 所属メディア -->
                 <div class="form-group">
                     <label class="form-label">所属メディア <span class="optional-badge">任意</span></label>
@@ -736,6 +742,7 @@
             // 入力データをまとめる
             const reporterData = {
                 name: name,
+                nameRomaji: document.getElementById('nameRomaji').value.trim() || null,
                 mediaOutlet: document.getElementById('mediaOutlet').value.trim() || null,
                 twitterHandle: document.getElementById('twitterHandle').value.trim() || null,
                 expertise: Array.from(selectedExpertise),

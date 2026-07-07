@@ -521,6 +521,12 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label">選手名（ローマ字） <span class="optional-badge">任意</span></label>
+                    <p class="form-hint">例: Mohamed Salah</p>
+                    <input type="text" class="form-input" id="nameRomaji" placeholder="ローマ字表記を入力" autocomplete="off">
+                </div>
+
                 <!-- 所属クラブ -->
                 <div class="form-group">
                     <label class="form-label">現所属クラブ <span class="optional-badge">任意</span></label>
@@ -777,6 +783,7 @@
             }
 
             document.getElementById('reporterName').value = editingPlayer.name || '';
+            document.getElementById('nameRomaji').value = editingPlayer.nameRomaji || '';
 
             if (editingPlayer.currentClub) {
                 const sel = document.getElementById('currentClubSelect');
@@ -949,6 +956,7 @@
             // 入力データをまとめる
             const reporterData = {
                 name: name,
+                nameRomaji: document.getElementById('nameRomaji').value.trim() || null,
                 currentClub: document.getElementById('currentClub').value.trim() || null,
                 position: document.getElementById('playerPosition').value.trim() || null,
                 marketValue: document.getElementById('marketValue').value.trim() || null,

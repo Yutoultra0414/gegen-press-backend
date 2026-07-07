@@ -921,11 +921,18 @@
             if (typeof GegenPressAPI === 'undefined') return;
             try {
                 const res = await GegenPressAPI.reporters.getRanking();
-                if (!res || !res.success || !res.ranking || res.ranking.length === 0) {
-                    console.warn('ランキング取得に失敗、見本データを表示します:', res && res.message);
+                const tbody = document.getElementById('rankingBody');
+                if (!res || !res.success) {
+                    console.warn('ランキング取得に失敗しました:', res && res.message);
+                    return; // 通信エラー等の場合は既存表示のまま（見本データ）にしておく
+                }
+                if (!res.ranking || res.ranking.length === 0) {
+                    // 記者が0件になった場合は、最初から書かれている見本行を消して空表示にする
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999; padding:24px; font-size:13px;">まだ記者が登録されていません。「記者を追加」から追加できます。</td></tr>';
+                    const pg = document.querySelector('.pagination');
+                    if (pg) pg.style.display = 'none';
                     return;
                 }
-                const tbody = document.getElementById('rankingBody');
                 tbody.innerHTML = '';
                 // 見せかけのページ送りは実データ表示時には隠す
                 const pg = document.querySelector('.pagination');
@@ -953,7 +960,7 @@
                         '<td class="rank-number">' + medal + rank + '</td>' +
                         '<td><div class="reporter-info">' +
                             '<div class="reporter-avatar" style="' + avatarBg + 'overflow:hidden;">' + avatarInner + '</div>' +
-                            '<div class="reporter-details"><h3>' + esc(r.name) + '</h3><p>' + esc(r.mediaOutlet || '') + '</p></div>' +
+                            '<div class="reporter-details"><h3>' + esc(r.name) + (r.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(r.nameRomaji) + '</span>' : '') + '</h3><p>' + esc(r.mediaOutlet || '') + '</p></div>' +
                         '</div></td>' +
                         '<td class="score-cell">' + score + '<span class="score-max">/100</span></td>' +
                         '<td class="number-cell">' + esc(rating) + '</td>';

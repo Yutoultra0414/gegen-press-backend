@@ -289,7 +289,7 @@
                         '<div class="player-row" data-id="' + esc(p.id) + '">' +
                             '<div class="player-row-avatar" style="' + avatarStyle + '">' + avatar + '</div>' +
                             '<div class="player-row-name">' +
-                                '<h3>' + esc(p.name) + '</h3>' +
+                                '<h3>' + esc(p.name) + (p.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(p.nameRomaji) + '</span>' : '') + '</h3>' +
                                 '<p>' + esc(p.position || '') + (p.nationality ? ' ・ ' + esc(p.nationality) : '') + '</p>' +
                             '</div>' +
                             badge +

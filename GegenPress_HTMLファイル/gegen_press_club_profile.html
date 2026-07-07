@@ -322,7 +322,7 @@
                                 ? '<div class="squad-avatar" style="overflow:hidden;"><img src="' + p.profileImage + '" style="width:100%;height:100%;object-fit:cover;"></div>'
                                 : smallBadge(p.name)) +
                             '<div style="flex:1; min-width:0;">' +
-                                '<div class="squad-name">' + esc(p.name) + '</div>' +
+                                '<div class="squad-name">' + esc(p.name) + (p.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:10.5px;">' + esc(p.nameRomaji) + '</span>' : '') + '</div>' +
                                 '<div class="squad-position">' + esc(p.position || '-') + (p.nationality ? ' ・ ' + esc(p.nationality) : '') + '</div>' +
                             '</div>' +
                             (p.marketValue ? '<div style="font-size:11.5px; font-weight:bold; color:#333; flex-shrink:0;">' + esc(p.marketValue) + '</div>' : '') +

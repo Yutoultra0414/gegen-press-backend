@@ -251,6 +251,7 @@
           }
           var docData = {
             name: data.name,
+            nameRomaji: data.nameRomaji || null,
             mediaOutlet: data.mediaOutlet || null,
             twitterHandle: data.twitterHandle || null,
             expertise: data.expertise || [],
@@ -326,9 +327,11 @@
           }
           var docData = {
             name: data.name,
+            nameRomaji: data.nameRomaji || null,
             position: data.position || null,
             nationality: data.nationality || null,
             currentClub: data.currentClub || null,
+            marketValue: data.marketValue || null,
             transferStatus: data.transferStatus || null, // 'rumor' | 'completed' | null
             fromClub: data.fromClub || null,
             toClub: data.toClub || null,

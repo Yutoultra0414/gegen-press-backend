@@ -241,6 +241,7 @@
             </div>
             <div class="profile-info">
                 <h1 id="playerName">読み込み中...</h1>
+                <p id="playerNameRomaji" style="font-size:12px; color:#fff; opacity:0.85; margin-top:-2px; margin-bottom:6px; display:none;"></p>
                 <p class="subtitle" id="playerClub"></p>
                 <div class="profile-meta">
                     <div class="meta-item"><div class="meta-value" id="metaPosition">-</div><div class="meta-label">ポジション</div></div>
@@ -325,6 +326,11 @@
             currentPlayer = p;
             document.title = p.name + ' - Gegen Press!';
             document.getElementById('playerName').textContent = p.name;
+            const romajiEl = document.getElementById('playerNameRomaji');
+            if (p.nameRomaji) {
+                romajiEl.textContent = p.nameRomaji;
+                romajiEl.style.display = 'block';
+            }
             const clubEl = document.getElementById('playerClub');
             if (p.currentClub) {
                 clubEl.innerHTML = '<a href="gegen_press_club_profile.html?name=' + encodeURIComponent(p.currentClub) + '" style="color:#fff; text-decoration:underline;">' + esc(p.currentClub) + '</a>';

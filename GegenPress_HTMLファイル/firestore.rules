@@ -10,16 +10,16 @@ service cloud.firestore {
     }
 
     // 記事コレクション
-    // ※ 'YOUR_ADMIN_UID' は自分のユーザーUID（Authentication > Users で確認）に置き換えてください
+    // 管理者UIDは EcFjXMp6rpODK9i8E1DN1CPjZov2 に設定済み（別のFirebaseプロジェクト/アカウントを使う場合は要変更）
     match /articles/{articleId} {
       allow read: if true; // すべての人が閲覧可能
       allow create: if request.auth != null;
       allow update: if request.auth != null
                     && (request.auth.uid == resource.data.authorId
-                        || request.auth.uid == 'YOUR_ADMIN_UID');
+                        || request.auth.uid == 'EcFjXMp6rpODK9i8E1DN1CPjZov2');
       allow delete: if request.auth != null
                     && (request.auth.uid == resource.data.authorId
-                        || request.auth.uid == 'YOUR_ADMIN_UID');
+                        || request.auth.uid == 'EcFjXMp6rpODK9i8E1DN1CPjZov2');
     }
 
     // コメントコレクション（投稿はログイン必須）
@@ -39,15 +39,14 @@ service cloud.firestore {
     }
 
     // 記者コレクション（ログインユーザーが追加可能・追加者本人と管理者が編集可能）
-    // ※ 下の 'YOUR_ADMIN_UID' を、Firebaseコンソール > Authentication > Users で
-    //   確認できる自分のユーザーUIDに置き換えてください（運営者として公式記者を編集・削除できるようになります）
+    // 管理者UIDは EcFjXMp6rpODK9i8E1DN1CPjZov2 に設定済み
     match /reporters/{reporterId} {
       allow read: if true;
       allow create: if request.auth != null;
       allow update: if request.auth != null
                     && (request.auth.uid == resource.data.createdBy
-                        || request.auth.uid == 'YOUR_ADMIN_UID');
-      allow delete: if request.auth != null && request.auth.uid == 'YOUR_ADMIN_UID';
+                        || request.auth.uid == 'EcFjXMp6rpODK9i8E1DN1CPjZov2');
+      allow delete: if request.auth != null && request.auth.uid == 'EcFjXMp6rpODK9i8E1DN1CPjZov2';
     }
 
     // 選手コレクション（記者と同じ方式：ログインユーザーが追加可能・追加者本人と管理者が編集可能）
@@ -56,8 +55,8 @@ service cloud.firestore {
       allow create: if request.auth != null;
       allow update: if request.auth != null
                     && (request.auth.uid == resource.data.createdBy
-                        || request.auth.uid == 'YOUR_ADMIN_UID');
-      allow delete: if request.auth != null && request.auth.uid == 'YOUR_ADMIN_UID';
+                        || request.auth.uid == 'EcFjXMp6rpODK9i8E1DN1CPjZov2');
+      allow delete: if request.auth != null && request.auth.uid == 'EcFjXMp6rpODK9i8E1DN1CPjZov2';
     }
 
     // 記者へのレビュー（クチコミ）

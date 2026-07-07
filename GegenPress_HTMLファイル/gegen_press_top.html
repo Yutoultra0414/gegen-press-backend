@@ -1212,7 +1212,7 @@
                         '<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid #eee; cursor:pointer;" data-id="' + esc(p.id) + '">' +
                             '<div style="width:42px;height:42px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;overflow:hidden;' + avatarStyleAttr + '">' + avatar + '</div>' +
                             '<div style="flex:1; min-width:0;">' +
-                                '<div style="font-size:13px; font-weight:bold; color:#1a0dab;">' + esc(p.name) + '</div>' +
+                                '<div style="font-size:13px; font-weight:bold; color:#1a0dab;">' + esc(p.name) + (p.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(p.nameRomaji) + '</span>' : '') + '</div>' +
                                 '<div style="font-size:11px; color:#888;">' + esc(p.currentClub || '') + '</div>' +
                             '</div>' +
                             '<div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">' +
