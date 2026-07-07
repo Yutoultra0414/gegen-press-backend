@@ -607,6 +607,7 @@
         }
     
         /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
         header.gp-header {
             background: #fff !important;
             border-bottom: 3px solid #e63946 !important;
@@ -704,22 +705,39 @@
             letter-spacing: 0.5px;
         }
         @media (max-width: 768px) {
+            /* ヘッダーはロゴ+マイページの行と、ナビの行に分けて折り返す。
+               横スクロールしないと押せない問題への対応。 */
             header.gp-header {
-                padding: 4px 10px !important;
-                gap: 12px !important;
-                flex-wrap: nowrap !important;
+                flex-wrap: wrap !important;
+                padding: 8px 14px !important;
+                gap: 0 !important;
+                row-gap: 6px !important;
             }
+            .gp-logo { order: 1; }
             .gp-logo img { height: 26px !important; }
-            .gp-nav { gap: 14px; }
-            .gp-en { font-size: 12px; }
-            .gp-jp { font-size: 9px; }
+            .gp-actions { order: 2; margin-left: auto; }
             .gp-mypage { padding: 4px 10px; }
             .gp-mypage .gp-en { font-size: 10.5px; }
+            .gp-nav {
+                order: 3;
+                flex: 1 1 100%;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 6px 4px;
+            }
+            .gp-nav-item {
+                white-space: nowrap;
+                padding: 4px 2px;
+            }
+            .gp-en { font-size: 11.5px; }
+            .gp-jp { font-size: 9px; }
             header.gp-header .search-bar { display: none !important; }
             .gp-page-strip { padding: 8px 14px; }
             .gp-page-strip h1 { font-size: 14.5px; }
         }
-    
     </style>
 </head>
 <body>
@@ -870,9 +888,25 @@
                     <div class="info-label">信頼度</div>
                     <div class="info-value" id="infoTrust">98%</div>
                 </div>
-                <div class="info-item" id="thumbSetRow" style="display:none;">
-                    <button id="setThumbBtn" style="background:#fff; color:#e63946; border:1px solid #e63946; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer;">サムネイルを設定</button>
+                <div class="info-item" id="thumbSetRow" style="display:none; flex-direction:column; align-items:flex-start; gap:6px;">
+                    <div style="display:flex; gap:8px;">
+                        <button id="setThumbBtn" style="background:#fff; color:#e63946; border:1px solid #e63946; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer;">サムネイルを設定</button>
+                        <button id="adjustThumbBtn" style="display:none; background:#fff; color:#333; border:1px solid #ccc; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer;">表示位置を調整</button>
+                    </div>
                     <input type="file" id="thumbFileInput" accept="image/*" style="display:none;">
+                </div>
+            </div>
+
+            <!-- サムネイル位置調整モーダル -->
+            <div id="focalModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center;">
+                <div style="background:#fff; border-radius:10px; padding:20px; width:min(90vw,480px);">
+                    <h3 style="font-size:15px; margin-bottom:10px;">サムネイルの表示位置を調整</h3>
+                    <p style="font-size:12px; color:#888; margin-bottom:12px; line-height:1.6;">画像をクリック（またはドラッグ）して、一覧などで表示される際に中心にしたい部分を指定してください。</p>
+                    <div id="focalModalPickerWrap"></div>
+                    <div style="display:flex; gap:10px; margin-top:16px; justify-content:flex-end;">
+                        <button id="focalModalCancel" style="background:#fff; border:1px solid #ccc; border-radius:6px; padding:8px 16px; font-size:13px; cursor:pointer;">キャンセル</button>
+                        <button id="focalModalSave" style="background:#e63946; color:#fff; border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:bold; cursor:pointer;">保存</button>
+                    </div>
                 </div>
             </div>
 
@@ -1060,29 +1094,98 @@
         initCommentForm();
 
         // ==== サムネイル設定（ログイン中のみボタン表示・保存可否はサーバー側が判定） ====
+        // フォーカルポイント（画像の表示中心）は保存前にモーダルで調整できます。
+        let focalDataUrl = null;
+        let focalPoint = { x: 50, y: 50 };
+        let focalMode = 'new'; // 'new'=新規アップロード画像を保存 / 'adjust'=既存画像の位置だけ調整
+
+        function openFocalModal() {
+            const wrap = document.getElementById('focalModalPickerWrap');
+            wrap.innerHTML =
+                '<div class="focal-picker" id="dFocalPicker" style="position:relative; cursor:crosshair; touch-action:none; border-radius:6px; overflow:hidden;">' +
+                    '<img src="' + focalDataUrl + '" alt="" style="width:100%; max-height:280px; object-fit:cover; display:block; object-position:' + focalPoint.x + '% ' + focalPoint.y + '%; pointer-events:none;">' +
+                    '<div id="dFocalMarker" style="position:absolute; width:24px; height:24px; border:2px solid #fff; border-radius:50%; box-shadow:0 0 0 2px #e63946, 0 1px 5px rgba(0,0,0,0.5); transform:translate(-50%,-50%); pointer-events:none; left:' + focalPoint.x + '%; top:' + focalPoint.y + '%;"></div>' +
+                '</div>';
+            const picker = document.getElementById('dFocalPicker');
+            const marker = document.getElementById('dFocalMarker');
+            const img = picker.querySelector('img');
+            function setFromEvent(clientX, clientY) {
+                const rect = picker.getBoundingClientRect();
+                let x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+                let y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+                focalPoint = { x: Math.round(x), y: Math.round(y) };
+                marker.style.left = focalPoint.x + '%';
+                marker.style.top = focalPoint.y + '%';
+                img.style.objectPosition = focalPoint.x + '% ' + focalPoint.y + '%';
+            }
+            let dragging = false;
+            picker.addEventListener('pointerdown', function (e) { dragging = true; setFromEvent(e.clientX, e.clientY); try { picker.setPointerCapture(e.pointerId); } catch (err) {} });
+            picker.addEventListener('pointermove', function (e) { if (dragging) setFromEvent(e.clientX, e.clientY); });
+            picker.addEventListener('pointerup', function () { dragging = false; });
+            picker.addEventListener('pointercancel', function () { dragging = false; });
+            document.getElementById('focalModalOverlay').style.display = 'flex';
+        }
+
         async function initThumbButton() {
             if (typeof GegenPressAPI === 'undefined') return;
             let user = null;
             try { user = await GegenPressAPI._currentUser(); } catch (e) { return; }
             if (!user) return;
-            document.getElementById('thumbSetRow').style.display = 'block';
+            document.getElementById('thumbSetRow').style.display = 'flex';
 
             const btn = document.getElementById('setThumbBtn');
+            const adjustBtn = document.getElementById('adjustThumbBtn');
             const input = document.getElementById('thumbFileInput');
+
+            if (currentArticle && currentArticle.image) {
+                adjustBtn.style.display = 'inline-block';
+            }
+
             btn.addEventListener('click', () => input.click());
             input.addEventListener('change', async function () {
                 const file = this.files && this.files[0];
                 this.value = '';
                 if (!file) return;
                 if (!file.type || file.type.indexOf('image/') !== 0) { alert('画像ファイルを選択してください'); return; }
-                btn.disabled = true; btn.textContent = '処理中...';
                 try {
-                    const dataUrl = await fileToJpeg(file, 640);
-                    const res = await GegenPressAPI.articles.update(articleId, { image: dataUrl });
+                    focalDataUrl = await fileToJpeg(file, 640);
+                    focalPoint = { x: 50, y: 50 };
+                    focalMode = 'new';
+                    openFocalModal();
+                } catch (e) {
+                    alert('画像の処理に失敗しました: ' + (e.message || e));
+                }
+            });
+
+            adjustBtn.addEventListener('click', function () {
+                if (!currentArticle || !currentArticle.image) return;
+                focalDataUrl = currentArticle.image;
+                const existing = currentArticle.imagePosition;
+                focalPoint = (existing && typeof existing.x === 'number') ? existing : { x: 50, y: 50 };
+                focalMode = 'adjust';
+                openFocalModal();
+            });
+
+            document.getElementById('focalModalCancel').addEventListener('click', function () {
+                document.getElementById('focalModalOverlay').style.display = 'none';
+            });
+
+            document.getElementById('focalModalSave').addEventListener('click', async function () {
+                const saveBtn = this;
+                saveBtn.disabled = true; saveBtn.textContent = '保存中...';
+                try {
+                    const patch = focalMode === 'new'
+                        ? { image: focalDataUrl, imagePosition: focalPoint }
+                        : { imagePosition: focalPoint };
+                    const res = await GegenPressAPI.articles.update(articleId, patch);
                     if (res && res.success) {
-                        if (currentArticle) { currentArticle.image = dataUrl; }
-                        loadArticle(); // 再描画
-                        alert('サムネイルを設定しました');
+                        if (currentArticle) {
+                            if (focalMode === 'new') currentArticle.image = focalDataUrl;
+                            currentArticle.imagePosition = focalPoint;
+                        }
+                        document.getElementById('focalModalOverlay').style.display = 'none';
+                        loadArticle();
+                        alert('サムネイルを保存しました');
                     } else {
                         alert((res && res.message && String(res.message).indexOf('permission') >= 0)
                             ? 'このニュースのサムネイルを変更する権限がありません（ニュースの投稿者、または管理者のみ変更できます）'
@@ -1091,7 +1194,7 @@
                 } catch (e) {
                     alert('サムネイルの設定中にエラーが発生しました: ' + (e.message || e));
                 }
-                btn.disabled = false; btn.textContent = 'サムネイルを設定';
+                saveBtn.disabled = false; saveBtn.textContent = '保存';
             });
         }
         initThumbButton();
@@ -1217,8 +1320,10 @@
                 // 本文（サムネイル＋改行を段落として表示）
                 const bodyEl = document.getElementById('articleContent');
                 const text = a.content || a.description || '';
+                const pos = (a.imagePosition && typeof a.imagePosition.x === 'number')
+                    ? (a.imagePosition.x + '% ' + a.imagePosition.y + '%') : '50% 50%';
                 const thumbHtml = a.image
-                    ? '<img src="' + a.image + '" alt="" style="width:100%; max-height:340px; object-fit:cover; border-radius:8px; margin-bottom:16px; display:block;">'
+                    ? '<img src="' + a.image + '" alt="" style="width:100%; max-height:340px; object-fit:cover; object-position:' + pos + '; border-radius:8px; margin-bottom:16px; display:block;">'
                     : '';
                 if (text || thumbHtml) {
                     bodyEl.innerHTML = thumbHtml + text.split(/\n+/).filter(Boolean).map(p => '<p>' + esc(p) + '</p>').join('');

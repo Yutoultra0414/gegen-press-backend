@@ -105,6 +105,25 @@
         .thumb-drop-label { color: #999; font-size: 13px; }
         .thumb-required-note { font-size: 12px; color: #e63946; margin-top: 6px; }
 
+        /* サムネイルの中心位置（フォーカルポイント）調整ツール */
+        .focal-picker { position: relative; cursor: crosshair; touch-action: none; user-select: none; }
+        .focal-picker img { pointer-events: none; }
+        .focal-marker {
+            position: absolute;
+            width: 24px; height: 24px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px #e63946, 0 1px 5px rgba(0,0,0,0.5);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .focal-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
         /* カテゴリタグ */
         .tag-group { display: flex; flex-wrap: wrap; gap: 10px; }
         .tag-option {
@@ -158,6 +177,7 @@
         }
     
         /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
         header.gp-header {
             background: #fff !important;
             border-bottom: 3px solid #e63946 !important;
@@ -255,22 +275,39 @@
             letter-spacing: 0.5px;
         }
         @media (max-width: 768px) {
+            /* ヘッダーはロゴ+マイページの行と、ナビの行に分けて折り返す。
+               横スクロールしないと押せない問題への対応。 */
             header.gp-header {
-                padding: 4px 10px !important;
-                gap: 12px !important;
-                flex-wrap: nowrap !important;
+                flex-wrap: wrap !important;
+                padding: 8px 14px !important;
+                gap: 0 !important;
+                row-gap: 6px !important;
             }
+            .gp-logo { order: 1; }
             .gp-logo img { height: 26px !important; }
-            .gp-nav { gap: 14px; }
-            .gp-en { font-size: 12px; }
-            .gp-jp { font-size: 9px; }
+            .gp-actions { order: 2; margin-left: auto; }
             .gp-mypage { padding: 4px 10px; }
             .gp-mypage .gp-en { font-size: 10.5px; }
+            .gp-nav {
+                order: 3;
+                flex: 1 1 100%;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 6px 4px;
+            }
+            .gp-nav-item {
+                white-space: nowrap;
+                padding: 4px 2px;
+            }
+            .gp-en { font-size: 11.5px; }
+            .gp-jp { font-size: 9px; }
             header.gp-header .search-bar { display: none !important; }
             .gp-page-strip { padding: 8px 14px; }
             .gp-page-strip h1 { font-size: 14.5px; }
         }
-    
     </style>
 </head>
 <body>
@@ -307,6 +344,7 @@
                     </div>
                     <input type="file" id="thumbInput" accept="image/*" style="display:none;">
                     <div class="thumb-required-note" id="thumbRequiredNote" style="display:none;">サムネイル画像を設定してください</div>
+                    <p class="focal-hint" id="focalHint" style="display:none;">画像をクリック（またはドラッグ）すると、一覧などで表示される際に中心にしたい部分を指定できます。</p>
                 </div>
 
                 <!-- タイトル -->
@@ -420,9 +458,13 @@
 
         // サムネイル選択・圧縮
         let thumbDataUrl = null;
+        let thumbFocal = { x: 50, y: 50 }; // フォーカルポイント（%）。デフォルトは中央。
         const thumbDrop = document.getElementById('thumbDrop');
         const thumbInput = document.getElementById('thumbInput');
-        thumbDrop.addEventListener('click', () => thumbInput.click());
+        thumbDrop.addEventListener('click', function (e) {
+            if (thumbDrop.classList.contains('has-image')) return; // 画像ありの間はクリックで位置調整を優先
+            thumbInput.click();
+        });
         thumbInput.addEventListener('change', async function () {
             const file = this.files && this.files[0];
             if (!file) return;
@@ -430,14 +472,60 @@
             document.getElementById('thumbDropLabel').textContent = '処理中...';
             try {
                 thumbDataUrl = await fileToJpeg(file, 640);
-                thumbDrop.classList.add('has-image');
-                thumbDrop.innerHTML = '<img src="' + thumbDataUrl + '" alt="">';
+                thumbFocal = { x: 50, y: 50 };
+                renderThumbPicker();
                 document.getElementById('thumbRequiredNote').style.display = 'none';
+                document.getElementById('focalHint').style.display = 'block';
             } catch (e) {
                 alert('画像の処理に失敗しました: ' + (e.message || e));
                 document.getElementById('thumbDropLabel').textContent = 'クリックして画像を選択';
             }
         });
+
+        function renderThumbPicker() {
+            thumbDrop.classList.add('has-image');
+            thumbDrop.innerHTML =
+                '<div class="focal-picker" id="focalPicker">' +
+                    '<img src="' + thumbDataUrl + '" alt="" style="object-position:' + thumbFocal.x + '% ' + thumbFocal.y + '%;">' +
+                    '<div class="focal-marker" id="focalMarker" style="left:' + thumbFocal.x + '%; top:' + thumbFocal.y + '%;"></div>' +
+                    '<button type="button" id="focalReupload" style="position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.55); color:#fff; border:none; border-radius:4px; padding:5px 10px; font-size:11px; cursor:pointer;">画像を変更</button>' +
+                '</div>';
+            const picker = document.getElementById('focalPicker');
+            const marker = document.getElementById('focalMarker');
+            const img = picker.querySelector('img');
+
+            function setFocalFromEvent(clientX, clientY) {
+                const rect = picker.getBoundingClientRect();
+                let x = ((clientX - rect.left) / rect.width) * 100;
+                let y = ((clientY - rect.top) / rect.height) * 100;
+                x = Math.max(0, Math.min(100, x));
+                y = Math.max(0, Math.min(100, y));
+                thumbFocal = { x: Math.round(x), y: Math.round(y) };
+                marker.style.left = thumbFocal.x + '%';
+                marker.style.top = thumbFocal.y + '%';
+                img.style.objectPosition = thumbFocal.x + '% ' + thumbFocal.y + '%';
+            }
+
+            let dragging = false;
+            picker.addEventListener('pointerdown', function (e) {
+                if (e.target && e.target.id === 'focalReupload') return;
+                dragging = true;
+                setFocalFromEvent(e.clientX, e.clientY);
+                try { picker.setPointerCapture(e.pointerId); } catch (err) {}
+            });
+            picker.addEventListener('pointermove', function (e) {
+                if (!dragging) return;
+                setFocalFromEvent(e.clientX, e.clientY);
+            });
+            picker.addEventListener('pointerup', function () { dragging = false; });
+            picker.addEventListener('pointercancel', function () { dragging = false; });
+
+            document.getElementById('focalReupload').addEventListener('click', function (e) {
+                e.stopPropagation();
+                thumbInput.value = '';
+                thumbInput.click();
+            });
+        }
         function fileToJpeg(file, maxWidth) {
             return new Promise(function (resolve, reject) {
                 const reader = new FileReader();
@@ -499,6 +587,7 @@
                 authorName: rep ? rep.name : '',
                 authorScore: rep ? (rep.trustScore || 0) : 0,
                 image: thumbDataUrl,
+                imagePosition: thumbFocal,
                 averageRating: 0,
                 trustScore: rep ? (rep.trustScore || 0) : 0
             });

@@ -338,6 +338,7 @@
         }
     
         /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
         header.gp-header {
             background: #fff !important;
             border-bottom: 3px solid #e63946 !important;
@@ -435,22 +436,39 @@
             letter-spacing: 0.5px;
         }
         @media (max-width: 768px) {
+            /* ヘッダーはロゴ+マイページの行と、ナビの行に分けて折り返す。
+               横スクロールしないと押せない問題への対応。 */
             header.gp-header {
-                padding: 4px 10px !important;
-                gap: 12px !important;
-                flex-wrap: nowrap !important;
+                flex-wrap: wrap !important;
+                padding: 8px 14px !important;
+                gap: 0 !important;
+                row-gap: 6px !important;
             }
+            .gp-logo { order: 1; }
             .gp-logo img { height: 26px !important; }
-            .gp-nav { gap: 14px; }
-            .gp-en { font-size: 12px; }
-            .gp-jp { font-size: 9px; }
+            .gp-actions { order: 2; margin-left: auto; }
             .gp-mypage { padding: 4px 10px; }
             .gp-mypage .gp-en { font-size: 10.5px; }
+            .gp-nav {
+                order: 3;
+                flex: 1 1 100%;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 6px 4px;
+            }
+            .gp-nav-item {
+                white-space: nowrap;
+                padding: 4px 2px;
+            }
+            .gp-en { font-size: 11.5px; }
+            .gp-jp { font-size: 9px; }
             header.gp-header .search-bar { display: none !important; }
             .gp-page-strip { padding: 8px 14px; }
             .gp-page-strip h1 { font-size: 14.5px; }
         }
-    
     </style>
 </head>
 <body>
@@ -490,19 +508,27 @@
                 <!-- 記者名 -->
                 <div class="form-group">
                     <label class="form-label">選手名 <span class="required-badge">必須</span></label>
-                    <p class="form-hint">例: モハメド・サラー、レオ・メッシ など</p>
+                    <p class="form-hint">日本語表記で入力してください（例: モハメド・サラー、レオ・メッシ など）。英数字のみの名前は登録できません。</p>
                     <div class="name-check-row">
-                        <input type="text" class="form-input" id="reporterName" placeholder="選手名を入力" autocomplete="off">
+                        <input type="text" class="form-input" id="reporterName" placeholder="選手名を日本語で入力" autocomplete="off">
                         <button type="button" class="check-btn" id="checkBtn">重複チェック</button>
                     </div>
                     <div class="duplicate-result" id="duplicateResult"></div>
+                    <div class="duplicate-result show" id="nameFormatError" style="display:none;">
+                        <div class="duplicate-found">選手名は日本語（カタカナ・ひらがな・漢字など）で入力してください。</div>
+                    </div>
                 </div>
 
-                <!-- 所属メディア -->
+                <!-- 所属クラブ -->
                 <div class="form-group">
                     <label class="form-label">現所属クラブ <span class="optional-badge">任意</span></label>
-                    <p class="form-hint">例: リヴァプールFC など</p>
-                    <input type="text" class="form-input" id="currentClub" placeholder="現所属クラブを入力">
+                    <p class="form-hint">代表的なクラブから選択できます。一覧にない場合は「その他」を選んで直接入力してください。</p>
+                    <select class="form-input" id="currentClubSelect">
+                        <option value="">選択してください</option>
+                        <option value="__other__">その他（自由入力）</option>
+                    </select>
+                    <input type="text" class="form-input" id="currentClub" placeholder="クラブ名を入力" style="display:none; margin-top:10px;">
+                    <div id="clubInfoBox" style="display:none; margin-top:10px; font-size:12.5px; color:#555; background:#f5f5f5; border-radius:6px; padding:10px 12px;"></div>
                 </div>
 
                 <div class="form-group">
@@ -513,7 +539,11 @@
 
                 <div class="form-group">
                     <label class="form-label">国籍 <span class="optional-badge">任意</span></label>
-                    <input type="text" class="form-input" id="nationality" placeholder="国籍を入力">
+                    <select class="form-input" id="nationalitySelect">
+                        <option value="">選択してください</option>
+                        <option value="__other__">その他（自由入力）</option>
+                    </select>
+                    <input type="text" class="form-input" id="nationality" placeholder="国籍を入力" style="display:none; margin-top:10px;">
                 </div>
 
                 <!-- X(Twitter)ハンドル -->
@@ -557,6 +587,7 @@
 
     <!-- API クライアント（バックエンド接続用） -->
     <!-- 本番デプロイ時は api-client.js を同じフォルダに置けば下の行が有効になります -->
+    <script src="clubs-data.js" onerror="console.warn('clubs-data.js が見つかりません')"></script>
     <script src="api-client.js" onerror="console.warn('api-client.js が見つかりません。デモモードで動作します。')"></script>
     <script>
         // =========================================================
@@ -578,6 +609,198 @@
             }
         }
         checkLoginState();
+
+        // =========================================================
+        // クラブ / 国籍ドロップダウンの初期化
+        // clubs-data.js が読み込まれていない場合は自由入力にフォールバック
+        // =========================================================
+        const CLUBS_DATA = (typeof GegenPressClubsData !== 'undefined') ? GegenPressClubsData : null;
+
+        function populateClubSelect() {
+            const sel = document.getElementById('currentClubSelect');
+            const freeInput = document.getElementById('currentClub');
+            if (!CLUBS_DATA) {
+                // データファイル未読込 → 自由入力のみ
+                sel.style.display = 'none';
+                freeInput.style.display = 'block';
+                return;
+            }
+            const byLeague = {};
+            CLUBS_DATA.CLUBS.forEach(c => {
+                if (!byLeague[c.league]) byLeague[c.league] = [];
+                byLeague[c.league].push(c);
+            });
+            let html = '<option value="">選択してください</option>';
+            Object.keys(byLeague).forEach(league => {
+                html += '<optgroup label="' + league + '">';
+                byLeague[league].forEach(c => {
+                    html += '<option value="' + escapeHtml(c.name) + '" data-league="' + escapeHtml(c.league) + '" data-country="' + escapeHtml(c.country) + '">' + escapeHtml(c.name) + '</option>';
+                });
+                html += '</optgroup>';
+            });
+            html += '<option value="__other__">その他（自由入力）</option>';
+            sel.innerHTML = html;
+
+            sel.addEventListener('change', function () {
+                const infoBox = document.getElementById('clubInfoBox');
+                if (this.value === '__other__') {
+                    freeInput.style.display = 'block';
+                    freeInput.value = '';
+                    freeInput.focus();
+                    infoBox.style.display = 'none';
+                } else if (this.value) {
+                    freeInput.style.display = 'none';
+                    freeInput.value = this.value;
+                    const opt = this.options[this.selectedIndex];
+                    infoBox.style.display = 'block';
+                    infoBox.textContent = (opt.getAttribute('data-country') || '') + ' ・ ' + (opt.getAttribute('data-league') || '');
+                } else {
+                    freeInput.style.display = 'none';
+                    freeInput.value = '';
+                    infoBox.style.display = 'none';
+                }
+            });
+        }
+        populateClubSelect();
+
+        function populateNationalitySelect() {
+            const sel = document.getElementById('nationalitySelect');
+            const freeInput = document.getElementById('nationality');
+            if (!CLUBS_DATA) {
+                sel.style.display = 'none';
+                freeInput.style.display = 'block';
+                return;
+            }
+            let html = '<option value="">選択してください</option>';
+            CLUBS_DATA.NATIONALITIES.forEach(n => {
+                html += '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>';
+            });
+            html += '<option value="__other__">その他（自由入力）</option>';
+            sel.innerHTML = html;
+
+            sel.addEventListener('change', function () {
+                if (this.value === '__other__') {
+                    freeInput.style.display = 'block';
+                    freeInput.value = '';
+                    freeInput.focus();
+                } else {
+                    freeInput.style.display = 'none';
+                    freeInput.value = this.value;
+                }
+            });
+        }
+        populateNationalitySelect();
+
+        // =========================================================
+        // 選手名は日本語表記のみ許可（ひらがな・カタカナ・漢字・中黒・長音・空白など）
+        // 英数字（ローマ字）のみの名前は「ハネる」= 登録を拒否する
+        // =========================================================
+        function isJapaneseName(name) {
+            const s = (name || '').trim();
+            if (!s) return false;
+            // 日本語の文字を1文字も含まない場合は拒否
+            const hasJapanese = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/.test(s);
+            if (!hasJapanese) return false;
+            // 日本語文字・中黒(・)・長音(ー)・全角/半角スペース・カタカナの繰り返し記号以外の文字（＝ローマ字や記号）が
+            // 含まれている場合は拒否
+            const onlyAllowedChars = /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFFー・\s　]+$/;
+            return onlyAllowedChars.test(s);
+        }
+
+        function validateNameField() {
+            const name = document.getElementById('reporterName').value.trim();
+            const err = document.getElementById('nameFormatError');
+            if (name && !isJapaneseName(name)) {
+                err.style.display = 'block';
+                return false;
+            }
+            err.style.display = 'none';
+            return true;
+        }
+        document.getElementById('reporterName').addEventListener('blur', validateNameField);
+
+        // =========================================================
+        // 編集モード（?id=... がある場合、既存選手を読み込んでフォームに反映し、
+        // 送信時は create ではなく update を呼ぶ）
+        // =========================================================
+        const editPlayerId = new URLSearchParams(window.location.search).get('id');
+        let editingPlayer = null;
+
+        async function loadPlayerForEdit() {
+            if (!editPlayerId) return;
+            document.querySelector('.page-title').textContent = '選手情報を編集';
+            document.title = '選手情報を編集 | Gegen Press!';
+            document.querySelector('.page-subtitle').textContent = '登録済みの選手情報を編集します。';
+            document.getElementById('submitBtn').textContent = '変更を保存する';
+            document.querySelector('.form-intro').textContent =
+                '選手情報を編集しています。変更したい項目のみ更新してください。';
+            // 重複チェックUIは編集時は不要
+            document.querySelector('.name-check-row .check-btn').style.display = 'none';
+
+            if (!API_AVAILABLE) {
+                document.getElementById('loginNotice').style.display = 'block';
+                document.getElementById('loginNotice').textContent = '編集機能の読み込みに失敗しました。';
+                document.getElementById('formCard').style.display = 'none';
+                return;
+            }
+            const res = await GegenPressAPI.players.getById(editPlayerId);
+            if (!res || !res.success) {
+                document.getElementById('loginNotice').style.display = 'block';
+                document.getElementById('loginNotice').textContent = '編集対象の選手が見つかりませんでした。';
+                document.getElementById('formCard').style.display = 'none';
+                return;
+            }
+            editingPlayer = res.player;
+
+            // 権限チェック（作成者本人以外は編集不可。最終判断はサーバー側のルールに委ねます）
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+            if (!user || (editingPlayer.createdBy && editingPlayer.createdBy !== user.uid)) {
+                document.getElementById('loginNotice').style.display = 'block';
+                document.getElementById('loginNotice').textContent = 'この選手情報を編集する権限がありません（登録した本人のみ編集できます）。';
+                document.getElementById('formCard').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('reporterName').value = editingPlayer.name || '';
+
+            if (editingPlayer.currentClub) {
+                const sel = document.getElementById('currentClubSelect');
+                const match = Array.from(sel.options).find(o => o.value === editingPlayer.currentClub);
+                if (match) {
+                    sel.value = editingPlayer.currentClub;
+                    sel.dispatchEvent(new Event('change'));
+                } else {
+                    sel.value = '__other__';
+                    sel.dispatchEvent(new Event('change'));
+                    document.getElementById('currentClub').value = editingPlayer.currentClub;
+                }
+            }
+            document.getElementById('playerPosition').value = editingPlayer.position || '';
+            if (editingPlayer.nationality) {
+                const nsel = document.getElementById('nationalitySelect');
+                const nmatch = Array.from(nsel.options).find(o => o.value === editingPlayer.nationality);
+                if (nmatch) {
+                    nsel.value = editingPlayer.nationality;
+                    nsel.dispatchEvent(new Event('change'));
+                } else {
+                    nsel.value = '__other__';
+                    nsel.dispatchEvent(new Event('change'));
+                    document.getElementById('nationality').value = editingPlayer.nationality;
+                }
+            }
+            document.getElementById('reporterBio').value = editingPlayer.bio || '';
+            if (editingPlayer.transferStatus === 'rumor' || editingPlayer.transferStatus === 'completed') {
+                selectedTransferStatus = editingPlayer.transferStatus;
+                document.querySelectorAll('.expertise-tag[data-transfer]').forEach(t => {
+                    t.classList.toggle('selected', t.getAttribute('data-transfer') === editingPlayer.transferStatus);
+                });
+            }
+            document.getElementById('fromClub').value = editingPlayer.fromClub || '';
+            document.getElementById('toClub').value = editingPlayer.toClub || '';
+            document.getElementById('transferFee').value = editingPlayer.transferFee || '';
+        }
+        loadPlayerForEdit();
 
         // =========================================================
         // 移籍ステータスの選択（単一選択）
@@ -695,8 +918,14 @@
 
             const name = document.getElementById('reporterName').value.trim();
             if (!name) {
-                alert('記者名は必須です。');
+                alert('選手名は必須です。');
                 document.getElementById('reporterName').focus();
+                return;
+            }
+            if (!isJapaneseName(name)) {
+                document.getElementById('nameFormatError').style.display = 'block';
+                document.getElementById('reporterName').focus();
+                document.getElementById('reporterName').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
             }
 
@@ -720,6 +949,31 @@
             // --- 本番モード ---
             if (API_AVAILABLE && IS_LOGGED_IN) {
                 submitBtn.disabled = true;
+
+                if (editPlayerId) {
+                    // 編集モード：更新のみ（重複チェック・allowDuplicateは不要）
+                    delete reporterData.allowDuplicate;
+                    submitBtn.textContent = '保存中...';
+                    try {
+                        const res = await GegenPressAPI.players.update(editPlayerId, reporterData);
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '変更を保存する';
+                        if (res && res.success) {
+                            alert('選手情報を更新しました。');
+                            window.location.href = 'gegen_press_player_profile.html?id=' + encodeURIComponent(editPlayerId);
+                        } else {
+                            alert((res && res.message && String(res.message).indexOf('permission') >= 0)
+                                ? 'この選手情報を編集する権限がありません。'
+                                : ((res && res.message) || '更新に失敗しました。時間をおいて再度お試しください。'));
+                        }
+                    } catch (e) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '変更を保存する';
+                        alert('通信エラーが発生しました。ネットワークを確認してください。');
+                    }
+                    return;
+                }
+
                 submitBtn.textContent = '追加中...';
                 try {
                     const res = await GegenPressAPI.players.create(reporterData);

@@ -503,23 +503,29 @@
                 order: -1;
             }
 
+            /* 横スクロールしないと押せない/はみ出る問題への対応：
+               折り返しチップ表示にする（ヘッダーナビと同じ考え方） */
             .quicklink-list {
                 flex-direction: row;
-                overflow-x: auto;
-                gap: 16px;
-                -webkit-overflow-scrolling: touch;
+                flex-wrap: wrap;
+                overflow-x: visible;
+                gap: 8px 10px;
+                max-width: 100%;
             }
 
             .quicklink-item {
                 border-bottom: none;
-                border-bottom: 2px solid transparent;
+                background: #fff;
+                border: 1px solid #e5e5e5;
+                border-radius: 20px;
                 white-space: nowrap;
-                padding: 8px 2px 10px;
+                padding: 6px 14px;
             }
 
             .quicklink-item:hover,
             .quicklink-item.active {
-                border-bottom-color: #e63946;
+                border-color: #e63946;
+                color: #e63946;
             }
 
             .quicklink-item .count { display: none; }
@@ -595,6 +601,7 @@
         }
     
         /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
         header.gp-header {
             background: #fff !important;
             border-bottom: 3px solid #e63946 !important;
@@ -692,22 +699,39 @@
             letter-spacing: 0.5px;
         }
         @media (max-width: 768px) {
+            /* ヘッダーはロゴ+マイページの行と、ナビの行に分けて折り返す。
+               横スクロールしないと押せない問題への対応。 */
             header.gp-header {
-                padding: 4px 10px !important;
-                gap: 12px !important;
-                flex-wrap: nowrap !important;
+                flex-wrap: wrap !important;
+                padding: 8px 14px !important;
+                gap: 0 !important;
+                row-gap: 6px !important;
             }
+            .gp-logo { order: 1; }
             .gp-logo img { height: 26px !important; }
-            .gp-nav { gap: 14px; }
-            .gp-en { font-size: 12px; }
-            .gp-jp { font-size: 9px; }
+            .gp-actions { order: 2; margin-left: auto; }
             .gp-mypage { padding: 4px 10px; }
             .gp-mypage .gp-en { font-size: 10.5px; }
+            .gp-nav {
+                order: 3;
+                flex: 1 1 100%;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 6px 4px;
+            }
+            .gp-nav-item {
+                white-space: nowrap;
+                padding: 4px 2px;
+            }
+            .gp-en { font-size: 11.5px; }
+            .gp-jp { font-size: 9px; }
             header.gp-header .search-bar { display: none !important; }
             .gp-page-strip { padding: 8px 14px; }
             .gp-page-strip h1 { font-size: 14.5px; }
         }
-    
     </style>
 </head>
 <body>
@@ -813,7 +837,9 @@
 
         function thumbHtml(article) {
             if (article.image) {
-                return '<img src="' + article.image + '" alt="">';
+                const pos = (article.imagePosition && typeof article.imagePosition.x === 'number')
+                    ? (article.imagePosition.x + '% ' + article.imagePosition.y + '%') : '50% 50%';
+                return '<img src="' + article.image + '" alt="" style="object-position:' + pos + ';">';
             }
             return esc(article.category || 'Gegen Press!');
         }

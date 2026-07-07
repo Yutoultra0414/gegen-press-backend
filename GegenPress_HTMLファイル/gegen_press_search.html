@@ -467,6 +467,7 @@
         }
     
         /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
         header.gp-header {
             background: #fff !important;
             border-bottom: 3px solid #e63946 !important;
@@ -564,22 +565,39 @@
             letter-spacing: 0.5px;
         }
         @media (max-width: 768px) {
+            /* ヘッダーはロゴ+マイページの行と、ナビの行に分けて折り返す。
+               横スクロールしないと押せない問題への対応。 */
             header.gp-header {
-                padding: 4px 10px !important;
-                gap: 12px !important;
-                flex-wrap: nowrap !important;
+                flex-wrap: wrap !important;
+                padding: 8px 14px !important;
+                gap: 0 !important;
+                row-gap: 6px !important;
             }
+            .gp-logo { order: 1; }
             .gp-logo img { height: 26px !important; }
-            .gp-nav { gap: 14px; }
-            .gp-en { font-size: 12px; }
-            .gp-jp { font-size: 9px; }
+            .gp-actions { order: 2; margin-left: auto; }
             .gp-mypage { padding: 4px 10px; }
             .gp-mypage .gp-en { font-size: 10.5px; }
+            .gp-nav {
+                order: 3;
+                flex: 1 1 100%;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 6px 4px;
+            }
+            .gp-nav-item {
+                white-space: nowrap;
+                padding: 4px 2px;
+            }
+            .gp-en { font-size: 11.5px; }
+            .gp-jp { font-size: 9px; }
             header.gp-header .search-bar { display: none !important; }
             .gp-page-strip { padding: 8px 14px; }
             .gp-page-strip h1 { font-size: 14.5px; }
         }
-    
     </style>
 </head>
 <body>
