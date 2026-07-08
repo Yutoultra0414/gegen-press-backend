@@ -471,6 +471,19 @@
             .gp-page-strip { padding: 8px 14px; }
             .gp-page-strip h1 { font-size: 14.5px; }
         }
+    
+        .gp-dropdown-wrap { position: relative; }
+        .gp-dropdown-panel {
+            display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; flex-direction: column;
+        }
+        .gp-dropdown-wrap.open .gp-dropdown-panel, .gp-dropdown-wrap:hover .gp-dropdown-panel { display: flex; }
+        .gp-dropdown-option { display: flex; flex-direction: column; padding: 10px 14px; text-decoration: none; color: #333; border-bottom: 1px solid #eee; }
+        .gp-dropdown-option:last-child { border-bottom: none; }
+        .gp-dropdown-option strong { font-size: 12.5px; }
+        .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
+        .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+    
     </style>
 </head>
 <body>
@@ -481,14 +494,35 @@
             <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
             <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
             <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
-            <a class="gp-nav-item" href="gegen_press_players.html"><span class="gp-en">PLAYERS</span><span class="gp-jp">選手一覧</span></a>
-            <a class="gp-nav-item" href="gegen_press_add_reporter.html"><span class="gp-en">ADD REPORTER</span><span class="gp-jp">記者を追加</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
+                <a class="gp-nav-item" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">メディア/記者を追加</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_add_media.html" class="gp-dropdown-option"><strong>メディアを追加</strong><span>Add Media</span></a>
+                    <a href="gegen_press_add_reporter.html" class="gp-dropdown-option"><strong>記者を追加</strong><span>Add Reporter</span></a>
+                </div>
+            </div>
             <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
         </nav>
         <div class="gp-actions">
             <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
         </div>
     </header>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('addMediaDropdownWrap');
+            var trigger = document.getElementById('addMediaDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
 
     <!-- ページタイトル -->
     <div class="gp-page-strip"><h1>選手を追加</h1></div>

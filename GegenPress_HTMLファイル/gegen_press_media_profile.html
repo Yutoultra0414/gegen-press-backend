@@ -105,6 +105,19 @@
             .media-header h1 { font-size: 16px; }
             .content-wrap { padding: 14px; }
         }
+    
+        .gp-dropdown-wrap { position: relative; }
+        .gp-dropdown-panel {
+            display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; flex-direction: column;
+        }
+        .gp-dropdown-wrap.open .gp-dropdown-panel, .gp-dropdown-wrap:hover .gp-dropdown-panel { display: flex; }
+        .gp-dropdown-option { display: flex; flex-direction: column; padding: 10px 14px; text-decoration: none; color: #333; border-bottom: 1px solid #eee; }
+        .gp-dropdown-option:last-child { border-bottom: none; }
+        .gp-dropdown-option strong { font-size: 12.5px; }
+        .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
+        .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+    
     </style>
 </head>
 <body>
@@ -114,8 +127,13 @@
             <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
             <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
             <a class="gp-nav-item active" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
-            <a class="gp-nav-item" href="gegen_press_players.html"><span class="gp-en">PLAYERS</span><span class="gp-jp">選手一覧</span></a>
-            <a class="gp-nav-item" href="gegen_press_add_reporter.html"><span class="gp-en">ADD REPORTER</span><span class="gp-jp">記者を追加</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
+                <a class="gp-nav-item" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">メディア/記者を追加</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_add_media.html" class="gp-dropdown-option"><strong>メディアを追加</strong><span>Add Media</span></a>
+                    <a href="gegen_press_add_reporter.html" class="gp-dropdown-option"><strong>記者を追加</strong><span>Add Reporter</span></a>
+                </div>
+            </div>
             <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
         </nav>
         <div class="gp-actions">
@@ -123,11 +141,28 @@
         </div>
     </header>
 
+    <script>
+        (function () {
+            var wrap = document.getElementById('addMediaDropdownWrap');
+            var trigger = document.getElementById('addMediaDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+
     <section class="media-header">
         <div class="media-badge" id="mediaBadge">?</div>
         <div>
             <h1 id="mediaName">読み込み中...</h1>
             <p id="mediaSub"></p>
+            <p id="mediaReporterCount" style="font-size:11.5px; color:rgba(255,255,255,0.8); margin-top:2px;"></p>
         </div>
     </section>
 
@@ -189,6 +224,31 @@
                 reportersWrap.innerHTML = '<p class="empty-note">読み込めませんでした。</p>';
                 return;
             }
+
+            // 登録済みのメディア情報（ロゴ・紹介文・公式サイト）があれば反映
+            try {
+                const mres = await GegenPressAPI.media.getByName(mediaName);
+                if (mres && mres.success && mres.media) {
+                    const m = mres.media;
+                    if (m.logo) {
+                        badge.style.background = 'none';
+                        badge.innerHTML = '<img src="' + m.logo + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">';
+                    }
+                    if (m.description) {
+                        document.getElementById('mediaSub').textContent = m.description;
+                    }
+                    if (m.website) {
+                        const link = document.createElement('a');
+                        link.href = m.website; link.target = '_blank'; link.rel = 'noopener';
+                        link.textContent = m.website;
+                        link.style.cssText = 'display:block; color:#fff; text-decoration:underline; font-size:11.5px; margin-top:2px;';
+                        document.getElementById('mediaSub').after(link);
+                    }
+                } else if (mres && mres.success && !mres.media) {
+                    document.getElementById('mediaSub').textContent = 'このメディアはまだ「メディアを追加」から正式登録されていません（記者の所属先としてのみ存在します）。';
+                }
+            } catch (e) { /* メディア情報が無い場合は記者の集計のみ表示 */ }
+
             try {
                 const rres = await GegenPressAPI.reporters.getAll();
                 if (!rres || !rres.success) {
@@ -196,7 +256,7 @@
                     return;
                 }
                 const mine = (rres.reporters || []).filter(r => r.mediaOutlet === mediaName);
-                document.getElementById('mediaSub').textContent = '所属記者 ' + mine.length + '名';
+                document.getElementById('mediaReporterCount').textContent = '所属記者 ' + mine.length + '名';
                 if (mine.length === 0) {
                     reportersWrap.innerHTML = '<p class="empty-note">このメディアに登録されている記者はまだいません。</p>';
                     return;

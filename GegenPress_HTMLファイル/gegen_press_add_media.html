@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メディアを追加 - Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
+
+        .page-strip { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 16px 40px; }
+        .page-strip h1 { font-size: 18px; font-weight: 900; }
+        .page-strip p { font-size: 12.5px; color: #888; margin-top: 4px; }
+
+        .container { max-width: 640px; margin: 24px auto; padding: 0 16px 60px; }
+        .card { background: #fff; border: 1px solid #eee; padding: 22px; margin-bottom: 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 12.5px; font-weight: bold; margin-bottom: 5px; }
+        .form-hint { font-size: 11px; color: #999; margin-bottom: 6px; }
+        .form-input, .form-textarea { width: 100%; padding: 9px 12px; border: 1px solid #ddd; font-size: 13px; font-family: inherit; }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .required-badge { background: #e63946; color: #fff; font-size: 10px; padding: 1px 6px; margin-left: 4px; }
+        .optional-badge { background: #eee; color: #888; font-size: 10px; padding: 1px 6px; margin-left: 4px; }
+        .submit-btn {
+            width: 100%; background: #e63946; color: #fff; border: none; padding: 13px;
+            font-size: 14px; font-weight: bold; cursor: pointer;
+        }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .login-notice { background: #fff3cd; color: #856404; padding: 12px 16px; margin-bottom: 16px; font-size: 12.5px; display: none; }
+        .success-box { display: none; text-align: center; padding: 30px 20px; }
+        .success-box h2 { color: #2a9d8f; margin-bottom: 10px; }
+
+        .logo-drop { border: 2px dashed #ddd; padding: 16px; text-align: center; cursor: pointer; }
+        .logo-drop.has-image { padding: 0; border-style: solid; overflow: hidden; }
+        .logo-drop img { width: 100%; max-height: 160px; object-fit: cover; display: block; }
+        .logo-drop-label { color: #999; font-size: 12.5px; }
+
+        /* ===== 共通ヘッダー ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
+        header.gp-header {
+            background: #fff !important; border-bottom: 3px solid #e63946 !important; padding: 6px 24px !important;
+            display: flex !important; align-items: center !important; justify-content: flex-start !important;
+            flex-direction: row !important; flex-wrap: nowrap !important; gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important; position: sticky; top: 0; z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav { display: flex; align-items: stretch; gap: 22px; flex: 1; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; line-height: 1.15; padding: 6px 2px; white-space: nowrap; }
+        .gp-en { font-size: 13px; font-weight: 900; letter-spacing: 0.5px; color: #111; text-transform: uppercase; }
+        .gp-jp { font-size: 9px; color: #888; font-weight: 600; margin-top: 1px; }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-dropdown-wrap { position: relative; }
+        .gp-dropdown-panel {
+            display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; flex-direction: column;
+        }
+        .gp-dropdown-wrap.open .gp-dropdown-panel, .gp-dropdown-wrap:hover .gp-dropdown-panel { display: flex; }
+        .gp-dropdown-option { display: flex; flex-direction: column; padding: 10px 14px; text-decoration: none; color: #333; border-bottom: 1px solid #eee; }
+        .gp-dropdown-option:last-child { border-bottom: none; }
+        .gp-dropdown-option strong { font-size: 12.5px; }
+        .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
+        .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+        .gp-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-shrink: 0; }
+        .gp-mypage { display: flex; flex-direction: column; align-items: center; background: #e63946; color: #fff; text-decoration: none; padding: 5px 14px; line-height: 1.15; white-space: nowrap; }
+        .gp-mypage .gp-en { color: #fff; font-size: 11px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #ff6b6b; }
+        @media (max-width: 768px) {
+            header.gp-header { flex-wrap: wrap !important; padding: 8px 14px !important; gap: 0 !important; row-gap: 6px !important; }
+            .gp-logo { order: 1; }
+            .gp-logo img { height: 26px !important; }
+            .gp-actions { order: 2; margin-left: auto; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10px; }
+            .gp-nav { order: 3; flex: 1 1 100%; width: 100%; max-width: 100%; overflow-x: visible; flex-wrap: wrap; justify-content: space-between; gap: 6px 4px; }
+            .gp-nav-item { white-space: nowrap; padding: 4px 2px; }
+            .gp-en { font-size: 11px; }
+            .gp-jp { font-size: 8.5px; }
+            .page-strip { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="gp-header">
+        <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
+            <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
+                <a class="gp-nav-item active" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">メディア/記者を追加</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_add_media.html" class="gp-dropdown-option"><strong>メディアを追加</strong><span>Add Media</span></a>
+                    <a href="gegen_press_add_reporter.html" class="gp-dropdown-option"><strong>記者を追加</strong><span>Add Reporter</span></a>
+                </div>
+            </div>
+            <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
+        </nav>
+        <div class="gp-actions">
+            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
+        </div>
+    </header>
+    <script>
+        (function () {
+            var wrap = document.getElementById('addMediaDropdownWrap');
+            var trigger = document.getElementById('addMediaDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <div class="page-strip">
+        <h1>メディアを追加</h1>
+        <p>Sky SportsやMarcaのような「メディア（媒体）」を新しく登録します。登録後、記者を追加するときに所属メディアとして選べるようになります。</p>
+    </div>
+
+    <div class="container">
+        <div class="login-notice" id="loginNotice">メディアの追加にはログインが必要です。<a href="gegen_press_login.html">ログイン / 新規登録</a></div>
+
+        <div class="card" id="formCard">
+            <form id="mediaForm">
+                <div class="form-group">
+                    <label class="form-label">メディア名 <span class="required-badge">必須</span></label>
+                    <p class="form-hint">例: Sky Sports、The Athletic、Marca など。既に登録されている名前は使えません。</p>
+                    <input type="text" class="form-input" id="mediaName" placeholder="メディア名を入力" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">ロゴ画像 <span class="optional-badge">任意</span></label>
+                    <div class="logo-drop" id="logoDrop">
+                        <div class="logo-drop-label" id="logoDropLabel">クリックして画像を選択</div>
+                    </div>
+                    <input type="file" id="logoInput" accept="image/*" style="display:none;">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">公式サイトURL <span class="optional-badge">任意</span></label>
+                    <input type="text" class="form-input" id="mediaWebsite" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">紹介文 <span class="optional-badge">任意</span></label>
+                    <textarea class="form-textarea" id="mediaDescription" placeholder="どんなメディアか簡単に紹介してください"></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">メディアを追加する</button>
+            </form>
+        </div>
+
+        <div class="card success-box" id="successBox">
+            <h2>追加しました！</h2>
+            <p id="successName"></p>
+            <div style="margin-top:16px; display:flex; gap:10px; justify-content:center;">
+                <a href="gegen_press_add_reporter.html" class="submit-btn" style="display:inline-block; width:auto; padding:10px 20px; text-decoration:none;">続けて記者を追加</a>
+                <a href="gegen_press_top.html" style="display:inline-block; padding:10px 20px; border:1px solid #ccc; color:#333; text-decoration:none;">ホームに戻る</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js" onerror="console.warn('api-client.js が見つかりません')"></script>
+    <script>
+        const API_AVAILABLE = (typeof GegenPressAPI !== 'undefined');
+        let IS_LOGGED_IN = false;
+        async function checkLoginState() {
+            if (!API_AVAILABLE) return;
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+            IS_LOGGED_IN = !!user;
+            if (!IS_LOGGED_IN) {
+                document.getElementById('loginNotice').style.display = 'block';
+                document.getElementById('submitBtn').disabled = true;
+            }
+        }
+        checkLoginState();
+
+        // ロゴ画像選択・圧縮
+        let logoDataUrl = null;
+        const logoDrop = document.getElementById('logoDrop');
+        const logoInput = document.getElementById('logoInput');
+        logoDrop.addEventListener('click', () => logoInput.click());
+        logoInput.addEventListener('change', async function () {
+            const file = this.files && this.files[0];
+            if (!file) return;
+            if (!file.type || file.type.indexOf('image/') !== 0) { alert('画像ファイルを選択してください'); return; }
+            document.getElementById('logoDropLabel').textContent = '処理中...';
+            try {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const img = new Image();
+                    img.onload = function () {
+                        const size = 240;
+                        const canvas = document.createElement('canvas');
+                        canvas.width = size; canvas.height = size;
+                        const ctx = canvas.getContext('2d');
+                        const s = Math.min(img.width, img.height);
+                        ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+                        logoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                        logoDrop.classList.add('has-image');
+                        logoDrop.innerHTML = '<img src="' + logoDataUrl + '" alt="">';
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            } catch (e) {
+                alert('画像の処理に失敗しました: ' + (e.message || e));
+                document.getElementById('logoDropLabel').textContent = 'クリックして画像を選択';
+            }
+        });
+
+        document.getElementById('mediaForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const name = document.getElementById('mediaName').value.trim();
+            if (!name) { alert('メディア名は必須です'); return; }
+            if (!API_AVAILABLE || !IS_LOGGED_IN) { alert('ログインが必要です'); return; }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true; submitBtn.textContent = '追加中...';
+
+            const res = await GegenPressAPI.media.create({
+                name: name,
+                description: document.getElementById('mediaDescription').value.trim(),
+                website: document.getElementById('mediaWebsite').value.trim() || null,
+                logo: logoDataUrl
+            });
+
+            submitBtn.disabled = false; submitBtn.textContent = 'メディアを追加する';
+
+            if (res && res.success) {
+                document.getElementById('formCard').style.display = 'none';
+                document.getElementById('successBox').style.display = 'block';
+                document.getElementById('successName').textContent = name + ' を追加しました。';
+            } else {
+                alert((res && res.message) || '追加に失敗しました。');
+            }
+        });
+    </script>
+</body>
+</html>

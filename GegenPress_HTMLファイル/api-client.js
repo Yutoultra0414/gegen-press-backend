@@ -620,6 +620,55 @@
           return { success: true };
         } catch (e) { return { success: false, message: String(e) }; }
       }
+    },
+
+    // ===== メディア（媒体そのものを登録するコレクション。ドキュメントID＝メディア名） =====
+    media: {
+      async getAll() {
+        try {
+          var fb = await _ready;
+          var snap = await fb.db.collection('media').get();
+          return { success: true, media: docList(snap) };
+        } catch (e) { return { success: false, message: String(e), media: [] }; }
+      },
+      async getByName(name) {
+        try {
+          var fb = await _ready;
+          var doc = await fb.db.collection('media').doc(name).get();
+          if (!doc.exists) return { success: true, media: null };
+          var data = doc.data(); data.id = doc.id;
+          return { success: true, media: data };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async create(data) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: false, message: 'メディアの追加にはログインが必要です' };
+          if (!data.name) return { success: false, message: 'メディア名は必須です' };
+          var fb = await _ready;
+          var existing = await fb.db.collection('media').doc(data.name).get();
+          if (existing.exists) return { success: false, message: '同名のメディアが既に登録されています' };
+          var docData = {
+            name: data.name,
+            description: data.description || '',
+            website: data.website || null,
+            logo: data.logo || null,
+            createdBy: u.uid,
+            createdAt: tsNow(), updatedAt: tsNow()
+          };
+          await fb.db.collection('media').doc(data.name).set(docData);
+          return { success: true, id: data.name };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async update(name, data) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: false, message: 'ログインが必要です' };
+          var fb = await _ready;
+          await fb.db.collection('media').doc(name).set(Object.assign({}, data, { updatedAt: tsNow() }), { merge: true });
+          return { success: true };
+        } catch (e) { return { success: false, message: String(e) }; }
+      }
     }
   };
 
