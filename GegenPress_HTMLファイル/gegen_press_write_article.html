@@ -341,11 +341,19 @@
                 <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
                 <div class="gp-dropdown-panel">
                     <a href="gegen_press_category.html" class="gp-dropdown-option"><strong>すべてのニュース</strong><span>All News</span></a>
-                    <a href="gegen_press_category.html?type=confirmed" class="gp-dropdown-option"><strong>確定情報</strong><span>Confirmed</span></a>
-                    <a href="gegen_press_category.html?type=rumor" class="gp-dropdown-option"><strong>移籍の噂</strong><span>Rumor</span></a>
+                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=confirmed" class="gp-dropdown-option"><strong>移籍記事（確定情報）</strong><span>Transfer / Confirmed</span></a>
+                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=rumor" class="gp-dropdown-option"><strong>移籍記事（噂）</strong><span>Transfer / Rumor</span></a>
+                    <a href="gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>インタビュー記事</strong><span>Interviews</span></a>
+                    <a href="gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>一般記事</strong><span>General</span></a>
                 </div>
             </div>
-            <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="rankingDropdownWrap">
+                <a class="gp-nav-item" href="#" id="rankingDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_ranking.html?view=reporters" class="gp-dropdown-option"><strong>記者ランキング</strong><span>Reporters</span></a>
+                    <a href="gegen_press_ranking.html?view=media" class="gp-dropdown-option"><strong>メディアランキング</strong><span>Media</span></a>
+                </div>
+            </div>
             <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
                 <a class="gp-nav-item" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">メディア/記者を追加</span></a>
                 <div class="gp-dropdown-panel">
@@ -390,6 +398,22 @@
         })();
     </script>
 
+    <script>
+        (function () {
+            var wrap = document.getElementById('rankingDropdownWrap');
+            var trigger = document.getElementById('rankingDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+
 
 
     <div class="gp-page-strip"><h1>ニュースを投稿</h1></div>
@@ -428,9 +452,30 @@
                     </select>
                 </div>
 
-                <!-- カテゴリ -->
+                <!-- 記事の種類（複数選択可） -->
                 <div class="form-group">
-                    <label class="form-label">カテゴリ <span class="required-badge">必須</span></label>
+                    <label class="form-label">記事の種類 <span class="required-badge">必須</span></label>
+                    <p class="form-hint">複数選択できます。ニュース一覧上部の「NEWS」メニューの絞り込みに使われます。</p>
+                    <div class="tag-group" id="articleTypeTags">
+                        <span class="tag-option" data-value="移籍記事">移籍記事</span>
+                        <span class="tag-option" data-value="インタビュー記事">インタビュー記事</span>
+                        <span class="tag-option" data-value="一般記事">一般記事</span>
+                    </div>
+                </div>
+
+                <!-- 情報の確度（「移籍記事」を選んだ場合のみ表示・必須） -->
+                <div class="form-group" id="newsTypeGroup" style="display:none;">
+                    <label class="form-label">情報の確度 <span class="required-badge">必須</span></label>
+                    <p class="form-hint">「移籍記事」にはこの情報が必要です。ニュース一覧で「確定情報」「移籍の噂」に分けて表示されます。</p>
+                    <div class="tag-group" id="newsTypeTags">
+                        <span class="tag-option" data-value="confirmed">確定情報</span>
+                        <span class="tag-option" data-value="rumor">移籍の噂</span>
+                    </div>
+                </div>
+
+                <!-- サブカテゴリ（リーグ等） -->
+                <div class="form-group">
+                    <label class="form-label">サブカテゴリ（リーグ等） <span class="required-badge">必須</span></label>
                     <div class="tag-group" id="categoryTags">
                         <span class="tag-option" data-value="移籍情報">移籍情報</span>
                         <span class="tag-option" data-value="プレミアリーグ">プレミアリーグ</span>
@@ -440,16 +485,6 @@
                         <span class="tag-option" data-value="リーグアン">リーグアン</span>
                         <span class="tag-option" data-value="日本サッカー">日本サッカー</span>
                         <span class="tag-option" data-value="代表チーム">代表チーム</span>
-                    </div>
-                </div>
-
-                <!-- 情報の確度 -->
-                <div class="form-group">
-                    <label class="form-label">情報の確度 <span class="optional-badge">任意</span></label>
-                    <p class="form-hint">ニュース一覧で「確定情報」「移籍の噂」に分けて表示されます。</p>
-                    <div class="tag-group" id="newsTypeTags">
-                        <span class="tag-option" data-value="confirmed">確定情報</span>
-                        <span class="tag-option" data-value="rumor">移籍の噂</span>
                     </div>
                 </div>
 
@@ -574,7 +609,28 @@
             });
         });
 
-        // 情報の確度（任意・単一選択。もう一度押すと選択解除）
+        // 記事の種類（複数選択）。「移籍記事」を含む場合のみ「情報の確度」を表示・必須にする
+        const selectedArticleTypes = new Set();
+        document.querySelectorAll('#articleTypeTags .tag-option').forEach(tag => {
+            tag.addEventListener('click', function () {
+                const v = this.getAttribute('data-value');
+                if (selectedArticleTypes.has(v)) {
+                    selectedArticleTypes.delete(v);
+                    this.classList.remove('selected');
+                } else {
+                    selectedArticleTypes.add(v);
+                    this.classList.add('selected');
+                }
+                const showNewsType = selectedArticleTypes.has('移籍記事');
+                document.getElementById('newsTypeGroup').style.display = showNewsType ? 'block' : 'none';
+                if (!showNewsType) {
+                    selectedNewsType = null;
+                    document.querySelectorAll('#newsTypeTags .tag-option').forEach(t => t.classList.remove('selected'));
+                }
+            });
+        });
+
+        // 情報の確度（「移籍記事」選択時のみ必須・単一選択。もう一度押すと選択解除）
         let selectedNewsType = null;
         document.querySelectorAll('#newsTypeTags .tag-option').forEach(tag => {
             tag.addEventListener('click', function () {
@@ -703,7 +759,9 @@
             }
             if (!title) { alert('見出しを入力してください'); return; }
             if (!authorId) { alert('投稿する記者名義を選択してください'); return; }
-            if (!selectedCategory) { alert('カテゴリを選択してください'); return; }
+            if (selectedArticleTypes.size === 0) { alert('記事の種類を1つ以上選択してください'); return; }
+            if (selectedArticleTypes.has('移籍記事') && !selectedNewsType) { alert('「移籍記事」を選んだ場合は、情報の確度（確定情報／移籍の噂）を選択してください'); return; }
+            if (!selectedCategory) { alert('サブカテゴリを選択してください'); return; }
             if (!desc) { alert('概要を入力してください'); return; }
             if (!content) { alert('本文を入力してください'); return; }
 
@@ -717,6 +775,7 @@
                 description: desc,
                 content: content,
                 category: selectedCategory,
+                articleTypes: Array.from(selectedArticleTypes),
                 newsType: selectedNewsType,
                 tags: hashtags,
                 authorId: authorId,

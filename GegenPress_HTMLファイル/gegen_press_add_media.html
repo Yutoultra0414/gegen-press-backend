@@ -94,11 +94,19 @@
                 <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
                 <div class="gp-dropdown-panel">
                     <a href="gegen_press_category.html" class="gp-dropdown-option"><strong>すべてのニュース</strong><span>All News</span></a>
-                    <a href="gegen_press_category.html?type=confirmed" class="gp-dropdown-option"><strong>確定情報</strong><span>Confirmed</span></a>
-                    <a href="gegen_press_category.html?type=rumor" class="gp-dropdown-option"><strong>移籍の噂</strong><span>Rumor</span></a>
+                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=confirmed" class="gp-dropdown-option"><strong>移籍記事（確定情報）</strong><span>Transfer / Confirmed</span></a>
+                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=rumor" class="gp-dropdown-option"><strong>移籍記事（噂）</strong><span>Transfer / Rumor</span></a>
+                    <a href="gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>インタビュー記事</strong><span>Interviews</span></a>
+                    <a href="gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>一般記事</strong><span>General</span></a>
                 </div>
             </div>
-            <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="rankingDropdownWrap">
+                <a class="gp-nav-item" href="#" id="rankingDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_ranking.html?view=reporters" class="gp-dropdown-option"><strong>記者ランキング</strong><span>Reporters</span></a>
+                    <a href="gegen_press_ranking.html?view=media" class="gp-dropdown-option"><strong>メディアランキング</strong><span>Media</span></a>
+                </div>
+            </div>
             <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
                 <a class="gp-nav-item active" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">メディア/記者を追加</span></a>
                 <div class="gp-dropdown-panel">
@@ -141,6 +149,22 @@
             });
         })();
     </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('rankingDropdownWrap');
+            var trigger = document.getElementById('rankingDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
 
 
     <div class="page-strip">

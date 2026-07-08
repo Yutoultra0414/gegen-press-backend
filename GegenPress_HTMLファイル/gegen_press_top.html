@@ -365,6 +365,17 @@
             margin-top: 8px;
         }
         .hero-card:hover { box-shadow: 0 10px 26px rgba(230,57,70,0.18); transform: translateY(-2px); }
+        .hero-duo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .hero-duo .hero-card { margin-top: 0; }
+        @media (max-width: 1024px) {
+            .hero-duo { grid-template-columns: 1fr; }
+            .hero-card-second { display: none; }
+        }
         .hero-thumb {
             width: 100%;
             aspect-ratio: 16 / 9;
@@ -810,8 +821,12 @@
             }
 
             .section-title {
-                font-size: 24px;
+                font-size: 12px;
+                font-weight: 600;
+                padding: 8px 10px;
+                gap: 6px;
             }
+            .section-title svg { width: 13px; height: 13px; }
 
             .reporter-row-name h3 { font-size: 12px; }
             .reporter-row-stat { width: 48px; }
@@ -1032,6 +1047,17 @@
         .gp-dropdown-option strong { font-size: 12.5px; }
         .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
         .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+
+        /* スクロールで各セクションが徐々に見えてくる演出 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
     
     </style>
 </head>
@@ -1052,14 +1078,17 @@
             100% { opacity: 0; visibility: hidden; }
         }
         #introLogo { animation: introLogoIn 0.5s cubic-bezier(.2,1.1,.4,1) forwards; }
-        #introOverlay { animation: introOverlayOut 0.35s ease-in 0.62s forwards; }
+        #introOverlay { animation: introOverlayOut 0.35s ease-in 0.92s forwards; }
+        @media (min-width: 769px) {
+            #introLogo { height: 130px !important; }
+        }
     </style>
     <script>
         // アニメーション終了後、確実にDOMから消して操作を邪魔しないようにする
         setTimeout(function () {
             const el = document.getElementById('introOverlay');
             if (el) el.remove();
-        }, 1100);
+        }, 1400);
     </script>
 
     <!-- ヘッダー -->
@@ -1071,11 +1100,19 @@
                 <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
                 <div class="gp-dropdown-panel">
                     <a href="gegen_press_category.html" class="gp-dropdown-option"><strong>すべてのニュース</strong><span>All News</span></a>
-                    <a href="gegen_press_category.html?type=confirmed" class="gp-dropdown-option"><strong>確定情報</strong><span>Confirmed</span></a>
-                    <a href="gegen_press_category.html?type=rumor" class="gp-dropdown-option"><strong>移籍の噂</strong><span>Rumor</span></a>
+                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=confirmed" class="gp-dropdown-option"><strong>移籍記事（確定情報）</strong><span>Transfer / Confirmed</span></a>
+                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=rumor" class="gp-dropdown-option"><strong>移籍記事（噂）</strong><span>Transfer / Rumor</span></a>
+                    <a href="gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>インタビュー記事</strong><span>Interviews</span></a>
+                    <a href="gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>一般記事</strong><span>General</span></a>
                 </div>
             </div>
-            <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="rankingDropdownWrap">
+                <a class="gp-nav-item" href="#" id="rankingDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_ranking.html?view=reporters" class="gp-dropdown-option"><strong>記者ランキング</strong><span>Reporters</span></a>
+                    <a href="gegen_press_ranking.html?view=media" class="gp-dropdown-option"><strong>メディアランキング</strong><span>Media</span></a>
+                </div>
+            </div>
             <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
                 <a class="gp-nav-item" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">メディア/記者を追加</span></a>
                 <div class="gp-dropdown-panel">
@@ -1121,6 +1158,22 @@
             });
         })();
     </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('rankingDropdownWrap');
+            var trigger = document.getElementById('rankingDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
 
 
 
@@ -1346,16 +1399,24 @@
                         return;
                     }
                     const heroA = list[0];
-                    const rowA = list.slice(1, 9); // 横スクロール分：最大8件
+                    const heroB = list.length > 1 ? list[1] : null;
+                    const rowA = list.slice(2, 10); // 横スクロール分：最大8件
 
-                    const heroHtml =
-                        '<a class="hero-card" data-article-id="' + esc(heroA.id) + '">' +
-                            '<div class="hero-thumb"><span class="cat-tag">' + esc(heroA.category || '速報') + '</span>' + thumbHtmlFor(heroA) + '</div>' +
-                            '<div class="hero-body">' +
-                                '<div class="hero-title">' + esc(heroA.title) + '</div>' +
-                                '<div class="card-meta"><span style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;' + avatarStyle(heroA.authorName) + '">' + esc(getInitials(heroA.authorName)) + '</span>' + esc(heroA.authorName || '') + '</div>' +
-                            '</div>' +
-                        '</a>';
+                    function heroCardHtml(a, extraClass) {
+                        return (
+                            '<a class="hero-card' + (extraClass ? ' ' + extraClass : '') + '" data-article-id="' + esc(a.id) + '">' +
+                                '<div class="hero-thumb"><span class="cat-tag">' + esc(a.category || '速報') + '</span>' + thumbHtmlFor(a) + '</div>' +
+                                '<div class="hero-body">' +
+                                    '<div class="hero-title">' + esc(a.title) + '</div>' +
+                                    '<div class="card-meta"><span style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</span>' + esc(a.authorName || '') + '</div>' +
+                                '</div>' +
+                            '</a>'
+                        );
+                    }
+
+                    const heroHtml = heroB
+                        ? '<div class="hero-duo">' + heroCardHtml(heroA) + heroCardHtml(heroB, 'hero-card-second') + '</div>'
+                        : heroCardHtml(heroA);
 
                     const rowHtml = rowA.length === 0 ? '' : (
                         '<div class="pickup-articles" style="margin-top:14px;">' +
@@ -1687,6 +1748,25 @@
                 wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中にエラーが発生しました。</div>';
             }
         }
+
+        // スクロールで各セクションが徐々に見えてくる演出
+        (function () {
+            const targets = document.querySelectorAll('.pickup-section, .trio-col, .side-box');
+            targets.forEach(el => el.classList.add('reveal'));
+            if (!('IntersectionObserver' in window)) {
+                targets.forEach(el => el.classList.add('revealed'));
+                return;
+            }
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.08 });
+            targets.forEach(el => io.observe(el));
+        })();
     </script>
 </body>
 </html>

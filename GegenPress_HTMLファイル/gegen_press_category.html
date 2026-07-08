@@ -746,6 +746,16 @@
         .gp-dropdown-option strong { font-size: 12.5px; }
         .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
         .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
     
     </style>
 </head>
@@ -759,11 +769,19 @@
                 <a class="gp-nav-item active" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
                 <div class="gp-dropdown-panel">
                     <a href="gegen_press_category.html" class="gp-dropdown-option"><strong>すべてのニュース</strong><span>All News</span></a>
-                    <a href="gegen_press_category.html?type=confirmed" class="gp-dropdown-option"><strong>確定情報</strong><span>Confirmed</span></a>
-                    <a href="gegen_press_category.html?type=rumor" class="gp-dropdown-option"><strong>移籍の噂</strong><span>Rumor</span></a>
+                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=confirmed" class="gp-dropdown-option"><strong>移籍記事（確定情報）</strong><span>Transfer / Confirmed</span></a>
+                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=rumor" class="gp-dropdown-option"><strong>移籍記事（噂）</strong><span>Transfer / Rumor</span></a>
+                    <a href="gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>インタビュー記事</strong><span>Interviews</span></a>
+                    <a href="gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>一般記事</strong><span>General</span></a>
                 </div>
             </div>
-            <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="rankingDropdownWrap">
+                <a class="gp-nav-item" href="#" id="rankingDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_ranking.html?view=reporters" class="gp-dropdown-option"><strong>記者ランキング</strong><span>Reporters</span></a>
+                    <a href="gegen_press_ranking.html?view=media" class="gp-dropdown-option"><strong>メディアランキング</strong><span>Media</span></a>
+                </div>
+            </div>
             <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
                 <a class="gp-nav-item" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">メディア/記者を追加</span></a>
                 <div class="gp-dropdown-panel">
@@ -807,6 +825,22 @@
             });
         })();
     </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('rankingDropdownWrap');
+            var trigger = document.getElementById('rankingDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
 
 
 
@@ -1039,14 +1073,26 @@
                 }
                 let articles = res.articles || [];
 
-                // ?type=confirmed または ?type=rumor で絞り込み（NEWSナビのドロップダウンから遷移時）
-                const typeParam = new URLSearchParams(window.location.search).get('type');
+                // ?articleType=移籍記事/インタビュー記事/一般記事 と ?type=confirmed/rumor で絞り込み
+                // （NEWSナビのドロップダウンから遷移時。リーグ別のセクション分けはこれまで通り変更していません）
+                const params = new URLSearchParams(window.location.search);
+                const articleTypeParam = params.get('articleType');
+                const typeParam = params.get('type');
+                const bannerParts = [];
+
+                if (articleTypeParam) {
+                    articles = articles.filter(a => Array.isArray(a.articleTypes) && a.articleTypes.includes(articleTypeParam));
+                    bannerParts.push('「' + articleTypeParam + '」');
+                }
                 if (typeParam === 'confirmed' || typeParam === 'rumor') {
                     articles = articles.filter(a => a.newsType === typeParam);
+                    bannerParts.push(typeParam === 'confirmed' ? '「確定情報」' : '「移籍の噂」');
+                }
+                if (bannerParts.length > 0) {
                     const banner = document.createElement('div');
                     banner.style.cssText = 'max-width:1040px; margin:14px auto 0; padding:10px 16px; background:#fff3cd; color:#856404; font-size:12.5px; display:flex; justify-content:space-between; align-items:center;';
                     banner.innerHTML =
-                        '<span>' + (typeParam === 'confirmed' ? '「確定情報」のみ表示中です。' : '「移籍の噂」のみ表示中です。') + '</span>' +
+                        '<span>' + bannerParts.join('・') + 'のみ表示中です。</span>' +
                         '<a href="gegen_press_category.html" style="color:#856404; font-weight:bold; text-decoration:underline;">絞り込みを解除</a>';
                     document.querySelector('.main-content').prepend(banner);
                 }
@@ -1058,6 +1104,29 @@
             }
         }
         loadCategoryPage();
+
+        // スクロールで各セクションが徐々に見えてくる演出
+        (function () {
+            function applyReveal() {
+                const targets = document.querySelectorAll('.league-section, #sec-latest');
+                targets.forEach(el => { if (!el.classList.contains('reveal')) el.classList.add('reveal'); });
+                if (!('IntersectionObserver' in window)) {
+                    targets.forEach(el => el.classList.add('revealed'));
+                    return;
+                }
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('revealed');
+                            io.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.05 });
+                targets.forEach(el => io.observe(el));
+            }
+            // 記事の読み込み（非同期）が終わってからセクションが揃うので、少し遅らせて適用する
+            setTimeout(applyReveal, 400);
+        })();
     </script>
 </body>
 </html>
