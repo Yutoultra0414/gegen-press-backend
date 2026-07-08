@@ -734,6 +734,8 @@
     <!-- ページタイトル -->
     <div class="gp-page-strip"><h1>記者ランキング</h1></div>
 
+    <div id="pageLoadingIndicator" style="text-align:center; padding:80px 20px; color:#999; font-size:13px;">読み込み中...</div>
+    <div id="pageContentWrap" style="opacity:0; transition:opacity 0.25s ease;">
     <!-- メインコンテンツ -->
     <div class="container">
         <!-- フィルターセクション -->
@@ -980,6 +982,7 @@
             <button class="pagination-btn">次へ</button>
         </div>
     </div>
+    </div><!-- /#pageContentWrap -->
 
     <script src="api-client.js" onerror="console.warn('api-client.js 未読込: 見本データを表示します')"></script>
     <script>
@@ -1197,7 +1200,13 @@
             });
         });
 
-        loadRanking();
+        function revealPageContent() {
+            const loading = document.getElementById('pageLoadingIndicator');
+            const wrap = document.getElementById('pageContentWrap');
+            if (loading) loading.style.display = 'none';
+            if (wrap) wrap.style.opacity = '1';
+        }
+        loadRanking().finally(revealPageContent);
     </script>
 </body>
 </html>

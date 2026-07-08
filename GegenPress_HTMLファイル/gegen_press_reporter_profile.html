@@ -1224,27 +1224,6 @@
 
         <!-- サイドバー -->
         <aside class="sidebar">
-            <!-- プロフィール詳細 -->
-            <div class="sidebar-box">
-                <h3>プロフィール</h3>
-                <div class="info-item">
-                    <div class="info-label">国</div>
-                    <div class="info-value">イタリア</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">専門分野</div>
-                    <div class="info-value">移籍情報</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">経験年数</div>
-                    <div class="info-value">15年</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">活動開始</div>
-                    <div class="info-value">2009年</div>
-                </div>
-            </div>
-
             <!-- 専門分野 -->
             <div class="sidebar-box">
                 <h3>専門分野</h3>
@@ -1262,37 +1241,12 @@
                 </div><!-- /#expertiseTags -->
             </div>
 
-            <!-- ソーシャル -->
-            <div class="sidebar-box">
+            <!-- ソーシャル（Xのハンドルが設定されている場合のみ表示） -->
+            <div class="sidebar-box" id="snsBox" style="display:none;">
                 <h3>SNS</h3>
                 <div class="info-item">
                     <div class="info-label">Twitter/X</div>
-                    <div class="info-value">@FabrizioRomano</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">YouTube</div>
-                    <div class="info-value">Fabrizio Romano</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Instagram</div>
-                    <div class="info-value">fabrizioromano</div>
-                </div>
-            </div>
-
-            <!-- 統計 -->
-            <div class="sidebar-box">
-                <h3>統計</h3>
-                <div class="info-item">
-                    <div class="info-label">ニュース数</div>
-                    <div class="info-value">284</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">総閲覧数</div>
-                    <div class="info-value">2,450</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">平均評価</div>
-                    <div class="info-value">4.8 / 5.0</div>
+                    <div class="info-value" id="sidebarTwitterHandle">-</div>
                 </div>
             </div>
         </aside>
@@ -1504,6 +1458,12 @@
                     .join(' ');
                 document.getElementById('expertiseTags').innerHTML =
                     `<div>${tagsHtml}</div>`;
+            }
+
+            // SNS（実際に設定されているXのハンドルがある場合のみ表示）
+            if (r.twitterHandle) {
+                document.getElementById('sidebarTwitterHandle').textContent = r.twitterHandle;
+                document.getElementById('snsBox').style.display = 'block';
             }
         }
 
