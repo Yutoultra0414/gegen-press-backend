@@ -252,6 +252,8 @@
           var docData = {
             name: data.name,
             nameRomaji: data.nameRomaji || null,
+            reporterType: data.reporterType || null,
+            beatClub: data.beatClub || null,
             mediaOutlet: data.mediaOutlet || null,
             twitterHandle: data.twitterHandle || null,
             expertise: data.expertise || [],

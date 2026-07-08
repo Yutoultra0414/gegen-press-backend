@@ -666,6 +666,19 @@
             </div>
         </div>
 
+        <!-- カテゴリ別フィルター -->
+        <div class="filter-section">
+            <span class="filter-label">カテゴリ:</span>
+            <div class="filter-buttons" id="categoryFilterButtons">
+                <button class="filter-btn active" data-category="all">すべて</button>
+                <button class="filter-btn" data-category="番記者">番記者</button>
+                <button class="filter-btn" data-category="移籍専門">移籍専門</button>
+                <button class="filter-btn" data-category="大手メディア">大手メディア所属</button>
+                <button class="filter-btn" data-category="独立ジャーナリスト">独立ジャーナリスト</button>
+                <button class="filter-btn" data-category="__media__">メディア別</button>
+            </div>
+        </div>
+
         <!-- 記者追加CTAバナー -->
         <a href="gegen_press_add_reporter.html" style="text-decoration: none; display: block; margin-bottom: 30px;">
             <div style="background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%); border: 2px dashed #e63946; border-radius: 8px; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; gap: 15px; transition: all 0.3s ease; flex-wrap: wrap;"
@@ -680,8 +693,8 @@
         </a>
 
         <!-- ランキング表 -->
-        <div class="ranking-section">
-            <h2 class="ranking-title">総合ランキング</h2>
+        <div class="ranking-section" id="reporterRankingSection">
+            <h2 class="ranking-title" id="reporterRankingTitle">総合ランキング</h2>
             
             <table class="ranking-table">
                 <thead>
@@ -856,6 +869,27 @@
             </table>
         </div>
 
+        <!-- メディア別ランキング（カテゴリ:メディア別 を選んだ時のみ表示） -->
+        <div class="ranking-section" id="mediaRankingSection" style="display:none;">
+            <h2 class="ranking-title">メディア別ランキング</h2>
+            <p style="font-size:12.5px; color:#888; margin:-10px 0 16px;">
+                同じ「所属メディア」を登録した記者たちの記事評価をまとめて平均したスコアです（記者を直接評価するのではなく、記事の評価の積み上げです）。
+            </p>
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th width="15%">順位</th>
+                        <th width="45%">メディア名</th>
+                        <th width="20%">スコア</th>
+                        <th width="20%">平均評価</th>
+                    </tr>
+                </thead>
+                <tbody id="mediaRankingBody">
+                    <tr><td colspan="4" style="text-align:center; color:#999; padding:24px; font-size:13px;">読み込み中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
         <!-- ページネーション -->
         <div class="pagination">
             <button class="pagination-btn" disabled>前へ</button>
@@ -917,6 +951,48 @@
             return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
         }
 
+        let allReportersWithScores = []; // カテゴリフィルターの再描画に使うキャッシュ
+        let currentCategory = 'all';
+
+        function renderReporterTable(list) {
+            const tbody = document.getElementById('rankingBody');
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999; padding:24px; font-size:13px;">このカテゴリの記者はまだいません。</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            list.forEach((r, i) => {
+                const rank = i + 1;
+                const tr = document.createElement('tr');
+                if (rank <= 3) tr.className = 'rank-' + rank;
+                tr.style.cursor = 'pointer';
+                tr.setAttribute('data-reporter-id', r.id);
+                tr.addEventListener('click', () => goReporterProfile(r.id));
+
+                const medal = rank === 1 ? '<span class="medal medal-gold"></span>'
+                            : rank === 2 ? '<span class="medal medal-silver"></span>'
+                            : rank === 3 ? '<span class="medal medal-bronze"></span>' : '';
+                const g = avatarColor(r.name);
+                const rating = r.computedCount > 0 ? r.computedAverage.toFixed(1) : '-';
+                const score = Math.round((r.computedAverage / 5) * 100);
+                const avatarInner = r.profileImage
+                    ? '<img src="' + r.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">'
+                    : esc(getInitials(r.name));
+                const avatarBg = r.profileImage ? '' : 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
+                const typeTag = r.reporterType ? '<span style="display:inline-block; margin-left:6px; font-size:10px; font-weight:bold; color:#e63946; border:1px solid #e63946; border-radius:3px; padding:1px 6px;">' + esc(r.reporterType) + (r.beatClub ? '・' + esc(r.beatClub) : '') + '</span>' : '';
+
+                tr.innerHTML =
+                    '<td class="rank-number">' + medal + rank + '</td>' +
+                    '<td><div class="reporter-info">' +
+                        '<div class="reporter-avatar" style="' + avatarBg + 'overflow:hidden;">' + avatarInner + '</div>' +
+                        '<div class="reporter-details"><h3>' + esc(r.name) + (r.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(r.nameRomaji) + '</span>' : '') + typeTag + '</h3><p>' + (r.mediaOutlet ? '<a href="gegen_press_media_profile.html?name=' + encodeURIComponent(r.mediaOutlet) + '" onclick="event.stopPropagation();" style="color:#888; text-decoration:underline;">' + esc(r.mediaOutlet) + '</a>' : '') + '</p></div>' +
+                    '</div></td>' +
+                    '<td class="score-cell">' + score + '<span class="score-max">/100</span></td>' +
+                    '<td class="number-cell">' + esc(rating) + (r.computedCount > 0 ? ' <span style="font-size:11px;color:#999;">(' + r.computedCount + '件)</span>' : '') + '</td>';
+                tbody.appendChild(tr);
+            });
+        }
+
         async function loadRanking() {
             if (typeof GegenPressAPI === 'undefined') return;
             try {
@@ -951,43 +1027,87 @@
                     return b.computedCount - a.computedCount;
                 });
 
-                tbody.innerHTML = '';
+                allReportersWithScores = withScores;
+
                 // 見せかけのページ送りは実データ表示時には隠す
                 const pg = document.querySelector('.pagination');
                 if (pg) pg.style.display = 'none';
-                withScores.forEach((r, i) => {
-                    const rank = i + 1;
-                    const tr = document.createElement('tr');
-                    if (rank <= 3) tr.className = 'rank-' + rank;
-                    tr.style.cursor = 'pointer';
-                    tr.setAttribute('data-reporter-id', r.id);
-                    tr.addEventListener('click', () => goReporterProfile(r.id));
-
-                    const medal = rank === 1 ? '<span class="medal medal-gold"></span>'
-                                : rank === 2 ? '<span class="medal medal-silver"></span>'
-                                : rank === 3 ? '<span class="medal medal-bronze"></span>' : '';
-                    const g = avatarColor(r.name);
-                    const rating = r.computedCount > 0 ? r.computedAverage.toFixed(1) : '-';
-                    const score = Math.round((r.computedAverage / 5) * 100);
-                    const avatarInner = r.profileImage
-                        ? '<img src="' + r.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">'
-                        : esc(getInitials(r.name));
-                    const avatarBg = r.profileImage ? '' : 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
-
-                    tr.innerHTML =
-                        '<td class="rank-number">' + medal + rank + '</td>' +
-                        '<td><div class="reporter-info">' +
-                            '<div class="reporter-avatar" style="' + avatarBg + 'overflow:hidden;">' + avatarInner + '</div>' +
-                            '<div class="reporter-details"><h3>' + esc(r.name) + (r.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(r.nameRomaji) + '</span>' : '') + '</h3><p>' + esc(r.mediaOutlet || '') + '</p></div>' +
-                        '</div></td>' +
-                        '<td class="score-cell">' + score + '<span class="score-max">/100</span></td>' +
-                        '<td class="number-cell">' + esc(rating) + (r.computedCount > 0 ? ' <span style="font-size:11px;color:#999;">(' + r.computedCount + '件)</span>' : '') + '</td>';
-                    tbody.appendChild(tr);
-                });
+                applyCategoryFilter();
             } catch (e) {
                 console.warn('ランキング取得エラー、見本データを表示します:', e);
             }
         }
+
+        function applyCategoryFilter() {
+            if (currentCategory === '__media__') {
+                document.getElementById('reporterRankingSection').style.display = 'none';
+                document.getElementById('mediaRankingSection').style.display = 'block';
+                renderMediaRanking(allReportersWithScores);
+                return;
+            }
+            document.getElementById('reporterRankingSection').style.display = 'block';
+            document.getElementById('mediaRankingSection').style.display = 'none';
+            document.getElementById('reporterRankingTitle').textContent =
+                currentCategory === 'all' ? '総合ランキング' : currentCategory + 'ランキング';
+            const filtered = currentCategory === 'all'
+                ? allReportersWithScores
+                : allReportersWithScores.filter(r => r.reporterType === currentCategory);
+            renderReporterTable(filtered);
+        }
+
+        // メディア別ランキング：同じ mediaOutlet を持つ記者たちの評価をまとめて平均する
+        function renderMediaRanking(reporters) {
+            const byMedia = {};
+            reporters.forEach(r => {
+                if (!r.mediaOutlet) return;
+                if (!byMedia[r.mediaOutlet]) byMedia[r.mediaOutlet] = { name: r.mediaOutlet, sum: 0, count: 0, reporterCount: 0 };
+                byMedia[r.mediaOutlet].sum += r.computedAverage * r.computedCount;
+                byMedia[r.mediaOutlet].count += r.computedCount;
+                byMedia[r.mediaOutlet].reporterCount += 1;
+            });
+            const list = Object.values(byMedia).map(m => ({
+                name: m.name,
+                average: m.count > 0 ? m.sum / m.count : 0,
+                count: m.count,
+                reporterCount: m.reporterCount
+            })).sort((a, b) => b.average - a.average || b.count - a.count);
+
+            const tbody = document.getElementById('mediaRankingBody');
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999; padding:24px; font-size:13px;">所属メディアが登録されている記者がまだいません。</td></tr>';
+                return;
+            }
+            tbody.innerHTML = list.map((m, i) => {
+                const rank = i + 1;
+                const medal = rank === 1 ? '<span class="medal medal-gold"></span>'
+                            : rank === 2 ? '<span class="medal medal-silver"></span>'
+                            : rank === 3 ? '<span class="medal medal-bronze"></span>' : '';
+                const g = avatarColor(m.name);
+                const score = Math.round((m.average / 5) * 100);
+                const rating = m.count > 0 ? m.average.toFixed(1) : '-';
+                return (
+                    '<tr class="' + (rank <= 3 ? 'rank-' + rank : '') + '" style="cursor:pointer;" onclick="window.location.href=\'gegen_press_media_profile.html?name=' + encodeURIComponent(m.name) + '\';">' +
+                        '<td class="rank-number">' + medal + rank + '</td>' +
+                        '<td><div class="reporter-info">' +
+                            '<div class="reporter-avatar" style="background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;">' + esc(getInitials(m.name)) + '</div>' +
+                            '<div class="reporter-details"><h3>' + esc(m.name) + '</h3><p>所属記者 ' + m.reporterCount + '名</p></div>' +
+                        '</div></td>' +
+                        '<td class="score-cell">' + score + '<span class="score-max">/100</span></td>' +
+                        '<td class="number-cell">' + esc(rating) + (m.count > 0 ? ' <span style="font-size:11px;color:#999;">(' + m.count + '件)</span>' : '') + '</td>' +
+                    '</tr>'
+                );
+            }).join('');
+        }
+
+        document.getElementById('categoryFilterButtons').querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('categoryFilterButtons').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentCategory = this.getAttribute('data-category');
+                applyCategoryFilter();
+            });
+        });
+
         loadRanking();
     </script>
 </body>

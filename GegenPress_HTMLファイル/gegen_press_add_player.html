@@ -530,10 +530,12 @@
                 <!-- 所属クラブ -->
                 <div class="form-group">
                     <label class="form-label">現所属クラブ <span class="optional-badge">任意</span></label>
-                    <p class="form-hint">代表的なクラブから選択できます。一覧にない場合は「その他」を選んで直接入力してください。</p>
-                    <select class="form-input" id="currentClubSelect">
-                        <option value="">選択してください</option>
-                        <option value="__other__">その他（自由入力）</option>
+                    <p class="form-hint">まず大陸を選ぶと、クラブがあいうえお順で絞り込まれます。一覧にない場合は「その他」を選んで直接入力してください。</p>
+                    <select class="form-input" id="clubContinentSelect" style="margin-bottom:8px;">
+                        <option value="">大陸を選択してください</option>
+                    </select>
+                    <select class="form-input" id="currentClubSelect" disabled>
+                        <option value="">まず大陸を選んでください</option>
                     </select>
                     <input type="text" class="form-input" id="currentClub" placeholder="クラブ名を入力" style="display:none; margin-top:10px;">
                     <div id="clubInfoBox" style="display:none; margin-top:10px; font-size:12.5px; color:#555; background:#f5f5f5; border-radius:6px; padding:10px 12px;"></div>
@@ -553,9 +555,12 @@
 
                 <div class="form-group">
                     <label class="form-label">国籍 <span class="optional-badge">任意</span></label>
-                    <select class="form-input" id="nationalitySelect">
-                        <option value="">選択してください</option>
-                        <option value="__other__">その他（自由入力）</option>
+                    <p class="form-hint">まず大陸を選ぶと、国があいうえお順で絞り込まれます。</p>
+                    <select class="form-input" id="nationalityContinentSelect" style="margin-bottom:8px;">
+                        <option value="">大陸を選択してください</option>
+                    </select>
+                    <select class="form-input" id="nationalitySelect" disabled>
+                        <option value="">まず大陸を選んでください</option>
                     </select>
                     <input type="text" class="form-input" id="nationality" placeholder="国籍を入力" style="display:none; margin-top:10px;">
                 </div>
@@ -631,35 +636,64 @@
         }
 
         // =========================================================
-        // クラブ / 国籍ドロップダウンの初期化
+        // クラブ / 国籍ドロップダウンの初期化（大陸→あいうえお順のカスケード選択）
         // clubs-data.js が読み込まれていない場合は自由入力にフォールバック
         // =========================================================
         const CLUBS_DATA = (typeof GegenPressClubsData !== 'undefined') ? GegenPressClubsData : null;
+        const JA_COLLATOR = (typeof Intl !== 'undefined') ? new Intl.Collator('ja') : null;
+        function jaSort(list, keyFn) {
+            const arr = list.slice();
+            if (JA_COLLATOR) arr.sort((a, b) => JA_COLLATOR.compare(keyFn(a), keyFn(b)));
+            else arr.sort((a, b) => keyFn(a).localeCompare(keyFn(b)));
+            return arr;
+        }
+        function flagForCountry(countryName) {
+            if (!CLUBS_DATA) return '';
+            const n = CLUBS_DATA.NATIONALITIES.find(x => x.name === countryName);
+            return n ? n.flag : '';
+        }
 
         function populateClubSelect() {
+            const contSel = document.getElementById('clubContinentSelect');
             const sel = document.getElementById('currentClubSelect');
             const freeInput = document.getElementById('currentClub');
             if (!CLUBS_DATA) {
                 // データファイル未読込 → 自由入力のみ
+                contSel.style.display = 'none';
                 sel.style.display = 'none';
                 freeInput.style.display = 'block';
                 return;
             }
-            const byLeague = {};
-            CLUBS_DATA.CLUBS.forEach(c => {
-                if (!byLeague[c.league]) byLeague[c.league] = [];
-                byLeague[c.league].push(c);
-            });
-            let html = '<option value="">選択してください</option>';
-            Object.keys(byLeague).forEach(league => {
-                html += '<optgroup label="' + league + '">';
-                byLeague[league].forEach(c => {
-                    html += '<option value="' + escapeHtml(c.name) + '" data-league="' + escapeHtml(c.league) + '" data-country="' + escapeHtml(c.country) + '">' + escapeHtml(c.name) + '</option>';
-                });
-                html += '</optgroup>';
-            });
-            html += '<option value="__other__">その他（自由入力）</option>';
-            sel.innerHTML = html;
+            const continents = CLUBS_DATA.CONTINENTS_CLUB || [];
+            contSel.innerHTML = '<option value="">大陸を選択してください</option>' +
+                continents.map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('') +
+                '<option value="__other__">その他（自由入力）</option>';
+
+            function fillClubsForContinent(continent) {
+                if (continent === '__other__') {
+                    sel.innerHTML = '<option value="__other__" selected>その他（自由入力）</option>';
+                    sel.disabled = true;
+                    freeInput.style.display = 'block';
+                    freeInput.value = '';
+                    freeInput.focus();
+                    document.getElementById('clubInfoBox').style.display = 'none';
+                    return;
+                }
+                const list = jaSort(CLUBS_DATA.CLUBS.filter(c => c.continent === continent), c => c.name);
+                sel.disabled = list.length === 0;
+                sel.innerHTML = '<option value="">クラブを選択してください（あいうえお順）</option>' +
+                    list.map(c => {
+                        const flag = flagForCountry(c.country);
+                        return '<option value="' + escapeHtml(c.name) + '" data-league="' + escapeHtml(c.league) + '" data-country="' + escapeHtml(c.country) + '">' +
+                            (flag ? flag + ' ' : '') + escapeHtml(c.name) + '</option>';
+                    }).join('') +
+                    '<option value="__other__">その他（自由入力）</option>';
+                freeInput.style.display = 'none';
+                freeInput.value = '';
+                document.getElementById('clubInfoBox').style.display = 'none';
+            }
+
+            contSel.addEventListener('change', function () { fillClubsForContinent(this.value); });
 
             sel.addEventListener('change', function () {
                 const infoBox = document.getElementById('clubInfoBox');
@@ -680,23 +714,51 @@
                     infoBox.style.display = 'none';
                 }
             });
+
+            // 編集モードなどで外部からプログラム的に選択するためのヘルパー
+            window._selectClubProgrammatically = function (continent, clubName) {
+                contSel.value = continent;
+                fillClubsForContinent(continent);
+                sel.value = clubName;
+                sel.dispatchEvent(new Event('change'));
+            };
         }
         populateClubSelect();
 
         function populateNationalitySelect() {
+            const contSel = document.getElementById('nationalityContinentSelect');
             const sel = document.getElementById('nationalitySelect');
             const freeInput = document.getElementById('nationality');
             if (!CLUBS_DATA) {
+                contSel.style.display = 'none';
                 sel.style.display = 'none';
                 freeInput.style.display = 'block';
                 return;
             }
-            let html = '<option value="">選択してください</option>';
-            CLUBS_DATA.NATIONALITIES.forEach(n => {
-                html += '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>';
-            });
-            html += '<option value="__other__">その他（自由入力）</option>';
-            sel.innerHTML = html;
+            const continents = CLUBS_DATA.CONTINENTS_NATIONALITY || [];
+            contSel.innerHTML = '<option value="">大陸を選択してください</option>' +
+                continents.map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('') +
+                '<option value="__other__">その他（自由入力）</option>';
+
+            function fillCountriesForContinent(continent) {
+                if (continent === '__other__') {
+                    sel.innerHTML = '<option value="__other__" selected>その他（自由入力）</option>';
+                    sel.disabled = true;
+                    freeInput.style.display = 'block';
+                    freeInput.value = '';
+                    freeInput.focus();
+                    return;
+                }
+                const list = jaSort(CLUBS_DATA.NATIONALITIES.filter(n => n.continent === continent), n => n.name);
+                sel.disabled = list.length === 0;
+                sel.innerHTML = '<option value="">国を選択してください（あいうえお順）</option>' +
+                    list.map(n => '<option value="' + escapeHtml(n.name) + '">' + (n.flag ? n.flag + ' ' : '') + escapeHtml(n.name) + '</option>').join('') +
+                    '<option value="__other__">その他（自由入力）</option>';
+                freeInput.style.display = 'none';
+                freeInput.value = '';
+            }
+
+            contSel.addEventListener('change', function () { fillCountriesForContinent(this.value); });
 
             sel.addEventListener('change', function () {
                 if (this.value === '__other__') {
@@ -708,6 +770,13 @@
                     freeInput.value = this.value;
                 }
             });
+
+            window._selectNationalityProgrammatically = function (continent, countryName) {
+                contSel.value = continent;
+                fillCountriesForContinent(continent);
+                sel.value = countryName;
+                sel.dispatchEvent(new Event('change'));
+            };
         }
         populateNationalitySelect();
 
@@ -785,28 +854,24 @@
             document.getElementById('nameRomaji').value = editingPlayer.nameRomaji || '';
 
             if (editingPlayer.currentClub) {
-                const sel = document.getElementById('currentClubSelect');
-                const match = Array.from(sel.options).find(o => o.value === editingPlayer.currentClub);
-                if (match) {
-                    sel.value = editingPlayer.currentClub;
-                    sel.dispatchEvent(new Event('change'));
+                const clubMatch = CLUBS_DATA ? CLUBS_DATA.CLUBS.find(c => c.name === editingPlayer.currentClub) : null;
+                if (clubMatch && window._selectClubProgrammatically) {
+                    window._selectClubProgrammatically(clubMatch.continent, clubMatch.name);
                 } else {
-                    sel.value = '__other__';
-                    sel.dispatchEvent(new Event('change'));
+                    document.getElementById('clubContinentSelect').value = '__other__';
+                    document.getElementById('clubContinentSelect').dispatchEvent(new Event('change'));
                     document.getElementById('currentClub').value = editingPlayer.currentClub;
                 }
             }
             document.getElementById('playerPosition').value = editingPlayer.position || '';
             document.getElementById('marketValue').value = editingPlayer.marketValue || '';
             if (editingPlayer.nationality) {
-                const nsel = document.getElementById('nationalitySelect');
-                const nmatch = Array.from(nsel.options).find(o => o.value === editingPlayer.nationality);
-                if (nmatch) {
-                    nsel.value = editingPlayer.nationality;
-                    nsel.dispatchEvent(new Event('change'));
+                const natMatch = CLUBS_DATA ? CLUBS_DATA.NATIONALITIES.find(n => n.name === editingPlayer.nationality) : null;
+                if (natMatch && window._selectNationalityProgrammatically) {
+                    window._selectNationalityProgrammatically(natMatch.continent, natMatch.name);
                 } else {
-                    nsel.value = '__other__';
-                    nsel.dispatchEvent(new Event('change'));
+                    document.getElementById('nationalityContinentSelect').value = '__other__';
+                    document.getElementById('nationalityContinentSelect').dispatchEvent(new Event('change'));
                     document.getElementById('nationality').value = editingPlayer.nationality;
                 }
             }

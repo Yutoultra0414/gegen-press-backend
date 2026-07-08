@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メディア情報 - Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Hiragino Sans', 'Meiryo', 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
+
+        .media-header {
+            background: linear-gradient(135deg, #1d3557 0%, #14213d 100%);
+            padding: 22px 40px;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .media-badge {
+            width: 64px; height: 64px; border-radius: 12px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 900; color: #fff;
+        }
+        .media-header h1 { font-size: 20px; color: #fff; font-weight: 900; }
+        .media-header p { font-size: 12.5px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+
+        .content-wrap { max-width: 900px; margin: 0 auto; padding: 20px 40px 60px; }
+        .card { background: #fff; border-radius: 8px; padding: 16px 18px; margin-bottom: 14px; border: 1px solid #eee; }
+        .card h2 { font-size: 13px; color: #e63946; margin-bottom: 10px; border-left: 4px solid #e63946; padding-left: 8px; }
+        .empty-note { font-size: 12px; color: #999; padding: 10px 0; }
+
+        .stat-row { display: flex; gap: 24px; flex-wrap: wrap; }
+        .stat-box { text-align: center; }
+        .stat-box .val { font-size: 22px; font-weight: 900; color: #e63946; }
+        .stat-box .lbl { font-size: 11px; color: #888; margin-top: 2px; }
+
+        .reporter-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 4px; border-bottom: 1px solid #f0f0f0; text-decoration: none; color: inherit; cursor: pointer;
+        }
+        .reporter-row:last-child { border-bottom: none; }
+        .reporter-avatar {
+            width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 900; color: #fff; overflow: hidden;
+        }
+        .reporter-name { font-size: 12.5px; font-weight: bold; color: #1a0dab; }
+        .reporter-meta { font-size: 11px; color: #888; }
+
+        /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
+        header.gp-header {
+            background: #fff !important;
+            border-bottom: 3px solid #e63946 !important;
+            padding: 6px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav {
+            display: flex; align-items: stretch; gap: 22px; flex: 1; min-width: 0;
+            overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-decoration: none; line-height: 1.15; padding: 6px 2px; white-space: nowrap;
+        }
+        .gp-en { font-size: 13px; font-weight: 900; letter-spacing: 0.5px; color: #111; text-transform: uppercase; }
+        .gp-jp { font-size: 9px; color: #888; font-weight: 600; margin-top: 1px; }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-shrink: 0; }
+        .gp-mypage {
+            display: flex; flex-direction: column; align-items: center;
+            background: #e63946; color: #fff; text-decoration: none;
+            padding: 5px 14px; border-radius: 5px; line-height: 1.15; white-space: nowrap;
+        }
+        .gp-mypage .gp-en { color: #fff; font-size: 11px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #ff6b6b; }
+        @media (max-width: 768px) {
+            header.gp-header { flex-wrap: wrap !important; padding: 8px 14px !important; gap: 0 !important; row-gap: 6px !important; }
+            .gp-logo { order: 1; }
+            .gp-logo img { height: 26px !important; }
+            .gp-actions { order: 2; margin-left: auto; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10px; }
+            .gp-nav {
+                order: 3; flex: 1 1 100%; width: 100%; max-width: 100%;
+                overflow-x: visible; flex-wrap: wrap; justify-content: space-between; gap: 6px 4px;
+            }
+            .gp-nav-item { white-space: nowrap; padding: 4px 2px; }
+            .gp-en { font-size: 11px; }
+            .gp-jp { font-size: 8.5px; }
+            .media-header { padding: 14px 16px; }
+            .media-header h1 { font-size: 16px; }
+            .content-wrap { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="gp-header">
+        <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
+            <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+            <a class="gp-nav-item active" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
+            <a class="gp-nav-item" href="gegen_press_players.html"><span class="gp-en">PLAYERS</span><span class="gp-jp">選手一覧</span></a>
+            <a class="gp-nav-item" href="gegen_press_add_reporter.html"><span class="gp-en">ADD REPORTER</span><span class="gp-jp">記者を追加</span></a>
+            <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
+        </nav>
+        <div class="gp-actions">
+            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
+        </div>
+    </header>
+
+    <section class="media-header">
+        <div class="media-badge" id="mediaBadge">?</div>
+        <div>
+            <h1 id="mediaName">読み込み中...</h1>
+            <p id="mediaSub"></p>
+        </div>
+    </section>
+
+    <div class="content-wrap">
+        <div class="card">
+            <h2>スコア</h2>
+            <div class="stat-row" id="mediaStats">
+                <div class="stat-box"><div class="val" id="statScore">-</div><div class="lbl">スコア/100</div></div>
+                <div class="stat-box"><div class="val" id="statAverage">-</div><div class="lbl">平均評価</div></div>
+                <div class="stat-box"><div class="val" id="statCount">-</div><div class="lbl">評価件数</div></div>
+                <div class="stat-box"><div class="val" id="statReporters">-</div><div class="lbl">所属記者数</div></div>
+            </div>
+            <p class="empty-note" style="margin-top:10px;">このメディアに所属する記者たちの記事についた★評価をまとめて平均したスコアです（記者個人ではなく、記事の評価の積み上げです）。</p>
+        </div>
+        <div class="card">
+            <h2>所属記者</h2>
+            <div id="mediaReporters"><p class="empty-note">読み込み中...</p></div>
+        </div>
+    </div>
+
+    <script src="api-client.js" onerror="console.warn('api-client.js 未読込')"></script>
+    <script>
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function getInitials(name) {
+            if (!name) return '?';
+            return String(name).trim().substring(0, 2).toUpperCase();
+        }
+        const PALETTE = [
+            ['#e63946', '#a4161a'], ['#1d3557', '#14213d'], ['#2a9d8f', '#1f7a6f'],
+            ['#e76f51', '#c44a30'], ['#6a4c93', '#4e3470'], ['#457b9d', '#2f5a73'],
+            ['#588157', '#3a5a3a'], ['#bc6c25', '#8a4e16']
+        ];
+        function colorFor(name) {
+            let h = 0; const s = name || '';
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return PALETTE[h % PALETTE.length];
+        }
+
+        const mediaName = new URLSearchParams(window.location.search).get('name');
+
+        async function loadMedia() {
+            document.getElementById('mediaName').textContent = mediaName || 'メディアが指定されていません';
+            document.title = (mediaName || 'メディア情報') + ' - Gegen Press!';
+            const g = colorFor(mediaName || '');
+            const badge = document.getElementById('mediaBadge');
+            badge.style.background = 'linear-gradient(135deg,' + g[0] + ' 0%,' + g[1] + ' 100%)';
+            badge.textContent = getInitials(mediaName || '');
+
+            const reportersWrap = document.getElementById('mediaReporters');
+            if (!mediaName) {
+                reportersWrap.innerHTML = '<p class="empty-note">メディアが指定されていません。</p>';
+                return;
+            }
+            if (typeof GegenPressAPI === 'undefined') {
+                reportersWrap.innerHTML = '<p class="empty-note">読み込めませんでした。</p>';
+                return;
+            }
+            try {
+                const rres = await GegenPressAPI.reporters.getAll();
+                if (!rres || !rres.success) {
+                    reportersWrap.innerHTML = '<p class="empty-note">読み込みに失敗しました。</p>';
+                    return;
+                }
+                const mine = (rres.reporters || []).filter(r => r.mediaOutlet === mediaName);
+                document.getElementById('mediaSub').textContent = '所属記者 ' + mine.length + '名';
+                if (mine.length === 0) {
+                    reportersWrap.innerHTML = '<p class="empty-note">このメディアに登録されている記者はまだいません。</p>';
+                    return;
+                }
+
+                // 各記者の実際のスコア（記事評価の平均）を集計してメディア全体のスコアを算出
+                const withScores = await Promise.all(mine.map(async (r) => {
+                    try {
+                        const sres = await GegenPressAPI.ratings.getComputedReporterScore(r.id);
+                        return Object.assign({}, r, {
+                            computedAverage: (sres && sres.success) ? sres.average : 0,
+                            computedCount: (sres && sres.success) ? sres.count : 0
+                        });
+                    } catch (e) {
+                        return Object.assign({}, r, { computedAverage: 0, computedCount: 0 });
+                    }
+                }));
+
+                let sum = 0, count = 0;
+                withScores.forEach(r => { sum += r.computedAverage * r.computedCount; count += r.computedCount; });
+                const average = count > 0 ? sum / count : 0;
+                document.getElementById('statScore').textContent = Math.round((average / 5) * 100);
+                document.getElementById('statAverage').textContent = count > 0 ? average.toFixed(1) : '-';
+                document.getElementById('statCount').textContent = count;
+                document.getElementById('statReporters').textContent = mine.length;
+
+                withScores.sort((a, b) => b.computedAverage - a.computedAverage || b.computedCount - a.computedCount);
+                reportersWrap.innerHTML = withScores.map(r => {
+                    const gg = colorFor(r.name);
+                    const avatar = r.profileImage
+                        ? '<img src="' + r.profileImage + '" style="width:100%;height:100%;object-fit:cover;">'
+                        : esc(getInitials(r.name));
+                    return (
+                        '<a class="reporter-row" href="gegen_press_reporter_profile.html?id=' + encodeURIComponent(r.id) + '">' +
+                            '<div class="reporter-avatar" style="background: linear-gradient(135deg,' + gg[0] + ' 0%,' + gg[1] + ' 100%);">' + avatar + '</div>' +
+                            '<div style="flex:1; min-width:0;">' +
+                                '<div class="reporter-name">' + esc(r.name) + '</div>' +
+                                '<div class="reporter-meta">' + esc(r.reporterType || '') + (r.beatClub ? ' ・ ' + esc(r.beatClub) : '') + '</div>' +
+                            '</div>' +
+                            '<div style="font-size:11.5px; color:#888;">' + (r.computedCount > 0 ? r.computedAverage.toFixed(1) + ' (' + r.computedCount + '件)' : 'まだ評価なし') + '</div>' +
+                        '</a>'
+                    );
+                }).join('');
+            } catch (e) {
+                reportersWrap.innerHTML = '<p class="empty-note">読み込み中にエラーが発生しました。</p>';
+            }
+        }
+        loadMedia();
+    </script>
+</body>
+</html>

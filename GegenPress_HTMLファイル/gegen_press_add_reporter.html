@@ -527,8 +527,23 @@
                 <!-- 所属メディア -->
                 <div class="form-group">
                     <label class="form-label">所属メディア <span class="optional-badge">任意</span></label>
-                    <p class="form-hint">例: Sky Sports、Marca、The Athletic など</p>
+                    <p class="form-hint">例: Sky Sports、Marca、The Athletic など。同じメディア名を登録した記者同士はメディアページでまとめて表示されます。</p>
                     <input type="text" class="form-input" id="mediaOutlet" placeholder="所属メディアを入力">
+                </div>
+
+                <!-- 記者の種別 -->
+                <div class="form-group">
+                    <label class="form-label">記者の種別 <span class="optional-badge">任意</span></label>
+                    <p class="form-hint">ランキングのカテゴリ分けに使います。</p>
+                    <select class="form-input" id="reporterType">
+                        <option value="">選択してください</option>
+                        <option value="番記者">番記者（特定クラブの担当）</option>
+                        <option value="移籍専門">移籍専門</option>
+                        <option value="大手メディア">大手メディア所属</option>
+                        <option value="独立ジャーナリスト">独立ジャーナリスト</option>
+                        <option value="その他">その他</option>
+                    </select>
+                    <input type="text" class="form-input" id="beatClub" placeholder="担当クラブ名を入力（例: マンチェスター・シティ）" style="display:none; margin-top:10px;">
                 </div>
 
                 <!-- X(Twitter)ハンドル -->
@@ -618,6 +633,10 @@
         // =========================================================
         // 専門分野タグの選択
         // =========================================================
+        document.getElementById('reporterType').addEventListener('change', function () {
+            document.getElementById('beatClub').style.display = (this.value === '番記者') ? 'block' : 'none';
+        });
+
         const selectedExpertise = new Set();
         document.querySelectorAll('.expertise-tag').forEach(tag => {
             tag.addEventListener('click', function() {
@@ -743,6 +762,9 @@
             const reporterData = {
                 name: name,
                 nameRomaji: document.getElementById('nameRomaji').value.trim() || null,
+                reporterType: document.getElementById('reporterType').value || null,
+                beatClub: document.getElementById('reporterType').value === '番記者'
+                    ? (document.getElementById('beatClub').value.trim() || null) : null,
                 mediaOutlet: document.getElementById('mediaOutlet').value.trim() || null,
                 twitterHandle: document.getElementById('twitterHandle').value.trim() || null,
                 expertise: Array.from(selectedExpertise),

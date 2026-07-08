@@ -880,6 +880,22 @@
             }
             .gp-page-strip { padding: 8px 14px; }
             .gp-page-strip h1 { font-size: 14.5px; }
+
+            /* ヒーロー画像（Breaking News/人気の記事の一番大きいカード）を
+               以前と同じくらいのサイズに戻す */
+            .hero-thumb { aspect-ratio: 16 / 9; max-height: 180px; }
+            .hero-title { font-size: 16px; }
+            .hero-body { padding: 12px 14px 14px; }
+
+            /* 横スクロール行が画面端で中途半端に切れる問題への対応：
+               .pickup-section(20px) + .container(20px) の合計ぶんだけ
+               外側にはみ出させて、画面の端まで使う */
+            .pickup-articles {
+                margin-left: -40px;
+                margin-right: -40px;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
         }
     </style>
 </head>
