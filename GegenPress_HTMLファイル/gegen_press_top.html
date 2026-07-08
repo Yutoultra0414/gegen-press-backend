@@ -13,7 +13,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto', 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif;
             background-color: #f5f5f5;
             color: #333;
         
@@ -91,7 +91,7 @@
             background-color: #fff;
             border: 2px solid #e63946;
             padding: 10px 15px;
-            border-radius: 5px;
+            border-radius: 2px;
             color: #333;
             width: 200px;
         }
@@ -164,21 +164,46 @@
         }
 
         .section-title {
-            font-size: 16px;
-            font-weight: 900;
-            color: #e63946;
-            margin-bottom: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            background: #e63946;
+            margin-bottom: 0;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-left: 4px solid #e63946;
-            padding-left: 10px;
+            letter-spacing: 0.5px;
+            padding: 10px 14px;
             position: relative;
         }
 
         .section-title::before {
-            content: '● ';
+            content: none;
+        }
+
+        /* ===== 話題の選手／話題の記者／直近の移籍（Transfermarkt風 3カラム） ===== */
+        .trio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+        .trio-col {
+            background: #fff;
+            border: 1px solid #ddd;
+        }
+        .trio-footer {
+            text-align: center;
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        .trio-footer a {
             color: #e63946;
-            margin-right: 10px;
+            font-weight: 700;
+            font-size: 12px;
+            text-decoration: none;
+        }
+        .trio-footer a:hover { text-decoration: underline; }
+        @media (max-width: 768px) {
+            .trio-grid { grid-template-columns: 1fr; gap: 16px; }
         }
 
         /* ピックアップニュース */
@@ -199,7 +224,7 @@
         .pickup-thumb {
             width: 100%;
             height: 130px;
-            border-radius: 8px 8px 0 0;
+            border-radius: 2px;
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
             display: flex;
             align-items: center;
@@ -221,7 +246,7 @@
             font-size: 10px;
             font-weight: bold;
             padding: 2px 8px;
-            border-radius: 3px;
+            border-radius: 2px;
             margin-bottom: 6px;
         }
 
@@ -237,7 +262,7 @@
             color: inherit;
             cursor: pointer;
             background: #fff;
-            border-radius: 8px;
+            border-radius: 2px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             transition: box-shadow 0.2s ease, transform 0.2s ease;
@@ -246,6 +271,7 @@
         .hero-thumb {
             width: 100%;
             aspect-ratio: 16 / 9;
+            max-height: 340px;
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
             display: flex; align-items: center; justify-content: center;
             color: rgba(255,255,255,0.9); font-size: 13px; font-weight: bold;
@@ -255,7 +281,7 @@
         .cat-tag {
             position: absolute; top: 10px; left: 10px;
             background: #e63946; color: #fff; font-size: 11px; font-weight: bold;
-            padding: 4px 10px; border-radius: 3px; letter-spacing: 0.5px;
+            padding: 4px 10px; border-radius: 2px; letter-spacing: 0.5px;
         }
         .hero-body { padding: 14px 16px 16px; }
         .hero-title { font-size: 18px; font-weight: 900; line-height: 1.35; color: #000; margin-bottom: 8px; }
@@ -263,12 +289,12 @@
         .side-list { display: flex; flex-direction: column; gap: 12px; }
         .side-card {
             display: flex; gap: 12px; text-decoration: none; color: inherit;
-            background: #fff; border-radius: 8px; padding: 10px;
+            background: #fff; border-radius: 2px; padding: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: box-shadow 0.2s ease; cursor: pointer;
         }
         .side-card:hover { box-shadow: 0 6px 16px rgba(230,57,70,0.15); }
         .side-thumb {
-            width: 96px; height: 72px; flex-shrink: 0; border-radius: 5px; overflow: hidden;
+            width: 96px; height: 72px; flex-shrink: 0; border-radius: 2px; overflow: hidden;
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
             display: flex; align-items: center; justify-content: center;
             color: rgba(255,255,255,0.85); font-size: 10px; font-weight: bold;
@@ -286,7 +312,7 @@
         .pickup-card {
             background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
             border: 2px solid #e63946;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 0;
             transition: all 0.3s ease;
             position: relative;
@@ -324,7 +350,7 @@
             background-color: #e63946;
             color: #fff;
             padding: 6px 12px;
-            border-radius: 4px;
+            border-radius: 2px;
             font-size: 12px;
             font-weight: bold;
             margin-bottom: 12px;
@@ -426,7 +452,7 @@
             display: flex;
             flex-direction: column;
             border: 1px solid #e3e3e3;
-            border-radius: 6px;
+            border-radius: 2px;
             overflow: hidden;
         }
 
@@ -447,7 +473,7 @@
         .reporter-row-avatar {
             width: 40px;
             height: 40px;
-            border-radius: 6px;
+            border-radius: 2px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -499,7 +525,7 @@
         .reporter-card {
             background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
             border: 2px solid #ddd;
-            border-radius: 8px;
+            border-radius: 2px;
             padding: 25px;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -547,7 +573,7 @@
             background-color: #e63946;
             color: #fff;
             padding: 8px 12px;
-            border-radius: 4px;
+            border-radius: 2px;
             font-weight: bold;
             font-size: 14px;
             text-align: center;
@@ -598,7 +624,7 @@
             background-color: #e63946;
             color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: 2px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -810,7 +836,7 @@
             color: #fff;
             text-decoration: none;
             padding: 5px 14px;
-            border-radius: 5px;
+            border-radius: 2px;
             line-height: 1.15;
             white-space: nowrap;
         }
@@ -939,26 +965,32 @@
         </div>
     </section>
 
-    <!-- 選手・移籍情報（暫定デザイン。参考画像2枚目が届いたら本デザインに差し替え予定） -->
-    <section class="reporters-section" style="background:#f5f5f5;">
-        <div style="max-width:1200px; margin:0 auto;">
-            <h2 class="section-title">話題の選手</h2>
-            <div id="playersSection" style="border:1px solid #e3e3e3; border-radius:6px; overflow:hidden; background:#fff;">
-                <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
-            </div>
-            <div style="text-align:center; margin-top:16px;">
-                <a href="gegen_press_players.html" style="display:inline-block; background:linear-gradient(135deg, #e63946 0%, #a4161a 100%); color:#fff; padding:10px 28px; border-radius:6px; font-weight:bold; text-decoration:none; font-size:13px;">選手一覧をすべて見る</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- 直近の移籍 -->
-    <section class="reporters-section" style="background:#fff;">
-        <div style="max-width:1200px; margin:0 auto;">
-            <h2 class="section-title">直近の移籍</h2>
-            <p style="font-size:11.5px; color:#999; margin:-8px 0 12px;">※ クラブのマークは画像ロゴではなく、クラブ名から自動生成した色付きの略称バッジです。マークをタップするとクラブページに移動します。</p>
-            <div id="transfersSection" style="border:1px solid #e3e3e3; border-radius:6px; overflow:hidden; background:#fff;">
-                <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
+    <!-- 話題の選手／話題の記者／直近の移籍（3カラム、スマホでは縦並び） -->
+    <section class="pickup-section" style="background:#f5f5f5;">
+        <div class="container">
+            <p style="font-size:11.5px; color:#999; margin-bottom:10px;">※ クラブのマークは画像ロゴではなく、クラブ名から自動生成した色付きの略称バッジです。マークをタップするとクラブページに移動します。</p>
+            <div class="trio-grid">
+                <div class="trio-col">
+                    <h2 class="section-title">話題の選手</h2>
+                    <div id="playersSection">
+                        <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
+                    </div>
+                    <div class="trio-footer"><a href="gegen_press_players.html">選手一覧をすべて見る →</a></div>
+                </div>
+                <div class="trio-col">
+                    <h2 class="section-title">話題の記者</h2>
+                    <div id="trendingReportersSection">
+                        <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
+                    </div>
+                    <div class="trio-footer"><a href="gegen_press_ranking.html">記者ランキングをすべて見る →</a></div>
+                </div>
+                <div class="trio-col">
+                    <h2 class="section-title">直近の移籍</h2>
+                    <div id="transfersSection">
+                        <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
+                    </div>
+                    <div class="trio-footer"><a href="gegen_press_players.html">選手一覧をすべて見る →</a></div>
+                </div>
             </div>
         </div>
     </section>
@@ -1145,6 +1177,7 @@
         loadTopPage();
         loadPlayersSection();
         loadTransfersSection();
+        loadTrendingReporters();
 
         // クラブ名から色付きの略称バッジHTMLを作る（本物のクラブロゴ画像は用意できていないための代替表現）
         function clubBadgeHtml(clubName, size) {
@@ -1211,10 +1244,10 @@
                     const tb = b.updatedAt && b.updatedAt.toMillis ? b.updatedAt.toMillis() : 0;
                     return tb - ta;
                 });
-                wrap.innerHTML = list.slice(0, 10).map(p => {
+                wrap.innerHTML = list.slice(0, 5).map(p => {
                     const badge = p.transferStatus === 'rumor'
-                        ? '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:4px;background:#fff3cd;color:#856404;flex-shrink:0;">移籍の噂</span>'
-                        : '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:4px;background:#d4edda;color:#155724;flex-shrink:0;">移籍決定</span>';
+                        ? '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#fff3cd;color:#856404;flex-shrink:0;">移籍の噂</span>'
+                        : '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#d4edda;color:#155724;flex-shrink:0;">移籍決定</span>';
                     return (
                         '<div style="display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid #eee;">' +
                             clubBadgeHtml(p.fromClub, 34) +
@@ -1248,7 +1281,7 @@
                 const sorted = res.players.slice().sort((a, b) => {
                     const rank = s => s === 'rumor' ? 0 : s === 'completed' ? 1 : 2;
                     return rank(a.transferStatus) - rank(b.transferStatus);
-                }).slice(0, 8);
+                }).slice(0, 5);
                 wrap.innerHTML = sorted.map(p => {
                     const g = avatarColor(p.name);
                     const avatar = p.profileImage
@@ -1256,11 +1289,11 @@
                         : esc(getInitials(p.name));
                     const avatarStyleAttr = p.profileImage ? '' : ('background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;');
                     let badge = '';
-                    if (p.transferStatus === 'rumor') badge = '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:4px;background:#fff3cd;color:#856404;">移籍の噂</span>';
-                    else if (p.transferStatus === 'completed') badge = '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:4px;background:#d4edda;color:#155724;">移籍決定</span>';
+                    if (p.transferStatus === 'rumor') badge = '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#fff3cd;color:#856404;">移籍の噂</span>';
+                    else if (p.transferStatus === 'completed') badge = '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#d4edda;color:#155724;">移籍決定</span>';
                     return (
                         '<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid #eee; cursor:pointer;" data-id="' + esc(p.id) + '">' +
-                            '<div style="width:42px;height:42px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;overflow:hidden;' + avatarStyleAttr + '">' + avatar + '</div>' +
+                            '<div style="width:42px;height:42px;border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;overflow:hidden;' + avatarStyleAttr + '">' + avatar + '</div>' +
                             '<div style="flex:1; min-width:0;">' +
                                 '<div style="font-size:13px; font-weight:bold; color:#1a0dab;">' + esc(p.name) + (p.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(p.nameRomaji) + '</span>' : '') + '</div>' +
                                 '<div style="font-size:11px; color:#888;">' + esc(p.currentClub || '') + '</div>' +
@@ -1279,6 +1312,62 @@
                     });
                 });
                 bindClubBadges(wrap);
+            } catch (e) {
+                wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中にエラーが発生しました。</div>';
+            }
+        }
+
+        // ==== 話題の記者（実際の記事評価から算出したスコアが高い順に5名） ====
+        async function loadTrendingReporters() {
+            const wrap = document.getElementById('trendingReportersSection');
+            if (typeof GegenPressAPI === 'undefined') return;
+            try {
+                const res = await GegenPressAPI.reporters.getRanking();
+                if (!res || !res.success || !res.ranking || res.ranking.length === 0) {
+                    wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">まだ記者が登録されていません。</div>';
+                    return;
+                }
+                const withScores = await Promise.all(res.ranking.map(async (r) => {
+                    try {
+                        const sres = await GegenPressAPI.ratings.getComputedReporterScore(r.id);
+                        return Object.assign({}, r, {
+                            computedAverage: (sres && sres.success) ? sres.average : 0,
+                            computedCount: (sres && sres.success) ? sres.count : 0
+                        });
+                    } catch (e) {
+                        return Object.assign({}, r, { computedAverage: 0, computedCount: 0 });
+                    }
+                }));
+                withScores.sort((a, b) => b.computedAverage - a.computedAverage || b.computedCount - a.computedCount);
+                const top5 = withScores.slice(0, 5);
+
+                wrap.innerHTML = top5.map(r => {
+                    const g = avatarColor(r.name);
+                    const avatar = r.profileImage
+                        ? '<img src="' + r.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
+                        : esc(getInitials(r.name));
+                    const avatarStyleAttr = r.profileImage ? '' : ('background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;');
+                    const score = Math.round((r.computedAverage / 5) * 100);
+                    const typeTag = r.reporterType ? '<span style="font-size:10px; color:#e63946; border:1px solid #e63946; padding:1px 6px; margin-left:4px;">' + esc(r.reporterType) + '</span>' : '';
+                    return (
+                        '<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid #eee; cursor:pointer;" data-id="' + esc(r.id) + '">' +
+                            '<div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;overflow:hidden;' + avatarStyleAttr + '">' + avatar + '</div>' +
+                            '<div style="flex:1; min-width:0;">' +
+                                '<div style="font-size:13px; font-weight:bold; color:#1a0dab;">' + esc(r.name) + typeTag + '</div>' +
+                                '<div style="font-size:11px; color:#888;">' + esc(r.mediaOutlet || '') + '</div>' +
+                            '</div>' +
+                            '<div style="text-align:right; flex-shrink:0;">' +
+                                '<div style="font-size:14px; font-weight:900; color:#e63946;">' + score + '</div>' +
+                                '<div style="font-size:10px; color:#999;">' + (r.computedCount > 0 ? r.computedAverage.toFixed(1) + '★' : '評価なし') + '</div>' +
+                            '</div>' +
+                        '</div>'
+                    );
+                }).join('');
+                wrap.querySelectorAll('[data-id]').forEach(el => {
+                    el.addEventListener('click', () => {
+                        window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                    });
+                });
             } catch (e) {
                 wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中にエラーが発生しました。</div>';
             }
