@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー管理（管理者用） - Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
+        .page-strip { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 16px 40px; display:flex; justify-content:space-between; align-items:center; }
+        .page-strip h1 { font-size: 18px; font-weight: 900; }
+        .container { max-width: 1000px; margin: 20px auto; padding: 0 20px 80px; }
+        .card { background: #fff; border: 1px solid #eee; padding: 16px; margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+        th, td { border-bottom: 1px solid #eee; padding: 8px 10px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+        th { background: #f5f5f5; position: sticky; top: 0; }
+        .btn { background: #e63946; color: #fff; border: none; padding: 8px 16px; font-size: 12.5px; font-weight: bold; cursor: pointer; text-decoration: none; display:inline-block; }
+        .empty-note { color: #999; font-size: 13px; padding: 20px 0; text-align:center; }
+        .table-wrap { overflow-x: auto; }
+        .denied { text-align:center; padding: 60px 20px; color:#999; }
+    </style>
+</head>
+<body>
+    <div class="page-strip">
+        <h1><a href="gegen_press_top.html" style="color:#e63946; text-decoration:none;">Gegen Press!</a> ユーザー管理（管理者用）</h1>
+        <button class="btn" id="exportBtn" style="display:none;">CSVでダウンロード</button>
+    </div>
+
+    <div class="container">
+        <div id="deniedBox" class="denied" style="display:none;">このページは管理者のみ閲覧できます。</div>
+        <div id="loadingBox" class="empty-note">読み込み中...</div>
+        <div class="card" id="tableCard" style="display:none;">
+            <p style="font-size:12px; color:#999; margin-bottom:10px;">
+                登録ユーザー数: <strong id="userCount">-</strong>件　※このデータはこの画面を開いた時点のものです。ダウンロードしたCSVファイルはExcelやGoogleスプレッドシートで開けます。
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>UID</th>
+                            <th>表示名</th>
+                            <th>メールアドレス</th>
+                            <th>登録日</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js" onerror="console.warn('api-client.js が見つかりません')"></script>
+    <script>
+        const ADMIN_UID = 'EcFjXMp6rpODK9i8E1DN1CPjZov2';
+
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function fmtDate(ts) {
+            try {
+                const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                if (!d || isNaN(d)) return '';
+                return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
+            } catch (e) { return ''; }
+        }
+
+        let userRows = [];
+
+        async function init() {
+            if (typeof GegenPressAPI === 'undefined') {
+                document.getElementById('loadingBox').textContent = '読み込めませんでした。';
+                return;
+            }
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+            if (!user || user.uid !== ADMIN_UID) {
+                document.getElementById('loadingBox').style.display = 'none';
+                document.getElementById('deniedBox').style.display = 'block';
+                return;
+            }
+
+            try {
+                const fb = await GegenPressAPI._db();
+                const snap = await fb.collection('users').get();
+                userRows = snap.docs.map(d => {
+                    const data = d.data();
+                    return {
+                        uid: d.id,
+                        username: data.username || '',
+                        email: data.email || '',
+                        createdAt: fmtDate(data.createdAt)
+                    };
+                });
+                document.getElementById('loadingBox').style.display = 'none';
+                document.getElementById('tableCard').style.display = 'block';
+                document.getElementById('exportBtn').style.display = 'inline-block';
+                document.getElementById('userCount').textContent = userRows.length;
+
+                if (userRows.length === 0) {
+                    document.getElementById('userTableBody').innerHTML = '<tr><td colspan="4" class="empty-note">登録ユーザーがいません。</td></tr>';
+                } else {
+                    document.getElementById('userTableBody').innerHTML = userRows.map(r =>
+                        '<tr><td>' + esc(r.uid) + '</td><td>' + esc(r.username) + '</td><td>' + esc(r.email) + '</td><td>' + esc(r.createdAt) + '</td></tr>'
+                    ).join('');
+                }
+            } catch (e) {
+                document.getElementById('loadingBox').textContent = '読み込みに失敗しました: ' + (e.message || e);
+            }
+        }
+        init();
+
+        document.getElementById('exportBtn').addEventListener('click', function () {
+            const header = ['UID', '表示名', 'メールアドレス', '登録日'];
+            const rows = userRows.map(r => [r.uid, r.username, r.email, r.createdAt]);
+            const csvLines = [header, ...rows].map(row =>
+                row.map(cell => '"' + String(cell).replace(/"/g, '""') + '"').join(',')
+            );
+            const csv = '\uFEFF' + csvLines.join('\r\n'); // BOM付きでExcelの文字化けを防ぐ
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'gegen-press-users-' + new Date().toISOString().slice(0, 10) + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>

@@ -443,6 +443,23 @@
                     <input type="text" class="form-input" id="articleTitle" placeholder="例: マンチェスター・シティが超大型補強を発表" maxlength="80">
                 </div>
 
+                <!-- 報道日時 -->
+                <div class="form-group">
+                    <label class="form-label">報道日 <span class="required-badge">必須</span></label>
+                    <p class="form-hint">実際にこのニュースが報じられた日付です。「どこが一番早く報じたか」の比較に使われます。時刻がわからない場合は日付のみでかまいません。</p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <input type="date" class="form-input" id="reportedDate" style="max-width:200px;">
+                        <input type="time" class="form-input" id="reportedTime" style="max-width:160px;" placeholder="時刻（任意）">
+                    </div>
+                </div>
+
+                <!-- 引用元 -->
+                <div class="form-group">
+                    <label class="form-label">引用元URL <span class="optional-badge">任意</span></label>
+                    <p class="form-hint">引用元の記事やツイートなどのリンクを入力してください。</p>
+                    <input type="text" class="form-input" id="sourceUrl" placeholder="https://...">
+                </div>
+
                 <!-- 投稿記者 -->
                 <div class="form-group">
                     <label class="form-label">投稿する記者名義 <span class="required-badge">必須</span></label>
@@ -483,6 +500,9 @@
                         <span class="tag-option" data-value="セリエA">セリエA</span>
                         <span class="tag-option" data-value="ブンデスリーガ">ブンデスリーガ</span>
                         <span class="tag-option" data-value="リーグアン">リーグアン</span>
+                        <span class="tag-option" data-value="エールディヴィジ">エールディヴィジ</span>
+                        <span class="tag-option" data-value="プリメイラ・リーガ">プリメイラ・リーガ</span>
+                        <span class="tag-option" data-value="MLS">MLS</span>
                         <span class="tag-option" data-value="日本サッカー">日本サッカー</span>
                         <span class="tag-option" data-value="代表チーム">代表チーム</span>
                     </div>
@@ -534,6 +554,10 @@
         let myReporters = []; // 自分が追加した記者 or 全記者（後述の方針）
 
         async function init() {
+            // 報道日はデフォルトで今日の日付にしておく（編集モードでは後で上書きされます）
+            const todayStr = new Date().toISOString().slice(0, 10);
+            document.getElementById('reportedDate').value = todayStr;
+
             if (typeof GegenPressAPI === 'undefined') {
                 loginNotice.style.display = 'block';
                 loginNotice.innerHTML = 'ニュース投稿機能を読み込めませんでした。';
@@ -557,6 +581,12 @@
 
             authorSelect.innerHTML = '<option value="">選択してください</option>' +
                 myReporters.map(r => '<option value="' + r.id + '">' + escapeHtml(r.name) + '</option>').join('');
+
+            // 記者ページの「この記者のニュースを投稿する」から来た場合、記者名義を事前に選択しておく
+            const preselectAuthorId = new URLSearchParams(window.location.search).get('authorId');
+            if (preselectAuthorId && myReporters.some(r => r.id === preselectAuthorId)) {
+                authorSelect.value = preselectAuthorId;
+            }
 
             await loadArticleForEdit();
         }
@@ -593,12 +623,25 @@
             document.getElementById('articleTitle').value = editingArticle.title || '';
             document.getElementById('articleDesc').value = editingArticle.description || '';
             document.getElementById('articleContent').value = editingArticle.content || '';
+            document.getElementById('sourceUrl').value = editingArticle.sourceUrl || '';
             if (editingArticle.authorId) authorSelect.value = editingArticle.authorId;
 
-            if (editingArticle.category) {
-                const catTag = document.querySelector('#categoryTags .tag-option[data-value="' + CSS.escape(editingArticle.category) + '"]');
-                if (catTag) { catTag.classList.add('selected'); selectedCategory = editingArticle.category; }
+            if (editingArticle.reportedAt) {
+                const rd = editingArticle.reportedAt.toDate ? editingArticle.reportedAt.toDate() : new Date(editingArticle.reportedAt);
+                if (!isNaN(rd)) {
+                    document.getElementById('reportedDate').value = rd.toISOString().slice(0, 10);
+                    if (!editingArticle.reportedTimeUnknown) {
+                        document.getElementById('reportedTime').value = String(rd.getHours()).padStart(2, '0') + ':' + String(rd.getMinutes()).padStart(2, '0');
+                    }
+                }
             }
+
+            // サブカテゴリ（複数）。旧データ（category が1件のみ）にも対応
+            const cats = editingArticle.categories || (editingArticle.category ? [editingArticle.category] : []);
+            cats.forEach(v => {
+                const catTag = document.querySelector('#categoryTags .tag-option[data-value="' + CSS.escape(v) + '"]');
+                if (catTag) { catTag.classList.add('selected'); selectedCategories.add(v); }
+            });
             (editingArticle.articleTypes || []).forEach(v => {
                 const tag = document.querySelector('#articleTypeTags .tag-option[data-value="' + CSS.escape(v) + '"]');
                 if (tag) { tag.classList.add('selected'); selectedArticleTypes.add(v); }
@@ -663,12 +706,18 @@
         });
         hashtagInput.addEventListener('blur', addHashtagFromInput);
 
-        let selectedCategory = null;
+        // サブカテゴリ（複数選択可）
+        const selectedCategories = new Set();
         document.querySelectorAll('#categoryTags .tag-option').forEach(tag => {
             tag.addEventListener('click', function () {
-                document.querySelectorAll('#categoryTags .tag-option').forEach(t => t.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedCategory = this.getAttribute('data-value');
+                const v = this.getAttribute('data-value');
+                if (selectedCategories.has(v)) {
+                    selectedCategories.delete(v);
+                    this.classList.remove('selected');
+                } else {
+                    selectedCategories.add(v);
+                    this.classList.add('selected');
+                }
             });
         });
 
@@ -814,6 +863,9 @@
             const desc = document.getElementById('articleDesc').value.trim();
             const content = document.getElementById('articleContent').value.trim();
             const authorId = authorSelect.value;
+            const reportedDate = document.getElementById('reportedDate').value;
+            const reportedTime = document.getElementById('reportedTime').value;
+            const sourceUrl = document.getElementById('sourceUrl').value.trim();
 
             if (!thumbDataUrl) {
                 document.getElementById('thumbRequiredNote').style.display = 'block';
@@ -821,12 +873,17 @@
                 return;
             }
             if (!title) { alert('見出しを入力してください'); return; }
+            if (!reportedDate) { alert('報道日を入力してください'); return; }
             if (!authorId) { alert('投稿する記者名義を選択してください'); return; }
             if (selectedArticleTypes.size === 0) { alert('記事の種類を1つ以上選択してください'); return; }
             if (selectedArticleTypes.has('移籍記事') && !selectedNewsType) { alert('「移籍記事」を選んだ場合は、情報の確度（確定情報／移籍の噂）を選択してください'); return; }
-            if (!selectedCategory) { alert('サブカテゴリを選択してください'); return; }
+            if (selectedCategories.size === 0) { alert('サブカテゴリを1つ以上選択してください'); return; }
             if (!desc) { alert('概要を入力してください'); return; }
             if (!content) { alert('本文を入力してください'); return; }
+
+            // 報道日時（時刻が未入力の場合は00:00扱い。「日にちだけ」の比較用途では十分です）
+            const reportedAtDate = new Date(reportedDate + 'T' + (reportedTime || '00:00') + ':00');
+            const categoriesArray = Array.from(selectedCategories);
 
             const rep = myReporters.find(r => r.id === authorId);
             const submitBtn = document.getElementById('submitBtn');
@@ -838,7 +895,11 @@
                     title: title,
                     description: desc,
                     content: content,
-                    category: selectedCategory,
+                    category: categoriesArray[0], // 既存のリーグ別グルーピングとの互換用（先頭のサブカテゴリ）
+                    categories: categoriesArray,
+                    reportedAt: reportedAtDate,
+                    reportedTimeUnknown: !reportedTime,
+                    sourceUrl: sourceUrl || null,
                     articleTypes: Array.from(selectedArticleTypes),
                     newsType: selectedNewsType,
                     tags: hashtags,
@@ -864,7 +925,11 @@
                 title: title,
                 description: desc,
                 content: content,
-                category: selectedCategory,
+                category: categoriesArray[0], // 既存のリーグ別グルーピングとの互換用（先頭のサブカテゴリ）
+                categories: categoriesArray,
+                reportedAt: reportedAtDate,
+                reportedTimeUnknown: !reportedTime,
+                sourceUrl: sourceUrl || null,
                 articleTypes: Array.from(selectedArticleTypes),
                 newsType: selectedNewsType,
                 tags: hashtags,

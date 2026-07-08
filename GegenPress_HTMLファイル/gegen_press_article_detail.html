@@ -1612,6 +1612,8 @@
                 document.getElementById('articleTime').textContent = fmtDate(a.createdAt);
 
                 document.getElementById('infoViews').textContent = (a.views || 0).toLocaleString();
+                // このニュースの閲覧数を1増やす（表示のたびに加算。重複防止は行っていません）
+                try { GegenPressAPI.articles.incrementView(articleId); } catch (e) {}
 
                 // 本文（サムネイル＋改行を段落として表示）
                 const bodyEl = document.getElementById('articleContent');

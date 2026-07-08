@@ -1057,6 +1057,7 @@
                 <div style="display:flex; gap:8px; align-items:center; margin-top:4px; flex-wrap:wrap;">
                     <span id="reporterTypeBadge" style="display:none; font-size:10.5px; font-weight:bold; color:#fff; border:1px solid rgba(255,255,255,0.7); border-radius:4px; padding:2px 8px;"></span>
                     <a id="mediaLink" href="#" style="display:none; font-size:11.5px; color:#fff; text-decoration:underline;"></a>
+                    <a id="headerTwitterLink" href="#" target="_blank" rel="noopener" style="display:none; font-size:11.5px; color:#fff; text-decoration:underline; font-weight:bold;"></a>
                 </div>
                 
                 <div class="profile-meta">
@@ -1071,7 +1072,7 @@
                 </div>
 
                 <div class="profile-buttons">
-                    <button class="btn-share">シェア</button>
+                    <a class="btn-share" id="postAsReporterBtn" href="#" style="display:none; text-decoration:none;">この記者のニュースを投稿する</a>
                     <button class="btn-edit-reporter" id="editReporterBtn">編集</button>
                 </div>
             </div>
@@ -1213,12 +1214,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- 関連する記者（専門分野が近い記者） -->
-            <section class="reviews-section" id="relatedReportersSection" style="display:none;">
-                <h2 class="reviews-title">関連する記者</h2>
-                <div class="related-reporters-grid" id="relatedReportersGrid"></div>
-            </section>
         </main>
 
 
@@ -1241,13 +1236,16 @@
                 </div><!-- /#expertiseTags -->
             </div>
 
-            <!-- ソーシャル（Xのハンドルが設定されている場合のみ表示） -->
-            <div class="sidebar-box" id="snsBox" style="display:none;">
-                <h3>SNS</h3>
-                <div class="info-item">
-                    <div class="info-label">Twitter/X</div>
-                    <div class="info-value" id="sidebarTwitterHandle">-</div>
-                </div>
+            <!-- 直近の投稿 -->
+            <div class="sidebar-box">
+                <h3>直近の投稿</h3>
+                <div id="sidebarRecentArticles" style="display:flex; flex-direction:column;"></div>
+            </div>
+
+            <!-- 関連する記者 -->
+            <div class="sidebar-box" id="sidebarRelatedReportersBox" style="display:none;">
+                <h3>関連する記者</h3>
+                <div id="sidebarRelatedReporters" style="display:flex; flex-direction:column;"></div>
             </div>
         </aside>
     </div>
@@ -1275,6 +1273,12 @@
                 <input type="text" class="modal-input" id="editTwitter" placeholder="@username">
             </div>
             <div class="modal-group">
+                <label class="modal-label">国籍</label>
+                <select class="modal-input" id="editNationality">
+                    <option value="">選択してください</option>
+                </select>
+            </div>
+            <div class="modal-group">
                 <label class="modal-label">専門分野</label>
                 <div class="modal-tags" id="editTags">
                     <span class="modal-tag" data-value="移籍情報">移籍情報</span>
@@ -1283,6 +1287,10 @@
                     <span class="modal-tag" data-value="セリエA">セリエA</span>
                     <span class="modal-tag" data-value="ブンデスリーガ">ブンデスリーガ</span>
                     <span class="modal-tag" data-value="リーグアン">リーグアン</span>
+                    <span class="modal-tag" data-value="エールディヴィジ">エールディヴィジ</span>
+                    <span class="modal-tag" data-value="プリメイラ・リーガ">プリメイラ・リーガ</span>
+                    <span class="modal-tag" data-value="Jリーグ">Jリーグ</span>
+                    <span class="modal-tag" data-value="MLS">MLS</span>
                     <span class="modal-tag" data-value="日本サッカー">日本サッカー</span>
                     <span class="modal-tag" data-value="代表チーム">代表チーム</span>
                 </div>
@@ -1306,6 +1314,7 @@
     </div>
 
     <!-- 本番デプロイ時は api-client.js を同じフォルダに置けば下の行が有効になります -->
+    <script src="clubs-data.js" onerror="console.warn('clubs-data.js が見つかりません')"></script>
     <script src="api-client.js" onerror="console.warn('api-client.js が見つかりません。デモモードで動作します。')"></script>
     <script>
         // =========================================================
@@ -1445,6 +1454,12 @@
                 mediaLink.style.display = 'inline-block';
             }
 
+            const postBtn = document.getElementById('postAsReporterBtn');
+            if (currentReporter.id) {
+                postBtn.href = 'gegen_press_write_article.html?authorId=' + encodeURIComponent(currentReporter.id);
+                postBtn.style.display = 'inline-block';
+            }
+
             if (r.trustScore != null) {
                 document.getElementById('metaTrust').textContent = r.trustScore + '/100';
                 document.getElementById('scoreNumber').textContent = r.trustScore;
@@ -1462,8 +1477,10 @@
 
             // SNS（実際に設定されているXのハンドルがある場合のみ表示）
             if (r.twitterHandle) {
-                document.getElementById('sidebarTwitterHandle').textContent = r.twitterHandle;
-                document.getElementById('snsBox').style.display = 'block';
+                const twLink = document.getElementById('headerTwitterLink');
+                twLink.href = 'https://x.com/' + encodeURIComponent(String(r.twitterHandle).replace(/^@/, ''));
+                twLink.textContent = '@' + String(r.twitterHandle).replace(/^@/, '');
+                twLink.style.display = 'inline-block';
             }
         }
 
@@ -1495,6 +1512,19 @@
                     window.location.href = 'gegen_press_article_detail.html?id=' + encodeURIComponent(el.getAttribute('data-article-id'));
                 });
             });
+
+            // サイドバー：直近の投稿（最大5件）
+            const sideWrap = document.getElementById('sidebarRecentArticles');
+            if (sideWrap) {
+                const recent = articles.slice().sort((a, b) => {
+                    const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                    const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                    return tb - ta;
+                }).slice(0, 5);
+                sideWrap.innerHTML = recent.map(a =>
+                    '<a href="gegen_press_article_detail.html?id=' + encodeURIComponent(a.id) + '" style="display:block; font-size:12px; color:#1a0dab; text-decoration:none; padding:7px 0; border-bottom:1px solid #f0f0f0;">' + escapeHtml(a.title) + '</a>'
+                ).join('') || '<p style="color:#999; font-size:12px; padding:8px 0;">まだ投稿がありません。</p>';
+            }
         }
 
         // -------- レビュー一覧の反映 --------
@@ -1818,19 +1848,19 @@
 
                 if (scored.length === 0) return;
 
-                const grid = document.getElementById('relatedReportersGrid');
+                const grid = document.getElementById('sidebarRelatedReporters');
                 grid.innerHTML = scored.map(x => {
                     const r = x.r;
                     const g = avatarColor(r.name);
                     const avatar = r.profileImage
-                        ? '<div class="related-reporter-avatar"><img src="' + r.profileImage + '" alt=""></div>'
-                        : '<div class="related-reporter-avatar" style="background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%);">' + escapeHtml(getInitials(r.name)) + '</div>';
+                        ? '<img src="' + r.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
+                        : escapeHtml(getInitials(r.name));
+                    const avatarBg = r.profileImage ? '' : ('background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%);');
                     return (
-                        '<div class="related-reporter-card" data-id="' + escapeHtml(r.id) + '">' +
-                            avatar +
-                            '<div class="related-reporter-info">' +
-                                '<h4>' + escapeHtml(r.name) + '</h4>' +
-                                '<p>' + escapeHtml((r.expertise || []).slice(0, 2).join(' / ')) + '</p>' +
+                        '<div class="related-reporter-card" data-id="' + escapeHtml(r.id) + '" style="display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid #f0f0f0; cursor:pointer;">' +
+                            '<div style="width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#fff; overflow:hidden; ' + avatarBg + '">' + avatar + '</div>' +
+                            '<div style="min-width:0;">' +
+                                '<div style="font-size:12px; font-weight:bold; color:#1a0dab;">' + escapeHtml(r.name) + '</div>' +
                             '</div>' +
                         '</div>'
                     );
@@ -1840,7 +1870,7 @@
                         window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
                     });
                 });
-                document.getElementById('relatedReportersSection').style.display = 'block';
+                document.getElementById('sidebarRelatedReportersBox').style.display = 'block';
             } catch (e) {
                 console.warn('関連記者の読み込みに失敗:', e);
             }
@@ -1879,11 +1909,25 @@
             }
         });
 
+        // 国籍セレクトの初期化（あいうえお順、国旗つき）
+        function populateNationalitySelect() {
+            const sel = document.getElementById('editNationality');
+            if (typeof GegenPressClubsData === 'undefined') return;
+            const collator = (typeof Intl !== 'undefined') ? new Intl.Collator('ja') : null;
+            const list = GegenPressClubsData.NATIONALITIES.slice();
+            if (collator) list.sort((a, b) => collator.compare(a.name, b.name));
+            else list.sort((a, b) => a.name.localeCompare(b.name));
+            sel.innerHTML = '<option value="">選択してください</option>' +
+                list.map(n => '<option value="' + escapeHtml(n.name) + '">' + (n.flag ? n.flag + ' ' : '') + escapeHtml(n.name) + '</option>').join('');
+        }
+        populateNationalitySelect();
+
         document.getElementById('editReporterBtn').addEventListener('click', function() {
             // 現在の値をフォームに反映
             document.getElementById('editName').value = currentReporter.name || '';
             document.getElementById('editMedia').value = currentReporter.mediaOutlet || '';
             document.getElementById('editTwitter').value = currentReporter.twitterHandle || '';
+            document.getElementById('editNationality').value = currentReporter.nationality || '';
             document.getElementById('editBio').value = currentReporter.bio || '';
             editHashtags = (currentReporter.hashtags || []).slice();
             renderEditHashtagChips();
@@ -1937,6 +1981,7 @@
                 mediaOutlet: document.getElementById('editMedia').value.trim() || null,
                 twitterHandle: document.getElementById('editTwitter').value.trim() || null,
                 expertise: Array.from(editSelectedTags),
+                nationality: document.getElementById('editNationality').value || null,
                 bio: document.getElementById('editBio').value.trim() || '',
                 hashtags: editHashtags,
             };

@@ -1191,7 +1191,10 @@
                 <a href="gegen_press_category.html#sec-league-3" class="side-link">セリエA</a>
                 <a href="gegen_press_category.html#sec-league-4" class="side-link">ブンデスリーガ</a>
                 <a href="gegen_press_category.html#sec-league-5" class="side-link">リーグアン</a>
-                <a href="gegen_press_category.html#sec-league-6" class="side-link">その他</a>
+                <a href="gegen_press_category.html#sec-league-6" class="side-link">エールディヴィジ</a>
+                <a href="gegen_press_category.html#sec-league-7" class="side-link">プリメイラ・リーガ</a>
+                <a href="gegen_press_category.html#sec-league-8" class="side-link">MLS</a>
+                <a href="gegen_press_category.html#sec-league-9" class="side-link">その他</a>
             </div>
         </aside>
 
@@ -1272,8 +1275,8 @@
     <footer>
         <p>&copy; 2026 Gegen Press! All Rights Reserved.</p>
         <div class="footer-links">
-            <a href="#">利用規約</a>
-            <a href="#">プライバシーポリシー</a>
+            <a href="gegen_press_terms.html">利用規約</a>
+            <a href="gegen_press_privacy.html">プライバシーポリシー</a>
             <a href="#">お問い合わせ</a>
             <a href="gegen_press_add_reporter.html">記者を追加</a>
         </div>
@@ -1432,7 +1435,12 @@
                         '</div>'
                     );
 
-                    wrap.innerHTML = heroHtml + rowHtml;
+                    const moreLinkHtml =
+                        '<div style="text-align:center; margin-top:12px;">' +
+                            '<a href="gegen_press_category.html" style="color:#e63946; font-weight:bold; font-size:12.5px; text-decoration:none;">もっと見る（ニュース一覧へ） →</a>' +
+                        '</div>';
+
+                    wrap.innerHTML = heroHtml + rowHtml + moreLinkHtml;
                     wrap.querySelectorAll('[data-article-id]').forEach(el => {
                         el.addEventListener('click', () => goArticle(el.getAttribute('data-article-id')));
                     });

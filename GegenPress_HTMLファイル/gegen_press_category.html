@@ -918,14 +918,16 @@
         }
 
         // 表示するリーグと表示順（ユーザー指定）
-        const LEAGUES = ['プレミアリーグ', 'ラリーガ', 'Jリーグ', 'セリエA', 'ブンデスリーガ', 'リーグアン', 'その他'];
+        const LEAGUES = ['プレミアリーグ', 'ラリーガ', 'Jリーグ', 'セリエA', 'ブンデスリーガ', 'リーグアン', 'エールディヴィジ', 'プリメイラ・リーガ', 'MLS', 'その他'];
 
-        // ニュースの category が上記6リーグのいずれにも一致しない場合は「その他」に分類する
-        // （例：既存シードデータの「移籍情報」カテゴリはここでは独立枠を用意していないため、
-        // 「その他」に含める形にしています。この振り分けルールでよいか、あとで確認してください）
-        function bucketOf(category) {
-            const c = category || '';
-            return LEAGUES.slice(0, 6).indexOf(c) !== -1 ? c : 'その他';
+        // ニュースが属するリーグ一覧を返す（新しい categories 配列／旧来の category 単体どちらにも対応）。
+        // 上記6リーグのどれにも一致しないものは「その他」に分類する
+        function bucketsOf(article) {
+            const cats = Array.isArray(article.categories) && article.categories.length > 0
+                ? article.categories
+                : [article.category || ''];
+            const known = cats.filter(c => LEAGUES.slice(0, -1).indexOf(c) !== -1);
+            return known.length > 0 ? known : ['その他'];
         }
 
         function thumbHtml(article) {
@@ -1055,7 +1057,7 @@
             const quicklinkList = document.getElementById('quicklinkList');
             const grouped = {};
             LEAGUES.forEach(l => grouped[l] = []);
-            articles.forEach(a => grouped[bucketOf(a.category)].push(a));
+            articles.forEach(a => bucketsOf(a).forEach(b => grouped[b].push(a)));
 
             let html = '';
             let linksHtml = '<a href="#sec-latest" class="quicklink-item active">直近のニュース</a>';
@@ -1073,8 +1075,15 @@
                 } else {
                     html += leagueFeatureHtml(list[0]);
                     const rowItems = list.slice(1, 5);
+                    const restItems = list.slice(5);
                     if (rowItems.length > 0) {
                         html += '<div class="league-row">' + rowItems.map(leagueCardHtml).join('') + '</div>';
+                    }
+                    if (restItems.length > 0) {
+                        html += '<div class="league-row league-row-more" data-anchor="' + anchor + '" style="display:none;">' + restItems.map(leagueCardHtml).join('') + '</div>';
+                        html += '<div style="text-align:center; margin-top:10px;">' +
+                            '<button type="button" class="show-more-btn" data-anchor="' + anchor + '" style="background:#fff; border:1px solid #ccc; padding:8px 20px; font-size:12.5px; cursor:pointer;">もっと見る（残り' + restItems.length + '件）</button>' +
+                            '</div>';
                     }
                 }
                 html += '</section>';
@@ -1083,6 +1092,18 @@
             wrap.innerHTML = html;
             quicklinkList.innerHTML = linksHtml;
             attachClickHandlers(wrap);
+
+            wrap.querySelectorAll('.show-more-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const anchor = this.getAttribute('data-anchor');
+                    const more = wrap.querySelector('.league-row-more[data-anchor="' + anchor + '"]');
+                    if (more) {
+                        more.style.display = 'flex';
+                        attachClickHandlers(more);
+                    }
+                    this.style.display = 'none';
+                });
+            });
         }
 
         async function loadCategoryPage() {

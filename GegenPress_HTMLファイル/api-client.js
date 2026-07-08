@@ -421,6 +421,16 @@
           return { success: true };
         } catch (e) { return { success: false, message: String(e) }; }
       },
+      // 閲覧数を1増やす。未ログインの読者でも呼べる（ログインは不要）
+      async incrementView(id) {
+        try {
+          var fb = await _ready;
+          await fb.db.collection('articles').doc(id).update({
+            views: firebase.firestore.FieldValue.increment(1)
+          });
+          return { success: true };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
       async getByCategory(category, params) {
         try {
           var fb = await _ready;

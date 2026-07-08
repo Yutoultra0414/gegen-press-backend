@@ -4,7 +4,8 @@ service cloud.firestore {
 
     // ユーザーコレクション
     match /users/{userId} {
-      allow read: if true;
+      allow get: if true; // マイページの個別閲覧（?id=）用。1件ずつの取得は誰でも可能
+      allow list: if request.auth != null && request.auth.uid == 'EcFjXMp6rpODK9i8E1DN1CPjZov2'; // 全件一覧の取得は管理者のみ（メールアドレス一括流出防止）
       allow create: if request.auth != null;
       allow update, delete: if request.auth != null && request.auth.uid == userId;
     }
@@ -14,9 +15,11 @@ service cloud.firestore {
     match /articles/{articleId} {
       allow read: if true; // すべての人が閲覧可能
       allow create: if request.auth != null;
-      allow update: if request.auth != null
+      // 閲覧数(views)だけは、未ログインの読者も含め誰でも増やせるようにする
+      allow update: if (request.auth != null
                     && (request.auth.uid == resource.data.authorId
-                        || request.auth.uid == 'EcFjXMp6rpODK9i8E1DN1CPjZov2');
+                        || request.auth.uid == 'EcFjXMp6rpODK9i8E1DN1CPjZov2'))
+                    || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']);
       allow delete: if request.auth != null
                     && (request.auth.uid == resource.data.authorId
                         || request.auth.uid == 'EcFjXMp6rpODK9i8E1DN1CPjZov2');
