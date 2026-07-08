@@ -90,7 +90,14 @@
         <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
         <nav class="gp-nav">
             <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
-            <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="newsDropdownWrap">
+                <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_category.html" class="gp-dropdown-option"><strong>すべてのニュース</strong><span>All News</span></a>
+                    <a href="gegen_press_category.html?type=confirmed" class="gp-dropdown-option"><strong>確定情報</strong><span>Confirmed</span></a>
+                    <a href="gegen_press_category.html?type=rumor" class="gp-dropdown-option"><strong>移籍の噂</strong><span>Rumor</span></a>
+                </div>
+            </div>
             <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
             <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
                 <a class="gp-nav-item active" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">メディア/記者を追加</span></a>
@@ -119,6 +126,22 @@
             });
         })();
     </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('newsDropdownWrap');
+            var trigger = document.getElementById('newsDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
 
     <div class="page-strip">
         <h1>メディアを追加</h1>

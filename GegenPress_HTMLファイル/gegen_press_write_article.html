@@ -337,7 +337,14 @@
         <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
         <nav class="gp-nav">
             <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
-            <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="newsDropdownWrap">
+                <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_category.html" class="gp-dropdown-option"><strong>すべてのニュース</strong><span>All News</span></a>
+                    <a href="gegen_press_category.html?type=confirmed" class="gp-dropdown-option"><strong>確定情報</strong><span>Confirmed</span></a>
+                    <a href="gegen_press_category.html?type=rumor" class="gp-dropdown-option"><strong>移籍の噂</strong><span>Rumor</span></a>
+                </div>
+            </div>
             <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
             <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
                 <a class="gp-nav-item" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">メディア/記者を追加</span></a>
@@ -367,6 +374,22 @@
             });
         })();
     </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('newsDropdownWrap');
+            var trigger = document.getElementById('newsDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
 
 
     <div class="gp-page-strip"><h1>ニュースを投稿</h1></div>
@@ -417,6 +440,16 @@
                         <span class="tag-option" data-value="リーグアン">リーグアン</span>
                         <span class="tag-option" data-value="日本サッカー">日本サッカー</span>
                         <span class="tag-option" data-value="代表チーム">代表チーム</span>
+                    </div>
+                </div>
+
+                <!-- 情報の確度 -->
+                <div class="form-group">
+                    <label class="form-label">情報の確度 <span class="optional-badge">任意</span></label>
+                    <p class="form-hint">ニュース一覧で「確定情報」「移籍の噂」に分けて表示されます。</p>
+                    <div class="tag-group" id="newsTypeTags">
+                        <span class="tag-option" data-value="confirmed">確定情報</span>
+                        <span class="tag-option" data-value="rumor">移籍の噂</span>
                     </div>
                 </div>
 
@@ -538,6 +571,22 @@
                 document.querySelectorAll('#categoryTags .tag-option').forEach(t => t.classList.remove('selected'));
                 this.classList.add('selected');
                 selectedCategory = this.getAttribute('data-value');
+            });
+        });
+
+        // 情報の確度（任意・単一選択。もう一度押すと選択解除）
+        let selectedNewsType = null;
+        document.querySelectorAll('#newsTypeTags .tag-option').forEach(tag => {
+            tag.addEventListener('click', function () {
+                const v = this.getAttribute('data-value');
+                if (selectedNewsType === v) {
+                    selectedNewsType = null;
+                    this.classList.remove('selected');
+                    return;
+                }
+                document.querySelectorAll('#newsTypeTags .tag-option').forEach(t => t.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedNewsType = v;
             });
         });
 
@@ -668,6 +717,7 @@
                 description: desc,
                 content: content,
                 category: selectedCategory,
+                newsType: selectedNewsType,
                 tags: hashtags,
                 authorId: authorId,
                 authorName: rep ? rep.name : '',

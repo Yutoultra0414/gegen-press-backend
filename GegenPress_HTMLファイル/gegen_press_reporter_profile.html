@@ -960,7 +960,14 @@
         <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
         <nav class="gp-nav">
             <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">ホーム</span></a>
-            <a class="gp-nav-item" href="gegen_press_category.html"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="newsDropdownWrap">
+                <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_category.html" class="gp-dropdown-option"><strong>すべてのニュース</strong><span>All News</span></a>
+                    <a href="gegen_press_category.html?type=confirmed" class="gp-dropdown-option"><strong>確定情報</strong><span>Confirmed</span></a>
+                    <a href="gegen_press_category.html?type=rumor" class="gp-dropdown-option"><strong>移籍の噂</strong><span>Rumor</span></a>
+                </div>
+            </div>
             <a class="gp-nav-item" href="gegen_press_ranking.html"><span class="gp-en">RANKING</span><span class="gp-jp">ランキング</span></a>
             <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
                 <a class="gp-nav-item" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">メディア/記者を追加</span></a>
@@ -990,6 +997,22 @@
             });
         })();
     </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('newsDropdownWrap');
+            var trigger = document.getElementById('newsDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
 
 
     <!-- プロフィールヘッダー -->
@@ -1287,6 +1310,12 @@
                 <label class="modal-label">説明・備考</label>
                 <textarea class="modal-textarea" id="editBio" placeholder="この記者の特徴など"></textarea>
             </div>
+            <div class="modal-group">
+                <label class="modal-label">ハッシュタグ</label>
+                <p style="font-size:11px; color:#999; margin-bottom:6px;">Enterまたはカンマで確定。この記者のページ下部に表示されます。</p>
+                <div id="editHashtagChips" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;"></div>
+                <input type="text" class="modal-input" id="editHashtagInput" placeholder="#タグを入力してEnter">
+            </div>
 
             <div class="modal-actions">
                 <button class="modal-cancel" id="modalCancelBtn">キャンセル</button>
@@ -1435,7 +1464,6 @@
                 mediaLink.style.display = 'inline-block';
             }
 
-            if (r.articlesCount != null) document.getElementById('metaArticles').textContent = r.articlesCount;
             if (r.trustScore != null) {
                 document.getElementById('metaTrust').textContent = r.trustScore + '/100';
                 document.getElementById('scoreNumber').textContent = r.trustScore;
@@ -1598,25 +1626,17 @@
         initReviewForm();
 
         // この記者の記事に使われているハッシュタグをまとめて表示
-        async function loadReporterHashtags() {
+        function renderReporterHashtags() {
             const wrap = document.getElementById('reporterHashtags');
-            if (!API_AVAILABLE || !currentReporter.id) { wrap.innerHTML = ''; return; }
-            try {
-                const ares = await GegenPressAPI.reporters.getArticles(currentReporter.id);
-                const tagSet = new Set();
-                (ares.articles || []).forEach(a => (a.tags || []).forEach(t => tagSet.add(t)));
-                if (tagSet.size === 0) {
-                    wrap.innerHTML = '<p style="color:#999; font-size:12.5px;">まだハッシュタグがありません。</p>';
-                    return;
-                }
-                wrap.innerHTML = Array.from(tagSet).map(t =>
-                    '<a href="gegen_press_hashtag.html?tag=' + encodeURIComponent(t) + '" style="background:#eef4ff; color:#1d3557; font-size:12px; font-weight:bold; padding:5px 12px; border-radius:14px; text-decoration:none;">#' + escapeHtml(t) + '</a>'
-                ).join('');
-            } catch (e) {
-                wrap.innerHTML = '';
+            const tags = currentReporter.hashtags || [];
+            if (tags.length === 0) {
+                wrap.innerHTML = '<p style="color:#999; font-size:12.5px;">まだハッシュタグがありません。</p>';
+                return;
             }
+            wrap.innerHTML = tags.map(t =>
+                '<a href="gegen_press_hashtag.html?tag=' + encodeURIComponent(t) + '" style="background:#eef4ff; color:#1d3557; font-size:12px; font-weight:bold; padding:5px 12px; border-radius:14px; text-decoration:none;">#' + escapeHtml(t) + '</a>'
+            ).join('');
         }
-        loadReporterHashtags();
 
 
         // -------- 統合ローダー --------
@@ -1657,10 +1677,17 @@
             // ニュース一覧
             try {
                 const res = await GegenPressAPI.reporters.getArticles(currentReporter.id, { limit: 10 });
-                if (res && res.success) renderArticles(res.articles);
+                if (res && res.success) {
+                    renderArticles(res.articles);
+                    const count = (res.articles || []).length;
+                    document.getElementById('metaArticles').textContent = count;
+                    document.getElementById('statArticleCount').textContent = count;
+                }
             } catch (e) {
                 console.warn('ニュース一覧の取得に失敗:', e);
             }
+
+            renderReporterHashtags();
 
             // レビュー一覧
             try {
@@ -1829,6 +1856,35 @@
         // モーダルの開閉
         const editModal = document.getElementById('editModal');
         const editSelectedTags = new Set();
+        let editHashtags = [];
+
+        function normalizeEditTag(raw) {
+            return String(raw || '').trim().replace(/^#+/, '').replace(/\s+/g, '');
+        }
+        function renderEditHashtagChips() {
+            const wrap = document.getElementById('editHashtagChips');
+            wrap.innerHTML = editHashtags.map((t, i) =>
+                '<span style="display:inline-flex; align-items:center; gap:5px; background:#eef4ff; color:#1d3557; font-size:12px; font-weight:bold; padding:4px 10px; border-radius:14px;">#' + escapeHtml(t) + '<span data-i="' + i + '" style="cursor:pointer; color:#888;">×</span></span>'
+            ).join('');
+            wrap.querySelectorAll('[data-i]').forEach(el => {
+                el.addEventListener('click', function () {
+                    editHashtags.splice(Number(this.getAttribute('data-i')), 1);
+                    renderEditHashtagChips();
+                });
+            });
+        }
+        const editHashtagInput = document.getElementById('editHashtagInput');
+        editHashtagInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                const t = normalizeEditTag(this.value);
+                this.value = '';
+                if (t && !editHashtags.some(x => x.toLowerCase() === t.toLowerCase())) {
+                    editHashtags.push(t);
+                    renderEditHashtagChips();
+                }
+            }
+        });
 
         document.getElementById('editReporterBtn').addEventListener('click', function() {
             // 現在の値をフォームに反映
@@ -1836,6 +1892,8 @@
             document.getElementById('editMedia').value = currentReporter.mediaOutlet || '';
             document.getElementById('editTwitter').value = currentReporter.twitterHandle || '';
             document.getElementById('editBio').value = currentReporter.bio || '';
+            editHashtags = (currentReporter.hashtags || []).slice();
+            renderEditHashtagChips();
 
             // 専門分野タグの選択状態を反映
             editSelectedTags.clear();
@@ -1887,6 +1945,7 @@
                 twitterHandle: document.getElementById('editTwitter').value.trim() || null,
                 expertise: Array.from(editSelectedTags),
                 bio: document.getElementById('editBio').value.trim() || '',
+                hashtags: editHashtags,
             };
 
             const saveBtn = this;
