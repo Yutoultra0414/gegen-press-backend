@@ -152,14 +152,14 @@
 
         /* コンテナ */
         .container {
-            max-width: 1200px;
+            max-width: 1040px;
             margin: 0 auto;
             padding: 0 40px;
         }
 
         /* ピックアップセクション */
         .pickup-section {
-            padding: 24px 40px 10px;
+            padding: 16px 40px 8px;
             background-color: #f5f5f5;
         }
 
@@ -173,7 +173,11 @@
             letter-spacing: 0.5px;
             padding: 10px 14px;
             position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        .section-title svg { flex-shrink: 0; }
 
         .section-title::before {
             content: none;
@@ -183,7 +187,7 @@
         .trio-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 12px;
             align-items: start;
         }
         .trio-col {
@@ -203,7 +207,7 @@
         }
         .trio-footer a:hover { text-decoration: underline; }
         @media (max-width: 768px) {
-            .trio-grid { grid-template-columns: 1fr; gap: 16px; }
+            .trio-grid { grid-template-columns: 1fr; gap: 10px; }
         }
 
         /* ピックアップニュース */
@@ -267,7 +271,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             transition: box-shadow 0.2s ease, transform 0.2s ease;
             max-width: 480px;
-            margin-top: 14px;
+            margin-top: 8px;
         }
         .hero-card:hover { box-shadow: 0 10px 26px rgba(230,57,70,0.18); transform: translateY(-2px); }
         .hero-thumb {
@@ -701,12 +705,12 @@
             }
 
             .container {
-                padding: 0 20px;
+                padding: 0 12px;
             }
 
             .pickup-section,
             .reporters-section {
-                padding: 40px 20px;
+                padding: 12px 12px 6px;
             }
 
             .pickup-articles .pickup-card {
@@ -791,7 +795,7 @@
             gap: 22px;
             flex: 1;
             min-width: 0;
-            overflow-x: auto;
+            overflow-x: visible;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
         }
@@ -910,7 +914,7 @@
 
             /* ヒーロー画像（Breaking News/人気の記事の一番大きいカード）を
                以前と同じくらいのサイズに戻す */
-            .hero-card { max-width: 100%; margin-top: 10px; }
+            .hero-card { max-width: 100%; margin-top: 6px; }
             .hero-thumb { aspect-ratio: 16 / 9; }
             .hero-title { font-size: 16px; }
             .hero-body { padding: 12px 14px 14px; }
@@ -919,10 +923,10 @@
                .pickup-section(20px) + .container(20px) の合計ぶんだけ
                外側にはみ出させて、画面の端まで使う */
             .pickup-articles {
-                margin-left: -40px;
-                margin-right: -40px;
-                padding-left: 20px;
-                padding-right: 20px;
+                margin-left: -24px;
+                margin-right: -24px;
+                padding-left: 12px;
+                padding-right: 12px;
             }
         }
     
@@ -984,7 +988,7 @@
     <!-- ピックアップセクション -->
     <section class="pickup-section">
         <div class="container">
-            <h2 class="section-title">Breaking News</h2>
+            <h2 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>Breaking News</h2>
             <div id="pickupArticles">
                 <p style="color:#999; font-size:13px;">読み込み中...</p>
             </div>
@@ -994,7 +998,7 @@
     <!-- 人気の記事 -->
     <section class="pickup-section">
         <div class="container">
-            <h2 class="section-title">人気の記事</h2>
+            <h2 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>人気の記事</h2>
             <div id="popularArticles">
                 <p style="color:#999; font-size:13px;">読み込み中...</p>
             </div>
@@ -1007,21 +1011,21 @@
             <p style="font-size:11.5px; color:#999; margin-bottom:10px;">※ クラブのマークは画像ロゴではなく、クラブ名から自動生成した色付きの略称バッジです。マークをタップするとクラブページに移動します。</p>
             <div class="trio-grid">
                 <div class="trio-col">
-                    <h2 class="section-title">話題の選手</h2>
+                    <h2 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>話題の選手</h2>
                     <div id="playersSection">
                         <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
                     </div>
                     <div class="trio-footer"><a href="gegen_press_players.html">選手一覧をすべて見る →</a></div>
                 </div>
                 <div class="trio-col">
-                    <h2 class="section-title">話題の記者</h2>
+                    <h2 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>話題の記者</h2>
                     <div id="trendingReportersSection">
                         <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
                     </div>
                     <div class="trio-footer"><a href="gegen_press_ranking.html">記者ランキングをすべて見る →</a></div>
                 </div>
                 <div class="trio-col">
-                    <h2 class="section-title">直近の移籍</h2>
+                    <h2 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>直近の移籍</h2>
                     <div id="transfersSection">
                         <div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中...</div>
                     </div>

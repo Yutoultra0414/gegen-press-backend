@@ -832,7 +832,7 @@
             gap: 22px;
             flex: 1;
             min-width: 0;
-            overflow-x: auto;
+            overflow-x: visible;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
         }
@@ -1016,17 +1016,12 @@
                         <div class="meta-label">ニュース数</div>
                     </div>
                     <div class="meta-item">
-                        <div class="meta-value" id="metaFollowers">1.2M</div>
-                        <div class="meta-label">フォロワー</div>
-                    </div>
-                    <div class="meta-item">
                         <div class="meta-value" id="metaTrust">96/100</div>
                         <div class="meta-label">信ぴょう性</div>
                     </div>
                 </div>
 
                 <div class="profile-buttons">
-                    <button class="btn-follow">フォロー</button>
                     <button class="btn-share">シェア</button>
                     <button class="btn-edit-reporter" id="editReporterBtn">編集</button>
                 </div>
@@ -1283,7 +1278,7 @@
 
             <!-- ソーシャル -->
             <div class="sidebar-box">
-                <h3>フォロー</h3>
+                <h3>SNS</h3>
                 <div class="info-item">
                     <div class="info-label">Twitter/X</div>
                     <div class="info-value">@FabrizioRomano</div>
@@ -1312,10 +1307,6 @@
                 <div class="info-item">
                     <div class="info-label">平均評価</div>
                     <div class="info-value">4.8 / 5.0</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">フォロワー</div>
-                    <div class="info-value">1.2M</div>
                 </div>
             </div>
         </aside>
@@ -1566,12 +1557,6 @@
             }
 
             if (r.articlesCount != null) document.getElementById('metaArticles').textContent = r.articlesCount;
-            if (r.followers != null) {
-                const f = r.followers;
-                document.getElementById('metaFollowers').textContent =
-                    f >= 1000000 ? (f / 1000000).toFixed(1) + 'M'
-                    : f >= 1000 ? (f / 1000).toFixed(1) + 'K' : f;
-            }
             if (r.trustScore != null) {
                 document.getElementById('metaTrust').textContent = r.trustScore + '/100';
                 document.getElementById('scoreNumber').textContent = r.trustScore;
