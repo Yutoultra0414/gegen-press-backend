@@ -1694,6 +1694,22 @@
                 console.warn('記者情報の取得に失敗:', e);
             }
 
+            // 実際の記事評価から算出したスコア（直接評価ではなく、記事の★評価の平均）
+            try {
+                const sres = await GegenPressAPI.ratings.getComputedReporterScore(currentReporter.id);
+                if (sres && sres.success) {
+                    const score = Math.round((sres.average / 5) * 100);
+                    document.getElementById('metaTrust').textContent = score + '/100';
+                    document.getElementById('scoreNumber').textContent = score;
+                    document.getElementById('scoreBarFill').style.width = score + '%';
+                    const ratingLabel = sres.count > 0 ? sres.average.toFixed(1) + ' (' + sres.count + '件の評価)' : 'まだ評価がありません';
+                    const noteEl = document.getElementById('scoreRatingNote');
+                    if (noteEl) noteEl.textContent = ratingLabel;
+                }
+            } catch (e) {
+                console.warn('評価スコアの算出に失敗:', e);
+            }
+
             // ニュース一覧
             try {
                 const res = await GegenPressAPI.reporters.getArticles(currentReporter.id, { limit: 10 });

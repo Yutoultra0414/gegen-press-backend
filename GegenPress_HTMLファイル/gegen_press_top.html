@@ -907,7 +907,17 @@
     <section class="pickup-section">
         <div class="container">
             <h2 class="section-title">Breaking News</h2>
-            <div class="latest-grid" id="pickupArticles">
+            <div id="pickupArticles">
+                <p style="color:#999; font-size:13px;">読み込み中...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 人気の記事 -->
+    <section class="pickup-section">
+        <div class="container">
+            <h2 class="section-title">人気の記事</h2>
+            <div id="popularArticles">
                 <p style="color:#999; font-size:13px;">読み込み中...</p>
             </div>
         </div>
@@ -1048,22 +1058,27 @@
         async function loadTopPage() {
             if (typeof GegenPressAPI === 'undefined') return;
 
-            // Breaking News（閲覧数の多いニュースから、1件を大きく＋3件を横に）
+            // Breaking News（新着順）／人気の記事（閲覧数順）を、共通のレイアウトで描画
             try {
                 const ares = await GegenPressAPI.articles.getAll();
-                const wrap = document.getElementById('pickupArticles');
-                if (ares && ares.success && ares.articles && ares.articles.length > 0) {
-                    const list = ares.articles.slice(0, 4);
-                    const heroA = list[0];
-                    const restA = list.slice(1, 4);
+                const articles = (ares && ares.success && ares.articles) ? ares.articles : [];
 
-                    function thumbHtmlFor(a) {
-                        const pos = (a.imagePosition && typeof a.imagePosition.x === 'number')
-                            ? (a.imagePosition.x + '% ' + a.imagePosition.y + '%') : '50% 50%';
-                        return a.image
-                            ? '<img src="' + a.image + '" alt="" style="object-position:' + pos + ';">'
-                            : esc(a.category || 'Gegen Press!');
+                function thumbHtmlFor(a) {
+                    const pos = (a.imagePosition && typeof a.imagePosition.x === 'number')
+                        ? (a.imagePosition.x + '% ' + a.imagePosition.y + '%') : '50% 50%';
+                    return a.image
+                        ? '<img src="' + a.image + '" alt="" style="object-position:' + pos + ';">'
+                        : esc(a.category || 'Gegen Press!');
+                }
+
+                function renderHeroScroll(containerId, list) {
+                    const wrap = document.getElementById(containerId);
+                    if (list.length === 0) {
+                        wrap.innerHTML = '<p style="color:#999; font-size:13px;">まだニュースがありません。</p>';
+                        return;
                     }
+                    const heroA = list[0];
+                    const rowA = list.slice(1, 9); // 横スクロール分：最大8件
 
                     const heroHtml =
                         '<a class="hero-card" data-article-id="' + esc(heroA.id) + '">' +
@@ -1073,23 +1088,42 @@
                                 '<div class="card-meta">' + esc(heroA.authorName || '') + '</div>' +
                             '</div>' +
                         '</a>';
-                    const sideHtml = '<div class="side-list">' + restA.map(a =>
-                        '<a class="side-card" data-article-id="' + esc(a.id) + '">' +
-                            '<div class="side-thumb">' + thumbHtmlFor(a) + '</div>' +
-                            '<div class="side-body"><div class="side-title">' + esc(a.title) + '</div></div>' +
-                        '</a>'
-                    ).join('') + '</div>';
 
-                    wrap.innerHTML = heroHtml + sideHtml;
+                    const rowHtml = rowA.length === 0 ? '' : (
+                        '<div class="pickup-articles" style="margin-top:14px;">' +
+                            rowA.map(a =>
+                                '<div class="pickup-card" data-article-id="' + esc(a.id) + '" style="cursor:pointer;">' +
+                                    '<div class="pickup-thumb">' + thumbHtmlFor(a) + '</div>' +
+                                    '<div class="pickup-card-content" style="padding:10px 12px 12px;">' +
+                                        '<span class="pickup-category-tag">' + esc(a.category || '') + '</span>' +
+                                        '<h3 class="pickup-title" style="font-size:13px; line-height:1.45; margin-bottom:0;">' + esc(a.title) + '</h3>' +
+                                    '</div>' +
+                                '</div>'
+                            ).join('') +
+                        '</div>'
+                    );
+
+                    wrap.innerHTML = heroHtml + rowHtml;
                     wrap.querySelectorAll('[data-article-id]').forEach(el => {
                         el.addEventListener('click', () => goArticle(el.getAttribute('data-article-id')));
                     });
-                } else {
-                    wrap.innerHTML = '<p style="color:#999; font-size:13px;">まだニュースが投稿されていません。</p>';
                 }
+
+                // Breaking News：新しい順
+                const byDate = articles.slice().sort((a, b) => {
+                    const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                    const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                    return tb - ta;
+                });
+                renderHeroScroll('pickupArticles', byDate.slice(0, 9));
+
+                // 人気の記事：閲覧数順
+                const byViews = articles.slice().sort((a, b) => (b.views || 0) - (a.views || 0));
+                renderHeroScroll('popularArticles', byViews.slice(0, 9));
             } catch (e) {
                 console.warn('ニュースの読み込みに失敗しました:', e);
                 document.getElementById('pickupArticles').innerHTML = '<p style="color:#999; font-size:13px;">読み込みに失敗しました。</p>';
+                document.getElementById('popularArticles').innerHTML = '<p style="color:#999; font-size:13px;">読み込みに失敗しました。</p>';
             }
         }
         loadTopPage();

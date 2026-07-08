@@ -33,8 +33,12 @@ service cloud.firestore {
     // 評価コレクション（記事・記者評価はログイン不要で投稿可能）
     match /ratings/{ratingId} {
       allow read: if true;
-      allow create: if true; // 誰でも評価可能
-      allow update, delete: if request.auth != null
+      // ログイン必須。ドキュメントIDは articleId_userId 固定なので、
+      // 本人のUIDと一致するIDでしか作成・上書きできない（＝1アカウント1記事1回）
+      allow create, update: if request.auth != null
+                            && request.auth.uid == request.resource.data.userId
+                            && ratingId == request.resource.data.articleId + '_' + request.auth.uid;
+      allow delete: if request.auth != null
                             && request.auth.uid == resource.data.userId;
     }
 

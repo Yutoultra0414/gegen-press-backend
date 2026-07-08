@@ -1048,6 +1048,22 @@
         const ratingButtons = document.querySelectorAll('#ratingInput .star-btn');
         let selectedRating = 0;
 
+        // 既に自分がこの記事を評価済みなら、その内容を反映（再評価は上書きになる）
+        async function initMyRating() {
+            if (typeof GegenPressAPI === 'undefined') return;
+            try {
+                const res = await GegenPressAPI.ratings.getMyRating(articleId);
+                if (res && res.success && res.rating) {
+                    selectedRating = res.rating.rating || 0;
+                    ratingButtons.forEach((b, index) => {
+                        b.classList.toggle('active', index < selectedRating);
+                        b.style.color = index < selectedRating ? '#e63946' : '#ddd';
+                    });
+                    if (ratingSubmitBtn) ratingSubmitBtn.textContent = '評価を更新（' + selectedRating + '★ 投稿済み）';
+                }
+            } catch (e) { /* 未ログイン・取得失敗時は何もしない */ }
+        }
+
         ratingButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1097,9 +1113,8 @@
                 ratingSubmitBtn.disabled = false;
                 ratingSubmitBtn.textContent = '評価を投稿';
                 if (res && res.success) {
-                    alert('ご投稿ありがとうございます！\n\n選択された評価: ' + selectedRating + '★\n\nあなたの評価は他のユーザーの参考になります。');
-                    selectedRating = 0;
-                    ratingButtons.forEach(btn => { btn.classList.remove('active'); btn.style.color = '#ddd'; });
+                    alert('ご投稿ありがとうございます！\n\n選択された評価: ' + selectedRating + '★\n\nあなたの評価はこの記者のスコアに反映されます。');
+                    ratingSubmitBtn.textContent = '評価を更新（' + selectedRating + '★ 投稿済み）';
                     loadRatings(); // 一覧と平均を更新
                 } else {
                     alert((res && res.message) || '評価の投稿に失敗しました。');
@@ -1541,7 +1556,7 @@
             }
         }
 
-        loadArticle().then(initThumbButton);
+        loadArticle().then(() => { initThumbButton(); initMyRating(); });
     </script>
 </body>
 </html>

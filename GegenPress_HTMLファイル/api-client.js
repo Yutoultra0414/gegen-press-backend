@@ -445,15 +445,31 @@
     ratings: {
       async create(ratingData) {
         try {
-          var fb = await _ready;
           var u = await currentUser();
+          if (!u) return { success: false, message: '評価にはログインが必要です' };
+          if (!ratingData.articleId) return { success: false, message: 'articleId が指定されていません' };
+          var fb = await _ready;
+          // ドキュメントIDを articleId_userId に固定することで、
+          // 同じ人が同じ記事に何度評価しても「1件を上書き」になるようにする（1アカウント1記事1回）
+          var docId = ratingData.articleId + '_' + u.uid;
           var docData = Object.assign({}, ratingData, {
-            userId: u ? u.uid : null,
-            createdAt: tsNow()
+            userId: u.uid,
+            updatedAt: tsNow()
           });
-          var ref = await fb.db.collection('ratings').add(docData);
-          return { success: true, id: ref.id };
+          var existing = await fb.db.collection('ratings').doc(docId).get();
+          if (!existing.exists) docData.createdAt = tsNow();
+          await fb.db.collection('ratings').doc(docId).set(docData, { merge: true });
+          return { success: true, id: docId };
         } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async getMyRating(articleId) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: true, rating: null };
+          var fb = await _ready;
+          var doc = await fb.db.collection('ratings').doc(articleId + '_' + u.uid).get();
+          return { success: true, rating: doc.exists ? doc.data() : null };
+        } catch (e) { return { success: false, message: String(e), rating: null }; }
       },
       async getByArticle(articleId) {
         try {
@@ -468,6 +484,23 @@
           var snap = await fb.db.collection('ratings').where('reporterId', '==', reporterId).get();
           return { success: true, ratings: docList(snap) };
         } catch (e) { return { success: false, message: String(e), ratings: [] }; }
+      },
+      // 記者の評価は「直接評価する」のではなく、その記者名義の記事に付いた評価（★）の平均で算出する
+      async getComputedReporterScore(reporterId) {
+        try {
+          var fb = await _ready;
+          var artSnap = await fb.db.collection('articles').where('authorId', '==', reporterId).get();
+          var articleIds = artSnap.docs.map(function (d) { return d.id; });
+          if (articleIds.length === 0) return { success: true, average: 0, count: 0, articlesCount: 0 };
+          var ratingsSnap = await fb.db.collection('ratings').get();
+          var relevant = docList(ratingsSnap).filter(function (r) {
+            return articleIds.indexOf(r.articleId) !== -1 && typeof r.rating === 'number';
+          });
+          var count = relevant.length;
+          var sum = relevant.reduce(function (s, r) { return s + r.rating; }, 0);
+          var average = count > 0 ? (sum / count) : 0;
+          return { success: true, average: average, count: count, articlesCount: articleIds.length };
+        } catch (e) { return { success: false, message: String(e), average: 0, count: 0, articlesCount: 0 }; }
       }
     },
 

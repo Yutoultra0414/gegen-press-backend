@@ -695,7 +695,7 @@
                 <tbody id="rankingBody">
                     <!-- 1位 -->
                     <tr class="rank-1" data-reporter-id="rep_fabrizio" onclick="goReporterProfile('rep_fabrizio')" style="cursor: pointer;">
-                        <td class="rank-number"><span class="medal medal-gold">Gold</span>1</td>
+                        <td class="rank-number"><span class="medal medal-gold"></span>1</td>
                         <td>
                             <div class="reporter-info">
                                 <div class="reporter-avatar">F</div>
@@ -711,7 +711,7 @@
 
                     <!-- 2位 -->
                     <tr class="rank-2" data-reporter-id="rep_skysports" onclick="goReporterProfile('rep_skysports')" style="cursor: pointer;">
-                        <td class="rank-number"><span class="medal medal-silver">Silver</span>2</td>
+                        <td class="rank-number"><span class="medal medal-silver"></span>2</td>
                         <td>
                             <div class="reporter-info">
                                 <div class="reporter-avatar">S</div>
@@ -727,7 +727,7 @@
 
                     <!-- 3位 -->
                     <tr class="rank-3" data-reporter-id="rep_marca" onclick="goReporterProfile('rep_marca')" style="cursor: pointer;">
-                        <td class="rank-number"><span class="medal medal-bronze">Bronze</span>3</td>
+                        <td class="rank-number"><span class="medal medal-bronze"></span>3</td>
                         <td>
                             <div class="reporter-info">
                                 <div class="reporter-avatar">M</div>
@@ -933,11 +933,29 @@
                     if (pg) pg.style.display = 'none';
                     return;
                 }
+
+                // 記者を直接評価するのではなく、その記者名義の記事に付いた★評価の平均で順位を決める
+                const withScores = await Promise.all(res.ranking.map(async (r) => {
+                    try {
+                        const sres = await GegenPressAPI.ratings.getComputedReporterScore(r.id);
+                        return Object.assign({}, r, {
+                            computedAverage: (sres && sres.success) ? sres.average : 0,
+                            computedCount: (sres && sres.success) ? sres.count : 0
+                        });
+                    } catch (e) {
+                        return Object.assign({}, r, { computedAverage: 0, computedCount: 0 });
+                    }
+                }));
+                withScores.sort((a, b) => {
+                    if (b.computedAverage !== a.computedAverage) return b.computedAverage - a.computedAverage;
+                    return b.computedCount - a.computedCount;
+                });
+
                 tbody.innerHTML = '';
                 // 見せかけのページ送りは実データ表示時には隠す
                 const pg = document.querySelector('.pagination');
                 if (pg) pg.style.display = 'none';
-                res.ranking.forEach((r, i) => {
+                withScores.forEach((r, i) => {
                     const rank = i + 1;
                     const tr = document.createElement('tr');
                     if (rank <= 3) tr.className = 'rank-' + rank;
@@ -945,12 +963,12 @@
                     tr.setAttribute('data-reporter-id', r.id);
                     tr.addEventListener('click', () => goReporterProfile(r.id));
 
-                    const medal = rank === 1 ? '<span class="medal medal-gold">Gold</span>'
-                                : rank === 2 ? '<span class="medal medal-silver">Silver</span>'
-                                : rank === 3 ? '<span class="medal medal-bronze">Bronze</span>' : '';
+                    const medal = rank === 1 ? '<span class="medal medal-gold"></span>'
+                                : rank === 2 ? '<span class="medal medal-silver"></span>'
+                                : rank === 3 ? '<span class="medal medal-bronze"></span>' : '';
                     const g = avatarColor(r.name);
-                    const rating = (typeof r.averageRating === 'number') ? r.averageRating.toFixed(1) : '-';
-                    const score = (typeof r.trustScore === 'number') ? r.trustScore : 0;
+                    const rating = r.computedCount > 0 ? r.computedAverage.toFixed(1) : '-';
+                    const score = Math.round((r.computedAverage / 5) * 100);
                     const avatarInner = r.profileImage
                         ? '<img src="' + r.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">'
                         : esc(getInitials(r.name));
@@ -963,7 +981,7 @@
                             '<div class="reporter-details"><h3>' + esc(r.name) + (r.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(r.nameRomaji) + '</span>' : '') + '</h3><p>' + esc(r.mediaOutlet || '') + '</p></div>' +
                         '</div></td>' +
                         '<td class="score-cell">' + score + '<span class="score-max">/100</span></td>' +
-                        '<td class="number-cell">' + esc(rating) + '</td>';
+                        '<td class="number-cell">' + esc(rating) + (r.computedCount > 0 ? ' <span style="font-size:11px;color:#999;">(' + r.computedCount + '件)</span>' : '') + '</td>';
                     tbody.appendChild(tr);
                 });
             } catch (e) {
