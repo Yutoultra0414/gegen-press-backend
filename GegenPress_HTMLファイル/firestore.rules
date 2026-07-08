@@ -67,8 +67,20 @@ service cloud.firestore {
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if request.auth != null;
-      allow update, delete: if request.auth != null
-                            && request.auth.uid == resource.data.userId;
+      // 本人はレビュー全体を編集・削除可能。それ以外のログインユーザーは
+      // いいね/うーんのカウント(likes/dislikes)のみ更新可能
+      allow update: if request.auth != null && (
+        request.auth.uid == resource.data.userId ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'dislikes'])
+      );
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // レビューへのいいね/うーん投票（1アカウント1レビュー1票。ドキュメントID＝reviewId_uid）
+    match /reviewVotes/{voteId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
 
     // フォロー関係コレクション

@@ -183,6 +183,79 @@
             content: none;
         }
 
+        /* ===== 左右サイドヘッドライン（PC/タブレットのみ） ===== */
+        .page-grid {
+            display: grid;
+            grid-template-columns: 190px 1fr 230px;
+            gap: 16px;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 20px;
+            align-items: start;
+        }
+        .page-center { min-width: 0; }
+        .side-col {
+            position: sticky;
+            top: 76px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .side-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px 12px 12px;
+        }
+        .side-box-title {
+            font-size: 11px;
+            font-weight: 900;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e63946;
+        }
+        .side-link {
+            display: block;
+            font-size: 12.5px;
+            color: #333;
+            text-decoration: none;
+            padding: 6px 2px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .side-link:last-child { border-bottom: none; }
+        .side-link:hover { color: #e63946; }
+        .side-tag-chip {
+            display: inline-block;
+            background: #eef4ff;
+            color: #1d3557;
+            font-size: 11.5px;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-decoration: none;
+            margin: 0 4px 6px 0;
+        }
+        .side-reporter-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 2px;
+            border-bottom: 1px solid #f0f0f0;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+        .side-reporter-row:last-child { border-bottom: none; }
+        .side-reporter-row .rank { font-size: 11px; font-weight: 900; color: #e63946; width: 14px; flex-shrink: 0; }
+        .side-reporter-row .name { font-size: 12px; font-weight: bold; color: #1a0dab; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .side-reporter-row .score { font-size: 11px; color: #999; flex-shrink: 0; }
+        @media (max-width: 1024px) {
+            .page-grid { grid-template-columns: 1fr; padding: 0; max-width: 100%; }
+            .side-col { display: none; }
+        }
+
         /* ===== 話題の選手／話題の記者／直近の移籍（Transfermarkt風 3カラム） ===== */
         .trio-grid {
             display: grid;
@@ -985,6 +1058,23 @@
 
     <!-- ヒーロー -->
 
+    <div class="page-grid">
+        <!-- 左サイドヘッドライン：リーグ別カテゴリ -->
+        <aside class="side-col side-left">
+            <div class="side-box">
+                <div class="side-box-title">リーグ別</div>
+                <a href="gegen_press_category.html" class="side-link">すべてのニュース</a>
+                <a href="gegen_press_category.html#sec-league-0" class="side-link">プレミアリーグ</a>
+                <a href="gegen_press_category.html#sec-league-1" class="side-link">ラリーガ</a>
+                <a href="gegen_press_category.html#sec-league-2" class="side-link">Jリーグ</a>
+                <a href="gegen_press_category.html#sec-league-3" class="side-link">セリエA</a>
+                <a href="gegen_press_category.html#sec-league-4" class="side-link">ブンデスリーガ</a>
+                <a href="gegen_press_category.html#sec-league-5" class="side-link">リーグアン</a>
+                <a href="gegen_press_category.html#sec-league-6" class="side-link">その他</a>
+            </div>
+        </aside>
+
+        <div class="page-center">
     <!-- ピックアップセクション -->
     <section class="pickup-section">
         <div class="container">
@@ -1034,6 +1124,21 @@
             </div>
         </div>
     </section>
+        </div><!-- /.page-center -->
+
+        <!-- 右サイドヘッドライン：注目のハッシュタグ + 記者ランキング -->
+        <aside class="side-col side-right">
+            <div class="side-box">
+                <div class="side-box-title">注目のハッシュタグ</div>
+                <div id="sideTrendingTags"><p style="color:#999; font-size:11.5px; padding:8px 0;">読み込み中...</p></div>
+            </div>
+            <div class="side-box">
+                <div class="side-box-title">記者ランキング TOP5</div>
+                <div id="sideReporterRanking"><p style="color:#999; font-size:11.5px; padding:8px 0;">読み込み中...</p></div>
+                <a href="gegen_press_ranking.html" class="side-link" style="border-top:1px solid #eee; margin-top:4px; padding-top:8px; color:#e63946; font-weight:bold;">ランキングをすべて見る →</a>
+            </div>
+        </aside>
+    </div><!-- /.page-grid -->
 
     <!-- フッター -->
     <footer>
@@ -1173,7 +1278,7 @@
                             '<div class="hero-thumb"><span class="cat-tag">' + esc(heroA.category || '速報') + '</span>' + thumbHtmlFor(heroA) + '</div>' +
                             '<div class="hero-body">' +
                                 '<div class="hero-title">' + esc(heroA.title) + '</div>' +
-                                '<div class="card-meta">' + esc(heroA.authorName || '') + '</div>' +
+                                '<div class="card-meta"><span style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;' + avatarStyle(heroA.authorName) + '">' + esc(getInitials(heroA.authorName)) + '</span>' + esc(heroA.authorName || '') + '</div>' +
                             '</div>' +
                         '</a>';
 
@@ -1208,6 +1313,17 @@
                 // 人気の記事：閲覧数順
                 const byViews = articles.slice().sort((a, b) => (b.views || 0) - (a.views || 0));
                 renderHeroScroll('popularArticles', byViews.slice(0, 9));
+
+                // サイドバー：注目のハッシュタグ（記事に付いたタグの出現頻度上位）
+                const tagWrap = document.getElementById('sideTrendingTags');
+                if (tagWrap) {
+                    const freq = {};
+                    articles.forEach(a => (a.tags || []).forEach(t => { freq[t] = (freq[t] || 0) + 1; }));
+                    const topTags = Object.keys(freq).sort((a, b) => freq[b] - freq[a]).slice(0, 12);
+                    tagWrap.innerHTML = topTags.length === 0
+                        ? '<p style="color:#999; font-size:11.5px; padding:8px 0;">まだハッシュタグがありません。</p>'
+                        : topTags.map(t => '<a class="side-tag-chip" href="gegen_press_hashtag.html?tag=' + encodeURIComponent(t) + '">#' + esc(t) + '</a>').join('');
+                }
             } catch (e) {
                 console.warn('ニュースの読み込みに失敗しました:', e);
                 document.getElementById('pickupArticles').innerHTML = '<p style="color:#999; font-size:13px;">読み込みに失敗しました。</p>';
@@ -1408,6 +1524,21 @@
                         window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
                     });
                 });
+
+                // サイドバー：コンパクトな記者ランキングTOP5
+                const sideWrap = document.getElementById('sideReporterRanking');
+                if (sideWrap) {
+                    sideWrap.innerHTML = top5.map((r, i) => {
+                        const score = Math.round((r.computedAverage / 5) * 100);
+                        return (
+                            '<a class="side-reporter-row" href="gegen_press_reporter_profile.html?id=' + encodeURIComponent(r.id) + '">' +
+                                '<span class="rank">' + (i + 1) + '</span>' +
+                                '<span class="name">' + esc(r.name) + '</span>' +
+                                '<span class="score">' + score + '</span>' +
+                            '</a>'
+                        );
+                    }).join('');
+                }
             } catch (e) {
                 wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中にエラーが発生しました。</div>';
             }

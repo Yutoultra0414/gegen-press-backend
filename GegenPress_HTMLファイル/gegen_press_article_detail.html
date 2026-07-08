@@ -356,32 +356,36 @@
         .comments-list {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 0;
+            border-top: 1px solid #ddd;
         }
 
         .comment {
-            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
-            border: 1px solid #ddd;
-            border-left: 3px solid #e63946;
-            border-radius: 6px;
-            padding: 20px;
+            background: #fff;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            border-radius: 0;
+            padding: 10px 4px;
         }
+        .comment:hover { background: #fafafa; }
 
         .comment-header {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
+            justify-content: flex-start;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
         }
 
         .comment-author {
             font-weight: bold;
-            color: #000;
-            font-size: 14px;
+            color: #1d3557;
+            font-size: 13px;
         }
 
         .comment-time {
-            font-size: 12px;
+            font-size: 11.5px;
             color: #999;
         }
 
@@ -392,40 +396,40 @@
 
         /* ===== 掲示板風の追加スタイル（コメント番号・返信） ===== */
         .comment-no {
-            font-size: 12px;
+            font-size: 12.5px;
             color: #e63946;
             font-weight: 900;
-            margin-right: 6px;
         }
         .comment-reply-link {
             font-size: 11.5px;
             color: #888;
             cursor: pointer;
-            text-decoration: underline;
-            margin-top: 8px;
+            margin-top: 4px;
             display: inline-block;
         }
+        .comment-reply-link::before { content: '└ '; color: #ccc; }
         .comment-reply-link:hover { color: #e63946; }
         .comment-replies {
-            margin-top: 12px;
-            padding-left: 18px;
+            margin-top: 4px;
+            padding-left: 16px;
             border-left: 2px solid #eee;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 0;
         }
+        .comment-replies .comment { padding: 8px 4px; }
         .comment-reply-form {
             display: none;
-            margin-top: 10px;
-            gap: 8px;
+            margin-top: 8px;
+            gap: 6px;
             flex-direction: column;
         }
         .comment-reply-form textarea {
             width: 100%;
-            min-height: 60px;
-            padding: 8px 10px;
+            min-height: 50px;
+            padding: 7px 9px;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: 0;
             font-size: 12.5px;
             font-family: inherit;
             resize: vertical;
@@ -435,7 +439,7 @@
             background: #e63946;
             color: #fff;
             border: none;
-            border-radius: 6px;
+            border-radius: 0;
             padding: 6px 14px;
             font-size: 12px;
             font-weight: bold;
@@ -452,10 +456,11 @@
         }
 
         .comment-text {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 12px;
-            font-size: 14px;
+            color: #333;
+            line-height: 1.7;
+            margin-bottom: 4px;
+            font-size: 13.5px;
+            white-space: pre-wrap;
         }
 
         .comment-actions {
@@ -1377,12 +1382,10 @@
             return (
                 '<div class="comment" data-comment-id="' + esc(c.id) + '">' +
                     '<div class="comment-header">' +
-                        '<div>' +
-                            '<span class="comment-no">No.' + no + '</span>' +
-                            '<span class="comment-author">' + esc(c.username || '匿名ユーザー') + '</span>' +
-                            '<div class="comment-time">' + esc(fmtDate(c.createdAt)) + '</div>' +
-                        '</div>' +
-                        (c.rating ? '<div class="comment-rating">' + starsHtml(c.rating) + '</div>' : '') +
+                        '<span class="comment-no">' + (no ? no + ' ' : '') + '</span>' +
+                        '<span class="comment-author">' + esc(c.username || '匿名ユーザー') + '</span>' +
+                        '<span class="comment-time">' + esc(fmtDate(c.createdAt)) + '</span>' +
+                        (c.rating ? '<span class="comment-rating">' + starsHtml(c.rating) + '</span>' : '') +
                     '</div>' +
                     '<div class="comment-text">' + esc(c.content || '') + '</div>' +
                     '<span class="comment-reply-link" data-reply-toggle="' + esc(c.id) + '">返信する</span>' +
@@ -1510,6 +1513,16 @@
                 document.getElementById('authorSection').onclick = function () {
                     window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
                 };
+                // 記者の実際のアイコン画像が設定されていれば、それを表示する（無ければ略称バッジのまま）
+                if (a.authorId && typeof GegenPressAPI !== 'undefined') {
+                    GegenPressAPI.reporters.getById(a.authorId).then(function (rres) {
+                        if (rres && rres.success && rres.reporter && rres.reporter.profileImage) {
+                            const avatarEl = document.getElementById('authorAvatar');
+                            avatarEl.style.background = 'none';
+                            avatarEl.innerHTML = '<img src="' + rres.reporter.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                        }
+                    }).catch(function () {});
+                }
                 document.getElementById('sideAuthorLink').href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
                 document.getElementById('sideAuthorName').textContent = a.authorName || '';
                 document.getElementById('sideAuthorOutlet').textContent = '';

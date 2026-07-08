@@ -1017,7 +1017,7 @@
                     </div>
                     <div class="meta-item">
                         <div class="meta-value" id="metaTrust">96/100</div>
-                        <div class="meta-label">信ぴょう性</div>
+                        <div class="meta-label">記者ランク</div>
                     </div>
                 </div>
 
@@ -1032,9 +1032,9 @@
     <!-- メインコンテンツ -->
     <div class="main-content">
         <main>
-            <!-- スコアセクション（ログインなし） -->
+            <!-- 記者ランク（記事の★評価から自動算出。直接評価はできません） -->
             <div class="score-section">
-                <div class="score-title">信ぴょう性スコア</div>
+                <div class="score-title">記者ランク</div>
                 <div class="score-display">
                     <div class="score-number" id="scoreNumber">96</div>
                     <div class="score-max">/ 100</div>
@@ -1044,38 +1044,15 @@
                 </div>
                 <div class="score-stats">
                     <div class="stat-box">
-                        <div class="number">98%</div>
-                        <div class="label">正確性</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="number">4.8</div>
+                        <div class="number" id="statAverageRating">4.8</div>
                         <div class="label">平均評価</div>
                     </div>
                     <div class="stat-box">
-                        <div class="number">2,450</div>
-                        <div class="label">総閲覧数</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="number">89</div>
-                        <div class="label">高評価</div>
+                        <div class="number" id="statArticleCount">284</div>
+                        <div class="label">記事数</div>
                     </div>
                 </div>
-
-                <!-- 記者評価フォーム（ログインなしでOK） -->
-                <div style="margin-top: 25px; padding-top: 25px; border-top: 1px solid #ddd;">
-                    <h4 style="font-size: 14px; color: #e63946; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">この記者を評価する</h4>
-                    <p style="font-size: 12px; color: #999; margin-bottom: 12px;">ログインなしで投稿できます</p>
-                    
-                    <div id="reporterRatingInput" style="display: flex; gap: 8px; margin-bottom: 15px;">
-                        <button class="star-btn reporter-star" data-value="1" style="background: none; border: none; font-size: 28px; color: #ddd; cursor: pointer; transition: color 0.3s ease;">★</button>
-                        <button class="star-btn reporter-star" data-value="2" style="background: none; border: none; font-size: 28px; color: #ddd; cursor: pointer; transition: color 0.3s ease;">★</button>
-                        <button class="star-btn reporter-star" data-value="3" style="background: none; border: none; font-size: 28px; color: #ddd; cursor: pointer; transition: color 0.3s ease;">★</button>
-                        <button class="star-btn reporter-star" data-value="4" style="background: none; border: none; font-size: 28px; color: #ddd; cursor: pointer; transition: color 0.3s ease;">★</button>
-                        <button class="star-btn reporter-star" data-value="5" style="background: none; border: none; font-size: 28px; color: #ddd; cursor: pointer; transition: color 0.3s ease;">★</button>
-                    </div>
-
-                    <button id="reporterRatingSubmit" style="width: 100%; padding: 12px; background-color: #e63946; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; font-size: 12px;">評価を投稿</button>
-                </div>
+                <p style="font-size:11.5px; color:#999; margin-top:14px;">この記者名義のニュースについた★評価の平均から自動的に算出しています。記者本人を直接評価することはできません。</p>
             </div>
 
             <!-- ニュースセクション -->
@@ -1161,72 +1138,31 @@
                 <h2 class="reviews-title">ユーザーレビュー</h2>
 
                 <!-- 記者への直接評価は廃止。記事についた★評価の平均がこの記者のスコアになります -->
-                <div style="background:#f5f5f5; border:1px solid #e5e5e5; padding:14px 16px; margin-bottom:24px; font-size:12.5px; color:#666;">
-                    この記者は直接評価できません。この記者名義のニュースについた★評価の平均が、上部のスコアに反映されます。
+                <div style="background:#f5f5f5; border:1px solid #e5e5e5; padding:14px 16px; margin-bottom:16px; font-size:12.5px; color:#666;">
+                    この記者は直接評価できません。この記者名義のニュースについた★評価の平均が、上部のスコアに反映されます。ここでは記者についての感想・コメントを共有できます。
                 </div>
 
-                <div id="reviewsList">
-
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="review-author">サッカーファン太郎</div>
-                        <div class="review-rating">
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                        </div>
-                    </div>
-                    <div class="review-date">2024年6月27日</div>
-                    <div class="review-content">
-                        Fabrizioの報道は本当に正確ですね。移籍情報が欲しい時は必ずFabrizioのニュースをチェックしています。スクープ力も素晴らしく、いつも一番早い情報を提供してくれます。
-                    </div>
-                    <div class="review-helpful">
-                        <button class="helpful-btn">参考になった: 23</button>
-                    </div>
+                <!-- レビュー投稿フォーム（ログイン必須・星評価なし） -->
+                <div id="reviewForm" style="display:none; background:#fff; border:1px solid #ddd; padding:16px; margin-bottom:20px;">
+                    <p id="reviewLoginNote" style="font-size:12.5px; color:#e63946; margin-bottom:10px; display:none;">
+                        投稿には<a href="gegen_press_login.html" style="color:#e63946; font-weight:bold;">ログイン</a>が必要です
+                    </p>
+                    <textarea id="reviewText" placeholder="この記者についてのコメントを書いてください" style="width:100%; min-height:70px; padding:10px; border:1px solid #ddd; font-size:13px; resize:vertical; font-family:inherit;"></textarea>
+                    <button id="reviewSubmitBtn" style="margin-top:8px; background:#e63946; color:#fff; border:none; padding:9px 18px; font-size:13px; font-weight:bold; cursor:pointer;">レビューを投稿</button>
                 </div>
 
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="review-author">Football Analytics Pro</div>
-                        <div class="review-rating">
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                        </div>
-                    </div>
-                    <div class="review-date">2024年6月26日</div>
-                    <div class="review-content">
-                        信頼性が本当に高い。報道の正確性はもちろん、深い分析も素晴らしい。彼のニュースは単なるスクープではなく、背景にある戦略や状況を説明してくれるので、とても勉強になります。
-                    </div>
-                    <div class="review-helpful">
-                        <button class="helpful-btn">参考になった: 45</button>
-                    </div>
+                <div id="reviewsList"></div>
+                <div style="text-align:center; margin-top:12px;">
+                    <button id="reviewsShowAllBtn" style="display:none; background:#fff; border:1px solid #ccc; padding:8px 20px; font-size:12.5px; cursor:pointer;">すべて見る</button>
                 </div>
 
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="review-author">移籍マニア</div>
-                        <div class="review-rating">
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star empty">★</span>
-                        </div>
-                    </div>
-                    <div class="review-date">2024年6月25日</div>
-                    <div class="review-content">
-                        ほとんどの情報は当たっていますが、時々確実でない情報も混じることがあります。ただし、訂正も素早く対応してくれるので信頼できます。
-                    </div>
-                    <div class="review-helpful">
-                        <button class="helpful-btn">参考になった: 12</button>
+                <!-- この記者にまつわるハッシュタグ -->
+                <div style="margin-top:24px;">
+                    <h3 style="font-size:13px; color:#666; margin-bottom:10px;">この記者に関連するハッシュタグ</h3>
+                    <div id="reporterHashtags" style="display:flex; flex-wrap:wrap; gap:8px;">
+                        <p style="color:#999; font-size:12.5px;">読み込み中...</p>
                     </div>
                 </div>
-                </div><!-- /#reviewsList -->
             </section>
 
             <!-- 関連する記者（専門分野が近い記者） -->
@@ -1235,6 +1171,7 @@
                 <div class="related-reporters-grid" id="relatedReportersGrid"></div>
             </section>
         </main>
+
 
         <!-- サイドバー -->
         <aside class="sidebar">
@@ -1361,64 +1298,6 @@
     <!-- 本番デプロイ時は api-client.js を同じフォルダに置けば下の行が有効になります -->
     <script src="api-client.js" onerror="console.warn('api-client.js が見つかりません。デモモードで動作します。')"></script>
     <script>
-        // 記者評価（ログインなしでOK）
-        const reporterStars = document.querySelectorAll('.reporter-star');
-        let selectedReporterRating = 0;
-
-        reporterStars.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                selectedReporterRating = this.getAttribute('data-value');
-                
-                reporterStars.forEach((b, index) => {
-                    if (index < selectedReporterRating) {
-                        b.style.color = '#e63946';
-                    } else {
-                        b.style.color = '#ddd';
-                    }
-                });
-            });
-
-            btn.addEventListener('mouseover', function() {
-                const value = this.getAttribute('data-value');
-                reporterStars.forEach((b, index) => {
-                    if (index < value) {
-                        b.style.color = '#e63946';
-                    } else {
-                        b.style.color = '#ddd';
-                    }
-                });
-            });
-        });
-
-        const ratingInput = document.getElementById('reporterRatingInput');
-        if (ratingInput) {
-            ratingInput.addEventListener('mouseout', function() {
-                reporterStars.forEach((btn, index) => {
-                    if (index < selectedReporterRating) {
-                        btn.style.color = '#e63946';
-                    } else {
-                        btn.style.color = '#ddd';
-                    }
-                });
-            });
-        }
-
-        // 記者評価投稿（ログインなし）
-        const ratingSubmit = document.getElementById('reporterRatingSubmit');
-        if (ratingSubmit) {
-            ratingSubmit.addEventListener('click', function() {
-                if (!selectedReporterRating) {
-                    alert('評価を選択してください');
-                    return;
-                }
-
-                alert('ご投稿ありがとうございます！\n\n選択された評価: ' + selectedReporterRating + '★\n\nあなたの評価は他のユーザーの判断の参考になります。');
-                selectedReporterRating = 0;
-                reporterStars.forEach(btn => btn.style.color = '#ddd');
-            });
-        }
-
         // =========================================================
         // 記者編集機能（追加した本人のみ）
         // =========================================================
@@ -1604,32 +1483,141 @@
         }
 
         // -------- レビュー一覧の反映 --------
+        let allReviewsCache = [];
+        let reviewsExpanded = false;
+        let myReviewVotes = {};
+
+        function reviewCardHtml(rv) {
+            const net = (rv.likes || 0) - (rv.dislikes || 0);
+            const myVote = myReviewVotes[rv.id];
+            return `
+                <div class="review-card" data-review-id="${escapeHtml(rv.id)}">
+                    <div class="review-header">
+                        <div class="review-author">${escapeHtml(rv.username || '匿名ユーザー')}</div>
+                    </div>
+                    <div class="review-date">${formatDate(rv.createdAt)}</div>
+                    <div class="review-content">${escapeHtml(rv.comment || '')}</div>
+                    <div class="review-helpful" style="display:flex; gap:10px; align-items:center;">
+                        <button class="review-vote-btn" data-vote="like" style="background:none; border:1px solid ${myVote === 'like' ? '#e63946' : '#ccc'}; color:${myVote === 'like' ? '#e63946' : '#666'}; padding:4px 10px; font-size:12px; cursor:pointer;">👍 いいね ${rv.likes || 0}</button>
+                        <button class="review-vote-btn" data-vote="dislike" style="background:none; border:1px solid ${myVote === 'dislike' ? '#1d3557' : '#ccc'}; color:${myVote === 'dislike' ? '#1d3557' : '#666'}; padding:4px 10px; font-size:12px; cursor:pointer;">👎 うーん ${rv.dislikes || 0}</button>
+                    </div>
+                </div>
+            `;
+        }
+
         function renderReviews(reviews) {
+            allReviewsCache = reviews || [];
             const container = document.getElementById('reviewsList');
-            if (!reviews || reviews.length === 0) {
+            const showAllBtn = document.getElementById('reviewsShowAllBtn');
+            if (allReviewsCache.length === 0) {
                 container.innerHTML = '<p style="color:#999;font-size:14px;padding:20px 0;">まだレビューがありません。最初のレビューを投稿してみましょう。</p>';
+                showAllBtn.style.display = 'none';
                 return;
             }
-            const sorted = reviews.slice().sort((a, b) => {
+            // 評価が良いもの（いいね - うーん）順。同点は新しい順
+            const sorted = allReviewsCache.slice().sort((a, b) => {
+                const netA = (a.likes || 0) - (a.dislikes || 0);
+                const netB = (b.likes || 0) - (b.dislikes || 0);
+                if (netB !== netA) return netB - netA;
                 const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
                 const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
                 return tb - ta;
             });
-            container.innerHTML = sorted.map(rv => `
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="review-author">${escapeHtml(rv.username || '匿名ユーザー')}</div>
-                        <div class="review-rating">${starString(rv.rating)}</div>
-                    </div>
-                    <div class="review-date">${formatDate(rv.createdAt)}</div>
-                    <div class="review-content">${escapeHtml(rv.comment || '')}</div>
-                </div>
-            `).join('');
+            const visible = reviewsExpanded ? sorted : sorted.slice(0, 5);
+            container.innerHTML = visible.map(reviewCardHtml).join('');
+            showAllBtn.style.display = (!reviewsExpanded && sorted.length > 5) ? 'inline-block' : 'none';
+            showAllBtn.textContent = 'すべて見る（' + sorted.length + '件）';
+
+            container.querySelectorAll('.review-vote-btn').forEach(btn => {
+                btn.addEventListener('click', async function () {
+                    const card = this.closest('[data-review-id]');
+                    const reviewId = card.getAttribute('data-review-id');
+                    const type = this.getAttribute('data-vote');
+                    let user = null;
+                    try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+                    if (!user) { alert('投票にはログインが必要です'); return; }
+                    const res = await GegenPressAPI.reviews.vote(reviewId, type);
+                    if (res && res.success) {
+                        try {
+                            const rres = await GegenPressAPI.reporters.getReviews(currentReporter.id);
+                            if (rres && rres.success) {
+                                const vres = await GegenPressAPI.reviews.getMyVotes(rres.reviews.map(r => r.id));
+                                myReviewVotes = (vres && vres.votes) || {};
+                                renderReviews(rres.reviews);
+                            }
+                        } catch (e) {}
+                    } else {
+                        alert((res && res.message) || '投票に失敗しました');
+                    }
+                });
+            });
         }
 
-        // クチコミ（レビュー）の直接投稿・星評価機能は廃止しました。
-        // 記者の評価は、その記者名義のニュースについた★評価の平均から自動算出されます
-        // （renderReporterHeader / loadReporterPage 内の getComputedReporterScore を参照）。
+        document.getElementById('reviewsShowAllBtn').addEventListener('click', function () {
+            reviewsExpanded = true;
+            renderReviews(allReviewsCache);
+        });
+
+        // レビュー投稿フォーム（星評価なし・ログイン必須）
+        async function initReviewForm() {
+            if (!API_AVAILABLE || !currentReporter.id) return;
+            const form = document.getElementById('reviewForm');
+            form.style.display = 'block';
+            const noteEl = document.getElementById('reviewLoginNote');
+            const submitBtn = document.getElementById('reviewSubmitBtn');
+            const textEl = document.getElementById('reviewText');
+
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+            if (!user) {
+                noteEl.style.display = 'block';
+                textEl.disabled = true;
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                return;
+            }
+            submitBtn.addEventListener('click', async function () {
+                const text = (textEl.value || '').trim();
+                if (!text) { alert('コメントを入力してください'); return; }
+                submitBtn.disabled = true;
+                submitBtn.textContent = '投稿中...';
+                const res = await GegenPressAPI.reviews.create(currentReporter.id, text, null);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'レビューを投稿';
+                if (res && res.success) {
+                    textEl.value = '';
+                    try {
+                        const rres = await GegenPressAPI.reporters.getReviews(currentReporter.id);
+                        if (rres && rres.success) renderReviews(rres.reviews);
+                    } catch (e) {}
+                } else {
+                    alert((res && res.message) || 'レビューの投稿に失敗しました');
+                }
+            });
+        }
+        initReviewForm();
+
+        // この記者の記事に使われているハッシュタグをまとめて表示
+        async function loadReporterHashtags() {
+            const wrap = document.getElementById('reporterHashtags');
+            if (!API_AVAILABLE || !currentReporter.id) { wrap.innerHTML = ''; return; }
+            try {
+                const ares = await GegenPressAPI.reporters.getArticles(currentReporter.id);
+                const tagSet = new Set();
+                (ares.articles || []).forEach(a => (a.tags || []).forEach(t => tagSet.add(t)));
+                if (tagSet.size === 0) {
+                    wrap.innerHTML = '<p style="color:#999; font-size:12.5px;">まだハッシュタグがありません。</p>';
+                    return;
+                }
+                wrap.innerHTML = Array.from(tagSet).map(t =>
+                    '<a href="gegen_press_hashtag.html?tag=' + encodeURIComponent(t) + '" style="background:#eef4ff; color:#1d3557; font-size:12px; font-weight:bold; padding:5px 12px; border-radius:14px; text-decoration:none;">#' + escapeHtml(t) + '</a>'
+                ).join('');
+            } catch (e) {
+                wrap.innerHTML = '';
+            }
+        }
+        loadReporterHashtags();
+
 
         // -------- 統合ローダー --------
         async function loadReporterPage() {
@@ -1659,9 +1647,8 @@
                     document.getElementById('metaTrust').textContent = score + '/100';
                     document.getElementById('scoreNumber').textContent = score;
                     document.getElementById('scoreBarFill').style.width = score + '%';
-                    const ratingLabel = sres.count > 0 ? sres.average.toFixed(1) + ' (' + sres.count + '件の評価)' : 'まだ評価がありません';
-                    const noteEl = document.getElementById('scoreRatingNote');
-                    if (noteEl) noteEl.textContent = ratingLabel;
+                    document.getElementById('statAverageRating').textContent = sres.count > 0 ? sres.average.toFixed(1) : '-';
+                    document.getElementById('statArticleCount').textContent = sres.articlesCount || 0;
                 }
             } catch (e) {
                 console.warn('評価スコアの算出に失敗:', e);
@@ -1678,7 +1665,13 @@
             // レビュー一覧
             try {
                 const res = await GegenPressAPI.reporters.getReviews(currentReporter.id);
-                if (res && res.success) renderReviews(res.reviews);
+                if (res && res.success) {
+                    try {
+                        const vres = await GegenPressAPI.reviews.getMyVotes(res.reviews.map(r => r.id));
+                        myReviewVotes = (vres && vres.votes) || {};
+                    } catch (e) {}
+                    renderReviews(res.reviews);
+                }
             } catch (e) {
                 console.warn('レビューの取得に失敗:', e);
             }

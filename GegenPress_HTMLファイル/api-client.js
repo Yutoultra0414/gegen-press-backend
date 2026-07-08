@@ -508,17 +508,24 @@
 
     // ===== 記者へのクチコミ（レビュー） =====
     reviews: {
-      async create(reporterId, rating, comment, username) {
+      async create(reporterId, comment, username) {
         try {
           var u = await currentUser();
           if (!u) return { success: false, message: 'レビューの投稿にはログインが必要です' };
           var fb = await _ready;
+          var finalUsername = username;
+          if (!finalUsername) {
+            try {
+              var udoc = await fb.db.collection('users').doc(u.uid).get();
+              finalUsername = (udoc.exists && udoc.data().username) || '匿名ユーザー';
+            } catch (e) { finalUsername = '匿名ユーザー'; }
+          }
           var docData = {
             reporterId: reporterId,
-            rating: rating || null,
             comment: comment || '',
             userId: u.uid,
-            username: username || u.displayName || '匿名ユーザー',
+            username: finalUsername,
+            likes: 0, dislikes: 0,
             createdAt: tsNow()
           };
           var ref = await fb.db.collection('reviews').add(docData);
@@ -532,6 +539,47 @@
           var snap = await fb.db.collection('reviews').where('reporterId', '==', reporterId).get();
           return { success: true, reviews: docList(snap) };
         } catch (e) { return { success: false, message: String(e), reviews: [] }; }
+      },
+      // いいね/うーん。1アカウント1レビューにつき1回まで（ドキュメントID固定で上書き）
+      async vote(reviewId, type) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: false, message: '投票にはログインが必要です' };
+          if (type !== 'like' && type !== 'dislike') return { success: false, message: '不正な投票です' };
+          var fb = await _ready;
+          var voteDocId = reviewId + '_' + u.uid;
+          var voteRef = fb.db.collection('reviewVotes').doc(voteDocId);
+          var existing = await voteRef.get();
+          var reviewRef = fb.db.collection('reviews').doc(reviewId);
+          var prevType = existing.exists ? existing.data().type : null;
+          if (prevType === type) {
+            // 同じボタンをもう一度押したら取り消し
+            await voteRef.delete();
+            await reviewRef.update({ [type + 's']: firebase.firestore.FieldValue.increment(-1) });
+            return { success: true, removed: true };
+          }
+          var updates = {};
+          updates[type + 's'] = firebase.firestore.FieldValue.increment(1);
+          if (prevType) updates[prevType + 's'] = firebase.firestore.FieldValue.increment(-1);
+          await reviewRef.update(updates);
+          await voteRef.set({ reviewId: reviewId, userId: u.uid, type: type, updatedAt: tsNow() });
+          return { success: true };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async getMyVotes(reviewIds) {
+        try {
+          var u = await currentUser();
+          if (!u || !reviewIds || reviewIds.length === 0) return { success: true, votes: {} };
+          var fb = await _ready;
+          var votes = {};
+          for (var i = 0; i < reviewIds.length; i++) {
+            try {
+              var d = await fb.db.collection('reviewVotes').doc(reviewIds[i] + '_' + u.uid).get();
+              if (d.exists) votes[reviewIds[i]] = d.data().type;
+            } catch (e) {}
+          }
+          return { success: true, votes: votes };
+        } catch (e) { return { success: false, message: String(e), votes: {} }; }
       }
     },
 
