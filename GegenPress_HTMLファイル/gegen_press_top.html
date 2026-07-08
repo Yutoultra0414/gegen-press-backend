@@ -1194,7 +1194,8 @@
                 <a href="gegen_press_category.html#sec-league-6" class="side-link">エールディヴィジ</a>
                 <a href="gegen_press_category.html#sec-league-7" class="side-link">プリメイラ・リーガ</a>
                 <a href="gegen_press_category.html#sec-league-8" class="side-link">MLS</a>
-                <a href="gegen_press_category.html#sec-league-9" class="side-link">その他</a>
+                <a href="gegen_press_category.html#sec-league-9" class="side-link">その他リーグ</a>
+                <a href="gegen_press_category.html#sec-league-10" class="side-link">その他</a>
             </div>
         </aside>
 
@@ -1214,6 +1215,26 @@
         <div class="container">
             <h2 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>人気の記事</h2>
             <div id="popularArticles">
+                <p style="color:#999; font-size:13px;">読み込み中...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 話題のインタビュー記事 -->
+    <section class="pickup-section">
+        <div class="container">
+            <h2 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>話題のインタビュー記事</h2>
+            <div id="interviewArticles">
+                <p style="color:#999; font-size:13px;">読み込み中...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 話題の一般記事 -->
+    <section class="pickup-section">
+        <div class="container">
+            <h2 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>話題の一般記事</h2>
+            <div id="generalArticles">
                 <p style="color:#999; font-size:13px;">読み込み中...</p>
             </div>
         </div>
@@ -1484,6 +1505,43 @@
                 // 人気の記事：閲覧数順
                 const byViews = articles.slice().sort((a, b) => (b.views || 0) - (a.views || 0));
                 renderHeroScroll('popularArticles', byViews.slice(0, 9));
+
+                // 話題のインタビュー記事／話題の一般記事：直近2日間で、閲覧数＋評価が高いもの
+                // （評価の平均をここで一括取得し、閲覧数と組み合わせた簡易スコアで並べています）
+                try {
+                    const fb = await GegenPressAPI._db();
+                    const ratingsSnap = await fb.collection('ratings').get();
+                    const ratingSums = {};
+                    ratingsSnap.docs.forEach(d => {
+                        const rd = d.data();
+                        if (!rd.articleId || typeof rd.rating !== 'number') return;
+                        if (!ratingSums[rd.articleId]) ratingSums[rd.articleId] = { sum: 0, count: 0 };
+                        ratingSums[rd.articleId].sum += rd.rating;
+                        ratingSums[rd.articleId].count += 1;
+                    });
+                    const twoDaysAgo = Date.now() - 2 * 24 * 60 * 60 * 1000;
+                    const recent = articles.filter(a => {
+                        const t = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                        return t >= twoDaysAgo;
+                    });
+                    function trendScore(a) {
+                        const r = ratingSums[a.id];
+                        const avgRating = r && r.count > 0 ? r.sum / r.count : 0;
+                        return (a.views || 0) + avgRating * 20; // 閲覧数と評価をあわせた簡易スコア
+                    }
+                    const interviewList = recent
+                        .filter(a => Array.isArray(a.articleTypes) && a.articleTypes.includes('インタビュー記事'))
+                        .sort((a, b) => trendScore(b) - trendScore(a));
+                    const generalList = recent
+                        .filter(a => Array.isArray(a.articleTypes) && a.articleTypes.includes('一般記事'))
+                        .sort((a, b) => trendScore(b) - trendScore(a));
+                    renderHeroScroll('interviewArticles', interviewList.slice(0, 9));
+                    renderHeroScroll('generalArticles', generalList.slice(0, 9));
+                } catch (e) {
+                    console.warn('話題のインタビュー記事／一般記事の読み込みに失敗:', e);
+                    document.getElementById('interviewArticles').innerHTML = '<p style="color:#999; font-size:13px;">読み込みに失敗しました。</p>';
+                    document.getElementById('generalArticles').innerHTML = '<p style="color:#999; font-size:13px;">読み込みに失敗しました。</p>';
+                }
 
                 // サイドバー：注目のハッシュタグ（記事に付いたタグの出現頻度上位）
                 const tagWrap = document.getElementById('sideTrendingTags');
@@ -1762,7 +1820,7 @@
                     const score = Math.round((m.average / 5) * 100);
                     return (
                         '<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid #eee; cursor:pointer;" data-name="' + esc(m.name) + '">' +
-                            '<div style="width:38px;height:38px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;background:linear-gradient(135deg,' + g[0] + ' 0%,' + g[1] + ' 100%);">' + esc(getInitials(m.name)) + '</div>' +
+                            '<div class="media-logo-badge" data-media-name="' + esc(m.name) + '" style="width:38px;height:38px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;overflow:hidden;background:linear-gradient(135deg,' + g[0] + ' 0%,' + g[1] + ' 100%);">' + esc(getInitials(m.name)) + '</div>' +
                             '<div style="flex:1; min-width:0;">' +
                                 '<div style="font-size:13px; font-weight:bold; color:#1a0dab;">' + esc(m.name) + '</div>' +
                                 '<div style="font-size:11px; color:#888;">所属記者 ' + m.reporterCount + '名</div>' +
@@ -1779,8 +1837,32 @@
                         window.location.href = 'gegen_press_media_profile.html?name=' + encodeURIComponent(el.getAttribute('data-name'));
                     });
                 });
+                upgradeMediaLogos(wrap);
             } catch (e) {
                 wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中にエラーが発生しました。</div>';
+            }
+        }
+
+        // メディアの実際のロゴ画像が設定されていれば、頭文字バッジを画像に差し替える
+        const _mediaLogoCache = {};
+        async function upgradeMediaLogos(root) {
+            if (typeof GegenPressAPI === 'undefined' || !GegenPressAPI.media) return;
+            const names = new Set();
+            root.querySelectorAll('.media-logo-badge[data-media-name]').forEach(el => names.add(el.getAttribute('data-media-name')));
+            for (const name of names) {
+                try {
+                    if (!(name in _mediaLogoCache)) {
+                        const res = await GegenPressAPI.media.getByName(name);
+                        _mediaLogoCache[name] = (res && res.success && res.media && res.media.logo) || null;
+                    }
+                    const logo = _mediaLogoCache[name];
+                    if (logo) {
+                        root.querySelectorAll('.media-logo-badge[data-media-name="' + CSS.escape(name) + '"]').forEach(el => {
+                            el.style.background = 'none';
+                            el.innerHTML = '<img src="' + logo + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                        });
+                    }
+                } catch (e) { /* ロゴが無ければ頭文字バッジのまま */ }
             }
         }
 

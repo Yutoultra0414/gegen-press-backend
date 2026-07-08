@@ -68,7 +68,7 @@
         /* プロフィールヘッダー */
         .profile-header {
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
-            padding: 22px 40px;
+            padding: 14px 40px;
             position: relative;
             overflow: hidden;
         }
@@ -87,29 +87,28 @@
         .profile-content {
             max-width: 1200px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 110px 1fr;
-            gap: 20px;
+            display: flex;
             align-items: center;
+            gap: 12px;
             position: relative;
             z-index: 1;
         }
 
         .profile-avatar {
-            width: 110px;
-            height: 110px;
+            width: 48px;
+            height: 48px;
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 38px;
+            font-size: 16px;
             font-weight: 900;
             color: #fff;
             letter-spacing: 1px;
             text-transform: uppercase;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-            border: 3px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.85);
             overflow: hidden;
             flex-shrink: 0;
         }
@@ -120,18 +119,88 @@
             object-fit: cover;
         }
 
+        .profile-info { min-width: 0; flex: 1; }
+
         .profile-info h1 {
-            font-size: 24px;
-            margin-bottom: 3px;
+            font-size: 15px;
+            margin-bottom: 1px;
             font-weight: 900;
             color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .profile-info .subtitle {
-            font-size: 13px;
-            opacity: 0.95;
-            margin-bottom: 12px;
-            color: #fff;
+        #reporterNameRomaji {
+            font-size: 11px;
+            color: rgba(255,255,255,0.85);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .header-sub-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 11px;
+        }
+        .header-sub-row .subtitle,
+        .header-sub-row #reporterTypeBadge,
+        .header-sub-row #mediaLink,
+        .header-sub-row #headerTwitterLink {
+            color: rgba(255,255,255,0.9);
+            font-size: 11px;
+        }
+        .header-sub-row #headerTwitterLink { text-decoration: underline; font-weight: bold; color: #fff; }
+        .header-sub-row #mediaLink { text-decoration: underline; }
+        .header-sub-row #reporterTypeBadge {
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 4px;
+            padding: 1px 6px;
+        }
+
+        .creator-badge { font-size: 10px; }
+
+        /* ヘッダー下のアクション行（白背景） */
+        .profile-actions-bar {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 10px 40px;
+        }
+        .profile-actions-bar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .profile-meta-compact {
+            display: flex;
+            gap: 20px;
+        }
+        .profile-meta-compact .meta-value { color: #333; font-size: 15px; }
+        .profile-meta-compact .meta-label { color: #999; font-size: 10px; }
+
+        .profile-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        #setIconBtn {
+            background: #fff;
+            color: #e63946;
+            border: 1px solid #e63946;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         .profile-meta {
@@ -414,78 +483,63 @@
             background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
             border: 2px solid #e63946;
             border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 40px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
         }
 
         .score-title {
-            font-size: 18px;
+            font-size: 13px;
             font-weight: bold;
-            margin-bottom: 25px;
+            margin-bottom: 10px;
             color: #e63946;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+
+        .score-row {
+            display: flex;
+            align-items: center;
+            gap: 22px;
         }
 
         .score-display {
             text-align: center;
-            margin-bottom: 30px;
+            flex-shrink: 0;
         }
 
         .score-number {
-            font-size: 72px;
+            font-size: 36px;
             font-weight: 900;
             color: #e63946;
             line-height: 1;
-            margin-bottom: 10px;
         }
 
         .score-max {
-            font-size: 18px;
+            font-size: 11px;
             color: #999;
         }
 
-        .score-bar {
-            width: 100%;
-            height: 8px;
-            background-color: #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 20px;
+        .score-stats-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-left: 2px solid #eee;
+            padding-left: 18px;
         }
-
-        .score-bar-fill {
-            height: 100%;
-            width: 96%;
-            background: linear-gradient(90deg, #e63946 0%, #ff6b6b 100%);
-            border-radius: 4px;
+        .stat-line {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
         }
-
-        .score-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .stat-box {
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: 4px;
-            border-left: 3px solid #e63946;
-        }
-
-        .stat-box .number {
-            font-size: 24px;
+        .stat-line .number {
+            font-size: 16px;
             font-weight: bold;
             color: #e63946;
-            margin-bottom: 5px;
+            min-width: 34px;
         }
-
-        .stat-box .label {
-            font-size: 12px;
+        .stat-line .label {
+            font-size: 11.5px;
             color: #999;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         /* ニュースセクション */
@@ -718,17 +772,6 @@
             .main-content {
                 grid-template-columns: 1fr;
             }
-
-            .profile-content {
-                grid-template-columns: 90px 1fr;
-                gap: 14px;
-            }
-
-            .profile-avatar {
-                width: 90px;
-                height: 90px;
-                font-size: 30px;
-            }
         }
 
         @media (max-width: 768px) {
@@ -743,24 +786,32 @@
             }
 
             .profile-header {
-                padding: 40px 20px;
+                padding: 10px 16px;
             }
 
-            .profile-content {
-                gap: 20px;
+            .profile-avatar {
+                width: 38px;
+                height: 38px;
+                font-size: 13px;
             }
 
             .profile-info h1 {
-                font-size: 28px;
+                font-size: 13px;
             }
+
+            #reporterNameRomaji { font-size: 10px; }
+            .header-sub-row { font-size: 10px; gap: 8px; }
+            .header-sub-row .subtitle,
+            .header-sub-row #reporterTypeBadge,
+            .header-sub-row #mediaLink,
+            .header-sub-row #headerTwitterLink { font-size: 10px; }
+
+            .profile-actions-bar { padding: 8px 16px; }
+            .profile-meta-compact { gap: 14px; }
+            .profile-meta-compact .meta-value { font-size: 13px; }
 
             .main-content {
                 padding: 40px 20px;
-            }
-
-            .profile-meta {
-                flex-wrap: wrap;
-                gap: 20px;
             }
 
             .profile-buttons {
@@ -1042,67 +1093,62 @@
     <!-- プロフィールヘッダー -->
     <div id="pageLoadingIndicator" style="text-align:center; padding:80px 20px; color:#999; font-size:13px;">読み込み中...</div>
     <div id="pageContentWrap" style="opacity:0; transition:opacity 0.25s ease;">
-    <section class="profile-header">
-        <div class="profile-content">
-            <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-                <div class="profile-avatar" id="profileAvatar">F</div>
-                <button id="setIconBtn" style="display:none; background:rgba(255,255,255,0.9); color:#e63946; border:none; border-radius:6px; padding:8px 14px; font-size:13px; font-weight:bold; cursor:pointer;">アイコンを設定</button>
-                <input type="file" id="iconFileInput" accept="image/*" style="display:none;">
-            </div>
-            <div class="profile-info">
-                <div class="creator-badge" id="creatorBadge">あなたが追加した記者</div>
+    <section class="profile-header profile-header-compact">
+        <div class="profile-content profile-content-compact">
+            <div class="profile-avatar profile-avatar-compact" id="profileAvatar">F</div>
+            <div class="profile-info profile-info-compact">
+                <div class="creator-badge" id="creatorBadge" style="display:none;">あなたが追加した記者</div>
                 <h1 id="reporterNameHeading">Fabrizio Romano</h1>
-                <div id="reporterNameRomaji" style="font-size:12px; color:#fff; opacity:0.85; display:none; margin-top:-4px;"></div>
-                <div class="subtitle" id="reporterSubtitle">世界の移籍情報スペシャリスト</div>
-                <div style="display:flex; gap:8px; align-items:center; margin-top:4px; flex-wrap:wrap;">
-                    <span id="reporterTypeBadge" style="display:none; font-size:10.5px; font-weight:bold; color:#fff; border:1px solid rgba(255,255,255,0.7); border-radius:4px; padding:2px 8px;"></span>
-                    <a id="mediaLink" href="#" style="display:none; font-size:11.5px; color:#fff; text-decoration:underline;"></a>
-                    <a id="headerTwitterLink" href="#" target="_blank" rel="noopener" style="display:none; font-size:11.5px; color:#fff; text-decoration:underline; font-weight:bold;"></a>
-                </div>
-                
-                <div class="profile-meta">
-                    <div class="meta-item">
-                        <div class="meta-value" id="metaArticles">284</div>
-                        <div class="meta-label">ニュース数</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-value" id="metaTrust">96/100</div>
-                        <div class="meta-label">記者ランク</div>
-                    </div>
-                </div>
-
-                <div class="profile-buttons">
-                    <a class="btn-share" id="postAsReporterBtn" href="#" style="display:none; text-decoration:none;">この記者のニュースを投稿する</a>
-                    <button class="btn-edit-reporter" id="editReporterBtn">編集</button>
+                <div id="reporterNameRomaji" style="display:none;"></div>
+                <div class="header-sub-row">
+                    <span class="subtitle" id="reporterSubtitle">世界の移籍情報スペシャリスト</span>
+                    <span id="reporterTypeBadge" style="display:none;"></span>
+                    <a id="mediaLink" href="#" style="display:none;"></a>
+                    <a id="headerTwitterLink" href="#" target="_blank" rel="noopener" style="display:none;"></a>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- ヘッダー下のアクション行（アイコン設定・編集・投稿ボタン、統計） -->
+    <div class="profile-actions-bar">
+        <div class="profile-actions-bar-inner">
+            <div class="profile-meta profile-meta-compact">
+                <div class="meta-item">
+                    <div class="meta-value" id="metaArticles">284</div>
+                    <div class="meta-label">ニュース数</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-value" id="metaTrust">96/100</div>
+                    <div class="meta-label">記者ランク</div>
+                </div>
+            </div>
+            <div class="profile-buttons">
+                <button id="setIconBtn" style="display:none;">アイコンを設定</button>
+                <input type="file" id="iconFileInput" accept="image/*" style="display:none;">
+                <a class="btn-share" id="postAsReporterBtn" href="#" style="display:none; text-decoration:none;">この記者のニュースを投稿する</a>
+                <button class="btn-edit-reporter" id="editReporterBtn">編集</button>
+            </div>
+        </div>
+    </div>
+
     <!-- メインコンテンツ -->
     <div class="main-content">
         <main>
             <!-- 記者ランク（記事の★評価から自動算出。直接評価はできません） -->
-            <div class="score-section">
+            <div class="score-section score-section-compact">
                 <div class="score-title">記者ランク</div>
-                <div class="score-display">
-                    <div class="score-number" id="scoreNumber">96</div>
-                    <div class="score-max">/ 100</div>
-                </div>
-                <div class="score-bar">
-                    <div class="score-bar-fill" id="scoreBarFill"></div>
-                </div>
-                <div class="score-stats">
-                    <div class="stat-box">
-                        <div class="number" id="statAverageRating">4.8</div>
-                        <div class="label">平均評価</div>
+                <div class="score-row">
+                    <div class="score-display">
+                        <div class="score-number" id="scoreNumber">96</div>
+                        <div class="score-max">/ 100</div>
                     </div>
-                    <div class="stat-box">
-                        <div class="number" id="statArticleCount">284</div>
-                        <div class="label">記事数</div>
+                    <div class="score-stats-vertical">
+                        <div class="stat-line"><span class="number" id="statAverageRating">4.8</span><span class="label">平均評価</span></div>
+                        <div class="stat-line"><span class="number" id="statArticleCount">284</span><span class="label">記事数</span></div>
                     </div>
                 </div>
-                <p style="font-size:11.5px; color:#999; margin-top:14px;">この記者名義のニュースについた★評価の平均から自動的に算出しています。記者本人を直接評価することはできません。</p>
+                <p style="font-size:11px; color:#999; margin-top:8px;">この記者名義のニュースについた★評価の平均から自動的に算出しています。記者本人を直接評価することはできません。</p>
             </div>
 
             <!-- ニュースセクション -->
@@ -1293,6 +1339,7 @@
                     <span class="modal-tag" data-value="MLS">MLS</span>
                     <span class="modal-tag" data-value="日本サッカー">日本サッカー</span>
                     <span class="modal-tag" data-value="代表チーム">代表チーム</span>
+                    <span class="modal-tag" data-value="その他リーグ">その他リーグ</span>
                 </div>
             </div>
             <div class="modal-group">
@@ -1463,7 +1510,6 @@
             if (r.trustScore != null) {
                 document.getElementById('metaTrust').textContent = r.trustScore + '/100';
                 document.getElementById('scoreNumber').textContent = r.trustScore;
-                document.getElementById('scoreBarFill').style.width = r.trustScore + '%';
             }
 
             // 専門分野タグ
@@ -1683,7 +1729,6 @@
                     const score = Math.round((sres.average / 5) * 100);
                     document.getElementById('metaTrust').textContent = score + '/100';
                     document.getElementById('scoreNumber').textContent = score;
-                    document.getElementById('scoreBarFill').style.width = score + '%';
                     document.getElementById('statAverageRating').textContent = sres.count > 0 ? sres.average.toFixed(1) : '-';
                     document.getElementById('statArticleCount').textContent = sres.articlesCount || 0;
                 }

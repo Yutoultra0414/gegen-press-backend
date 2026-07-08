@@ -268,6 +268,10 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            min-width: 0;
+        }
+        .reporter-details {
+            min-width: 0;
         }
 
         .reporter-avatar {
@@ -738,30 +742,6 @@
     <div id="pageContentWrap" style="opacity:0; transition:opacity 0.25s ease;">
     <!-- メインコンテンツ -->
     <div class="container">
-        <!-- フィルターセクション -->
-        <div class="filter-section">
-            <span class="filter-label">フィルター:</span>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">すべて</button>
-                <button class="filter-btn" data-filter="last-month">今月</button>
-                <button class="filter-btn" data-filter="last-3months">過去3ヶ月</button>
-                <button class="filter-btn" data-filter="last-year">過去1年</button>
-            </div>
-        </div>
-
-        <!-- カテゴリ別フィルター -->
-        <div class="filter-section">
-            <span class="filter-label">カテゴリ:</span>
-            <div class="filter-buttons" id="categoryFilterButtons">
-                <button class="filter-btn active" data-category="all">すべて</button>
-                <button class="filter-btn" data-category="番記者">番記者</button>
-                <button class="filter-btn" data-category="移籍専門">移籍専門</button>
-                <button class="filter-btn" data-category="大手メディア">大手メディア所属</button>
-                <button class="filter-btn" data-category="独立ジャーナリスト">独立ジャーナリスト</button>
-                <button class="filter-btn" data-category="__media__">メディア別</button>
-            </div>
-        </div>
-
         <!-- 記者追加CTAバナー -->
         <a href="gegen_press_add_reporter.html" style="text-decoration: none; display: block; margin-bottom: 30px;">
             <div style="background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%); border: 2px dashed #e63946; border-radius: 8px; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; gap: 15px; transition: all 0.3s ease; flex-wrap: wrap;"
@@ -783,9 +763,8 @@
                 <thead>
                     <tr>
                         <th width="15%">順位</th>
-                        <th width="45%">記者名</th>
-                        <th width="20%">スコア</th>
-                        <th width="20%">平均評価</th>
+                        <th width="60%">記者名</th>
+                        <th width="25%">スコア</th>
                     </tr>
                 </thead>
                 <tbody id="rankingBody">
@@ -1041,7 +1020,7 @@
         function renderReporterTable(list) {
             const tbody = document.getElementById('rankingBody');
             if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999; padding:24px; font-size:13px;">このカテゴリの記者はまだいません。</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999; padding:24px; font-size:13px;">このカテゴリの記者はまだいません。</td></tr>';
                 return;
             }
             tbody.innerHTML = '';
@@ -1057,22 +1036,22 @@
                             : rank === 2 ? '<span class="medal medal-silver"></span>'
                             : rank === 3 ? '<span class="medal medal-bronze"></span>' : '';
                 const g = avatarColor(r.name);
-                const rating = r.computedCount > 0 ? r.computedAverage.toFixed(1) : '-';
                 const score = Math.round((r.computedAverage / 5) * 100);
                 const avatarInner = r.profileImage
                     ? '<img src="' + r.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">'
                     : esc(getInitials(r.name));
                 const avatarBg = r.profileImage ? '' : 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
-                const typeTag = r.reporterType ? '<span style="display:inline-block; margin-left:6px; font-size:10px; font-weight:bold; color:#e63946; border:1px solid #e63946; border-radius:3px; padding:1px 6px;">' + esc(r.reporterType) + (r.beatClub ? '・' + esc(r.beatClub) : '') + '</span>' : '';
 
                 tr.innerHTML =
                     '<td class="rank-number">' + medal + rank + '</td>' +
                     '<td><div class="reporter-info">' +
                         '<div class="reporter-avatar" style="' + avatarBg + 'overflow:hidden;">' + avatarInner + '</div>' +
-                        '<div class="reporter-details"><h3>' + esc(r.name) + (r.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(r.nameRomaji) + '</span>' : '') + typeTag + '</h3><p>' + (r.mediaOutlet ? '<a href="gegen_press_media_profile.html?name=' + encodeURIComponent(r.mediaOutlet) + '" onclick="event.stopPropagation();" style="color:#888; text-decoration:underline;">' + esc(r.mediaOutlet) + '</a>' : '') + '</p></div>' +
+                        '<div class="reporter-details">' +
+                            '<h3 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;">' + esc(r.name) + '</h3>' +
+                            (r.mediaOutlet ? '<p style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;">' + esc(r.mediaOutlet) + '</p>' : '') +
+                        '</div>' +
                     '</div></td>' +
-                    '<td class="score-cell">' + score + '<span class="score-max">/100</span></td>' +
-                    '<td class="number-cell">' + esc(rating) + (r.computedCount > 0 ? ' <span style="font-size:11px;color:#999;">(' + r.computedCount + '件)</span>' : '') + '</td>';
+                    '<td class="score-cell">' + score + '<span class="score-max">/100</span></td>';
                 tbody.appendChild(tr);
             });
         }
@@ -1088,7 +1067,7 @@
                 }
                 if (!res.ranking || res.ranking.length === 0) {
                     // 記者が0件になった場合は、最初から書かれている見本行を消して空表示にする
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999; padding:24px; font-size:13px;">まだ記者が登録されていません。「記者を追加」から追加できます。</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999; padding:24px; font-size:13px;">まだ記者が登録されていません。「記者を追加」から追加できます。</td></tr>';
                     const pg = document.querySelector('.pagination');
                     if (pg) pg.style.display = 'none';
                     return;
@@ -1120,9 +1099,6 @@
                 // RANKINGナビの「メディアランキング」から来た場合は、最初からメディア別表示にする
                 if (new URLSearchParams(window.location.search).get('view') === 'media') {
                     currentCategory = '__media__';
-                    document.querySelectorAll('#categoryFilterButtons .filter-btn').forEach(b => {
-                        b.classList.toggle('active', b.getAttribute('data-category') === '__media__');
-                    });
                 }
                 applyCategoryFilter();
             } catch (e) {
@@ -1178,10 +1154,10 @@
                 const score = Math.round((m.average / 5) * 100);
                 const rating = m.count > 0 ? m.average.toFixed(1) : '-';
                 return (
-                    '<tr class="' + (rank <= 3 ? 'rank-' + rank : '') + '" style="cursor:pointer;" onclick="window.location.href=\'gegen_press_media_profile.html?name=' + encodeURIComponent(m.name) + '\';">' +
+                    '<tr class="' + (rank <= 3 ? 'rank-' + rank : '') + '" style="cursor:pointer;" data-media-row="' + esc(m.name) + '">' +
                         '<td class="rank-number">' + medal + rank + '</td>' +
                         '<td><div class="reporter-info">' +
-                            '<div class="reporter-avatar" style="background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;">' + esc(getInitials(m.name)) + '</div>' +
+                            '<div class="reporter-avatar media-logo-badge" data-media-name="' + esc(m.name) + '" style="overflow:hidden; background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;">' + esc(getInitials(m.name)) + '</div>' +
                             '<div class="reporter-details"><h3>' + esc(m.name) + '</h3><p>所属記者 ' + m.reporterCount + '名</p></div>' +
                         '</div></td>' +
                         '<td class="score-cell">' + score + '<span class="score-max">/100</span></td>' +
@@ -1189,16 +1165,36 @@
                     '</tr>'
                 );
             }).join('');
+            tbody.querySelectorAll('[data-media-row]').forEach(el => {
+                el.addEventListener('click', () => {
+                    window.location.href = 'gegen_press_media_profile.html?name=' + encodeURIComponent(el.getAttribute('data-media-row'));
+                });
+            });
+            upgradeMediaLogos(tbody);
         }
 
-        document.getElementById('categoryFilterButtons').querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.getElementById('categoryFilterButtons').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentCategory = this.getAttribute('data-category');
-                applyCategoryFilter();
-            });
-        });
+        // メディアの実際のロゴ画像が設定されていれば、頭文字バッジを画像に差し替える
+        const _mediaLogoCache = {};
+        async function upgradeMediaLogos(root) {
+            if (typeof GegenPressAPI === 'undefined' || !GegenPressAPI.media) return;
+            const names = new Set();
+            root.querySelectorAll('.media-logo-badge[data-media-name]').forEach(el => names.add(el.getAttribute('data-media-name')));
+            for (const name of names) {
+                try {
+                    if (!(name in _mediaLogoCache)) {
+                        const res = await GegenPressAPI.media.getByName(name);
+                        _mediaLogoCache[name] = (res && res.success && res.media && res.media.logo) || null;
+                    }
+                    const logo = _mediaLogoCache[name];
+                    if (logo) {
+                        root.querySelectorAll('.media-logo-badge[data-media-name="' + CSS.escape(name) + '"]').forEach(el => {
+                            el.style.background = 'none';
+                            el.innerHTML = '<img src="' + logo + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                        });
+                    }
+                } catch (e) { /* ロゴが無ければ頭文字バッジのまま */ }
+            }
+        }
 
         function revealPageContent() {
             const loading = document.getElementById('pageLoadingIndicator');
