@@ -1180,7 +1180,16 @@
             commentSubmitBtn.style.opacity = '1';
             commentSubmitBtn.style.cursor = 'pointer';
             commentSubmitBtn.textContent = 'コメントを投稿';
-            if (user.displayName && !commentName.value) commentName.value = user.displayName;
+            // 本名（Googleアカウント名など）を勝手に入れるのはプライバシー上よくないため、
+            // マイページで自分が設定した表示名(username)がある場合のみ使う。無ければ空欄のまま。
+            if (!commentName.value) {
+                try {
+                    const ures = await GegenPressAPI.users.get(user.uid);
+                    if (ures && ures.success && ures.user && ures.user.username) {
+                        commentName.value = ures.user.username;
+                    }
+                } catch (e) { /* 取得できなければ空欄のまま */ }
+            }
 
             commentSubmitBtn.addEventListener('click', async function () {
                 const text = (commentText.value || '').trim();

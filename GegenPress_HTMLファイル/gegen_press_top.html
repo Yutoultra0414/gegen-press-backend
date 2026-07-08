@@ -266,12 +266,13 @@
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             transition: box-shadow 0.2s ease, transform 0.2s ease;
+            max-width: 480px;
+            margin-top: 14px;
         }
         .hero-card:hover { box-shadow: 0 10px 26px rgba(230,57,70,0.18); transform: translateY(-2px); }
         .hero-thumb {
             width: 100%;
             aspect-ratio: 16 / 9;
-            max-height: 240px;
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
             display: flex; align-items: center; justify-content: center;
             color: rgba(255,255,255,0.9); font-size: 13px; font-weight: bold;
@@ -909,7 +910,8 @@
 
             /* ヒーロー画像（Breaking News/人気の記事の一番大きいカード）を
                以前と同じくらいのサイズに戻す */
-            .hero-thumb { aspect-ratio: 16 / 9; max-height: 180px; }
+            .hero-card { max-width: 100%; margin-top: 10px; }
+            .hero-thumb { aspect-ratio: 16 / 9; }
             .hero-title { font-size: 16px; }
             .hero-body { padding: 12px 14px 14px; }
 
