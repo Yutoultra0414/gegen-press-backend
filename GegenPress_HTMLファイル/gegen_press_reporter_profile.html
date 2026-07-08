@@ -68,7 +68,7 @@
         /* プロフィールヘッダー */
         .profile-header {
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
-            padding: 14px 40px;
+            padding: 18px 40px;
             position: relative;
             overflow: hidden;
         }
@@ -84,25 +84,54 @@
             border-radius: 50%;
         }
 
+        .header-edit-actions {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            z-index: 2;
+            display: flex;
+            gap: 8px;
+        }
+
         .profile-content {
             max-width: 1200px;
             margin: 0 auto;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             position: relative;
             z-index: 1;
+            padding-right: 70px; /* 右上の編集ボタンと重ならないように */
+        }
+
+        .avatar-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        #setIconBtn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.9);
+            font-size: 10.5px;
+            font-weight: bold;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
         }
 
         .profile-avatar {
-            width: 48px;
-            height: 48px;
+            width: 64px;
+            height: 64px;
             background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 22px;
             font-weight: 900;
             color: #fff;
             letter-spacing: 1px;
@@ -122,7 +151,7 @@
         .profile-info { min-width: 0; flex: 1; }
 
         .profile-info h1 {
-            font-size: 15px;
+            font-size: 19px;
             margin-bottom: 1px;
             font-weight: 900;
             color: #fff;
@@ -132,12 +161,12 @@
         }
 
         #reporterNameRomaji {
-            font-size: 11px;
+            font-size: 12.5px;
             color: rgba(255,255,255,0.85);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
 
         .header-sub-row {
@@ -145,17 +174,15 @@
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
-            font-size: 11px;
+            font-size: 11.5px;
         }
         .header-sub-row .subtitle,
         .header-sub-row #reporterTypeBadge,
-        .header-sub-row #mediaLink,
         .header-sub-row #headerTwitterLink {
             color: rgba(255,255,255,0.9);
-            font-size: 11px;
+            font-size: 11.5px;
         }
         .header-sub-row #headerTwitterLink { text-decoration: underline; font-weight: bold; color: #fff; }
-        .header-sub-row #mediaLink { text-decoration: underline; }
         .header-sub-row #reporterTypeBadge {
             font-weight: bold;
             border: 1px solid rgba(255,255,255,0.6);
@@ -164,44 +191,6 @@
         }
 
         .creator-badge { font-size: 10px; }
-
-        /* ヘッダー下のアクション行（白背景） */
-        .profile-actions-bar {
-            background: #fff;
-            border-bottom: 1px solid #eee;
-            padding: 10px 40px;
-        }
-        .profile-actions-bar-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-        .profile-meta-compact {
-            display: flex;
-            gap: 20px;
-        }
-        .profile-meta-compact .meta-value { color: #333; font-size: 15px; }
-        .profile-meta-compact .meta-label { color: #999; font-size: 10px; }
-
-        .profile-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        #setIconBtn {
-            background: #fff;
-            color: #e63946;
-            border: 1px solid #e63946;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-        }
 
         .profile-meta {
             display: flex;
@@ -255,15 +244,15 @@
         .btn-share {
             background-color: transparent;
             color: #fff;
-            border: 2px solid #fff;
-            padding: 7px 18px;
+            border: 1.5px solid #fff;
+            padding: 5px 12px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 10.5px;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
         }
 
         .btn-share:hover {
@@ -313,14 +302,15 @@
         .btn-edit-reporter {
             background-color: #fff;
             color: #e63946;
-            border: 2px solid #fff;
-            padding: 12px 30px;
+            border: 1.5px solid #fff;
+            padding: 5px 14px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 10.5px;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
             display: none; /* デフォルト非表示。本人だけ表示 */
         }
         .btn-edit-reporter:hover {
@@ -786,29 +776,39 @@
             }
 
             .profile-header {
-                padding: 10px 16px;
+                padding: 12px 16px;
+            }
+
+            .header-edit-actions {
+                top: 8px;
+                right: 10px;
+                gap: 6px;
+            }
+            .btn-share, .btn-edit-reporter {
+                padding: 4px 9px;
+                font-size: 9.5px;
+            }
+
+            .profile-content {
+                padding-right: 54px;
+                gap: 10px;
             }
 
             .profile-avatar {
-                width: 38px;
-                height: 38px;
-                font-size: 13px;
+                width: 52px;
+                height: 52px;
+                font-size: 18px;
             }
 
             .profile-info h1 {
-                font-size: 13px;
+                font-size: 15px;
             }
 
-            #reporterNameRomaji { font-size: 10px; }
-            .header-sub-row { font-size: 10px; gap: 8px; }
+            #reporterNameRomaji { font-size: 10.5px; }
+            .header-sub-row { font-size: 10px; gap: 6px; }
             .header-sub-row .subtitle,
             .header-sub-row #reporterTypeBadge,
-            .header-sub-row #mediaLink,
             .header-sub-row #headerTwitterLink { font-size: 10px; }
-
-            .profile-actions-bar { padding: 8px 16px; }
-            .profile-meta-compact { gap: 14px; }
-            .profile-meta-compact .meta-value { font-size: 13px; }
 
             .main-content {
                 padding: 40px 20px;
@@ -1002,6 +1002,21 @@
         .gp-dropdown-option strong { font-size: 12.5px; }
         .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
         .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+        .gp-submenu-wrap { position: relative; }
+        .gp-submenu-trigger { cursor: pointer; justify-content: space-between; display: flex; }
+        .gp-submenu-panel {
+            display: none;
+            position: absolute; top: 0; left: 100%;
+            background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            min-width: 170px; max-height: 320px; overflow-y: auto;
+            z-index: 210; flex-direction: column;
+        }
+        .gp-submenu-wrap.open .gp-submenu-panel { display: flex; }
+        .gp-submenu-option { font-size: 12px; padding: 8px 12px; }
+        @media (max-width: 768px) {
+            .gp-submenu-panel { position: static; box-shadow: none; border: none; border-top: 1px solid #eee; min-width: 0; }
+        }
     
     </style>
 </head>
@@ -1015,8 +1030,24 @@
                 <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
                 <div class="gp-dropdown-panel">
                     <a href="gegen_press_category.html" class="gp-dropdown-option"><strong>すべてのニュース</strong><span>All News</span></a>
-                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=confirmed" class="gp-dropdown-option"><strong>移籍記事（確定情報）</strong><span>Transfer / Confirmed</span></a>
-                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=rumor" class="gp-dropdown-option"><strong>移籍記事（噂）</strong><span>Transfer / Rumor</span></a>
+                    <div class="gp-submenu-wrap">
+                        <span class="gp-dropdown-option gp-submenu-trigger"><strong>移籍記事</strong><span>Transfer ▸</span></span>
+                        <div class="gp-submenu-panel">
+                            <a href="gegen_press_category.html?articleType=移籍記事&type=confirmed" class="gp-dropdown-option gp-submenu-option"><strong>確定情報（全リーグ）</strong></a>
+                            <a href="gegen_press_category.html?articleType=移籍記事&type=rumor" class="gp-dropdown-option gp-submenu-option"><strong>噂（全リーグ）</strong></a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=プレミアリーグ" class="gp-dropdown-option gp-submenu-option">プレミアリーグ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=ラリーガ" class="gp-dropdown-option gp-submenu-option">ラリーガ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=Jリーグ" class="gp-dropdown-option gp-submenu-option">Jリーグ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=セリエA" class="gp-dropdown-option gp-submenu-option">セリエA</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=ブンデスリーガ" class="gp-dropdown-option gp-submenu-option">ブンデスリーガ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=リーグアン" class="gp-dropdown-option gp-submenu-option">リーグアン</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=エールディヴィジ" class="gp-dropdown-option gp-submenu-option">エールディヴィジ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=プリメイラ・リーガ" class="gp-dropdown-option gp-submenu-option">プリメイラ・リーガ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=MLS" class="gp-dropdown-option gp-submenu-option">MLS</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=その他リーグ" class="gp-dropdown-option gp-submenu-option">その他リーグ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=その他" class="gp-dropdown-option gp-submenu-option">その他</a>
+                        </div>
+                    </div>
                     <a href="gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>インタビュー記事</strong><span>Interviews</span></a>
                     <a href="gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>一般記事</strong><span>General</span></a>
                 </div>
@@ -1087,6 +1118,20 @@
         })();
     </script>
 
+    <script>
+        (function () {
+            document.querySelectorAll('.gp-submenu-trigger').forEach(function (trigger) {
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var wrap = trigger.closest('.gp-submenu-wrap');
+                    if (wrap) wrap.classList.toggle('open');
+                });
+            });
+        })();
+    </script>
+
+
 
 
 
@@ -1094,43 +1139,28 @@
     <div id="pageLoadingIndicator" style="text-align:center; padding:80px 20px; color:#999; font-size:13px;">読み込み中...</div>
     <div id="pageContentWrap" style="opacity:0; transition:opacity 0.25s ease;">
     <section class="profile-header profile-header-compact">
+        <div class="header-edit-actions">
+            <a class="btn-share" id="postAsReporterBtn" href="#" style="display:none; text-decoration:none;">ニュースを投稿する</a>
+            <button class="btn-edit-reporter" id="editReporterBtn">編集</button>
+        </div>
         <div class="profile-content profile-content-compact">
-            <div class="profile-avatar profile-avatar-compact" id="profileAvatar">F</div>
+            <div class="avatar-col">
+                <button type="button" id="setIconBtn" style="display:none;">アイコンを設定</button>
+                <input type="file" id="iconFileInput" accept="image/*" style="display:none;">
+                <div class="profile-avatar profile-avatar-compact" id="profileAvatar">F</div>
+            </div>
             <div class="profile-info profile-info-compact">
                 <div class="creator-badge" id="creatorBadge" style="display:none;">あなたが追加した記者</div>
                 <h1 id="reporterNameHeading">Fabrizio Romano</h1>
                 <div id="reporterNameRomaji" style="display:none;"></div>
                 <div class="header-sub-row">
-                    <span class="subtitle" id="reporterSubtitle">世界の移籍情報スペシャリスト</span>
+                    <span class="subtitle" id="reporterSubtitle"></span>
                     <span id="reporterTypeBadge" style="display:none;"></span>
-                    <a id="mediaLink" href="#" style="display:none;"></a>
                     <a id="headerTwitterLink" href="#" target="_blank" rel="noopener" style="display:none;"></a>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- ヘッダー下のアクション行（アイコン設定・編集・投稿ボタン、統計） -->
-    <div class="profile-actions-bar">
-        <div class="profile-actions-bar-inner">
-            <div class="profile-meta profile-meta-compact">
-                <div class="meta-item">
-                    <div class="meta-value" id="metaArticles">284</div>
-                    <div class="meta-label">ニュース数</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-value" id="metaTrust">96/100</div>
-                    <div class="meta-label">記者ランク</div>
-                </div>
-            </div>
-            <div class="profile-buttons">
-                <button id="setIconBtn" style="display:none;">アイコンを設定</button>
-                <input type="file" id="iconFileInput" accept="image/*" style="display:none;">
-                <a class="btn-share" id="postAsReporterBtn" href="#" style="display:none; text-decoration:none;">この記者のニュースを投稿する</a>
-                <button class="btn-edit-reporter" id="editReporterBtn">編集</button>
-            </div>
-        </div>
-    </div>
 
     <!-- メインコンテンツ -->
     <div class="main-content">
@@ -1486,19 +1516,17 @@
                 romajiEl.style.display = 'block';
             }
             renderAvatar(document.getElementById('profileAvatar'), r);
-            const subtitle = r.mediaOutlet || r.bio || '';
-            if (subtitle) document.getElementById('reporterSubtitle').textContent = subtitle;
+            const subtitleEl = document.getElementById('reporterSubtitle');
+            if (r.mediaOutlet) {
+                subtitleEl.innerHTML = '<a href="gegen_press_media_profile.html?name=' + encodeURIComponent(r.mediaOutlet) + '" style="color:inherit; text-decoration:underline;">' + escapeHtml(r.mediaOutlet) + '</a>';
+            } else if (r.bio) {
+                subtitleEl.textContent = r.bio;
+            }
 
             const typeBadge = document.getElementById('reporterTypeBadge');
             if (r.reporterType) {
                 typeBadge.textContent = r.reporterType + (r.beatClub ? '（' + r.beatClub + '）' : '');
                 typeBadge.style.display = 'inline-block';
-            }
-            const mediaLink = document.getElementById('mediaLink');
-            if (r.mediaOutlet) {
-                mediaLink.href = 'gegen_press_media_profile.html?name=' + encodeURIComponent(r.mediaOutlet);
-                mediaLink.textContent = r.mediaOutlet + ' のページを見る →';
-                mediaLink.style.display = 'inline-block';
             }
 
             const postBtn = document.getElementById('postAsReporterBtn');
@@ -1508,7 +1536,6 @@
             }
 
             if (r.trustScore != null) {
-                document.getElementById('metaTrust').textContent = r.trustScore + '/100';
                 document.getElementById('scoreNumber').textContent = r.trustScore;
             }
 
@@ -1727,7 +1754,6 @@
                 const sres = await GegenPressAPI.ratings.getComputedReporterScore(currentReporter.id);
                 if (sres && sres.success) {
                     const score = Math.round((sres.average / 5) * 100);
-                    document.getElementById('metaTrust').textContent = score + '/100';
                     document.getElementById('scoreNumber').textContent = score;
                     document.getElementById('statAverageRating').textContent = sres.count > 0 ? sres.average.toFixed(1) : '-';
                     document.getElementById('statArticleCount').textContent = sres.articlesCount || 0;
@@ -1742,7 +1768,6 @@
                 if (res && res.success) {
                     renderArticles(res.articles);
                     const count = (res.articles || []).length;
-                    document.getElementById('metaArticles').textContent = count;
                     document.getElementById('statArticleCount').textContent = count;
                 }
             } catch (e) {

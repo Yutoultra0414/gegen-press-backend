@@ -613,6 +613,21 @@
         .gp-dropdown-option strong { font-size: 12.5px; }
         .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
         .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+        .gp-submenu-wrap { position: relative; }
+        .gp-submenu-trigger { cursor: pointer; justify-content: space-between; display: flex; }
+        .gp-submenu-panel {
+            display: none;
+            position: absolute; top: 0; left: 100%;
+            background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            min-width: 170px; max-height: 320px; overflow-y: auto;
+            z-index: 210; flex-direction: column;
+        }
+        .gp-submenu-wrap.open .gp-submenu-panel { display: flex; }
+        .gp-submenu-option { font-size: 12px; padding: 8px 12px; }
+        @media (max-width: 768px) {
+            .gp-submenu-panel { position: static; box-shadow: none; border: none; border-top: 1px solid #eee; min-width: 0; }
+        }
     
     </style>
 </head>
@@ -626,8 +641,24 @@
                 <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">ニュース一覧</span></a>
                 <div class="gp-dropdown-panel">
                     <a href="gegen_press_category.html" class="gp-dropdown-option"><strong>すべてのニュース</strong><span>All News</span></a>
-                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=confirmed" class="gp-dropdown-option"><strong>移籍記事（確定情報）</strong><span>Transfer / Confirmed</span></a>
-                    <a href="gegen_press_category.html?articleType=%E7%A7%BB%E7%B1%8D%E8%A8%98%E4%BA%8B&type=rumor" class="gp-dropdown-option"><strong>移籍記事（噂）</strong><span>Transfer / Rumor</span></a>
+                    <div class="gp-submenu-wrap">
+                        <span class="gp-dropdown-option gp-submenu-trigger"><strong>移籍記事</strong><span>Transfer ▸</span></span>
+                        <div class="gp-submenu-panel">
+                            <a href="gegen_press_category.html?articleType=移籍記事&type=confirmed" class="gp-dropdown-option gp-submenu-option"><strong>確定情報（全リーグ）</strong></a>
+                            <a href="gegen_press_category.html?articleType=移籍記事&type=rumor" class="gp-dropdown-option gp-submenu-option"><strong>噂（全リーグ）</strong></a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=プレミアリーグ" class="gp-dropdown-option gp-submenu-option">プレミアリーグ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=ラリーガ" class="gp-dropdown-option gp-submenu-option">ラリーガ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=Jリーグ" class="gp-dropdown-option gp-submenu-option">Jリーグ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=セリエA" class="gp-dropdown-option gp-submenu-option">セリエA</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=ブンデスリーガ" class="gp-dropdown-option gp-submenu-option">ブンデスリーガ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=リーグアン" class="gp-dropdown-option gp-submenu-option">リーグアン</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=エールディヴィジ" class="gp-dropdown-option gp-submenu-option">エールディヴィジ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=プリメイラ・リーガ" class="gp-dropdown-option gp-submenu-option">プリメイラ・リーガ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=MLS" class="gp-dropdown-option gp-submenu-option">MLS</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=その他リーグ" class="gp-dropdown-option gp-submenu-option">その他リーグ</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=その他" class="gp-dropdown-option gp-submenu-option">その他</a>
+                        </div>
+                    </div>
                     <a href="gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>インタビュー記事</strong><span>Interviews</span></a>
                     <a href="gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>一般記事</strong><span>General</span></a>
                 </div>
@@ -697,6 +728,20 @@
             });
         })();
     </script>
+
+    <script>
+        (function () {
+            document.querySelectorAll('.gp-submenu-trigger').forEach(function (trigger) {
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var wrap = trigger.closest('.gp-submenu-wrap');
+                    if (wrap) wrap.classList.toggle('open');
+                });
+            });
+        })();
+    </script>
+
 
 
 
