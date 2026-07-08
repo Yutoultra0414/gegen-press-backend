@@ -557,6 +557,69 @@
 
             authorSelect.innerHTML = '<option value="">選択してください</option>' +
                 myReporters.map(r => '<option value="' + r.id + '">' + escapeHtml(r.name) + '</option>').join('');
+
+            await loadArticleForEdit();
+        }
+
+        // =========================================================
+        // 編集モード（?id=... がある場合、既存ニュースを読み込んでフォームに反映し、
+        // 送信時は create ではなく update を呼ぶ）
+        // =========================================================
+        const editArticleId = new URLSearchParams(window.location.search).get('id');
+        let editingArticle = null;
+
+        async function loadArticleForEdit() {
+            if (!editArticleId) return;
+            document.querySelector('.gp-page-strip h1').textContent = 'ニュースを編集';
+            document.title = 'ニュースを編集 | Gegen Press!';
+            document.getElementById('submitBtn').textContent = '変更を保存する';
+
+            const res = await GegenPressAPI.articles.getById(editArticleId);
+            if (!res || !res.success || !res.article) {
+                loginNotice.style.display = 'block';
+                loginNotice.textContent = '編集対象のニュースが見つかりませんでした。';
+                formCard.style.display = 'none';
+                return;
+            }
+            editingArticle = res.article;
+
+            if (editingArticle.createdBy && editingArticle.createdBy !== currentUserObj.uid) {
+                loginNotice.style.display = 'block';
+                loginNotice.textContent = 'このニュースを編集する権限がありません（投稿した本人のみ編集できます）。';
+                formCard.style.display = 'none';
+                return;
+            }
+
+            document.getElementById('articleTitle').value = editingArticle.title || '';
+            document.getElementById('articleDesc').value = editingArticle.description || '';
+            document.getElementById('articleContent').value = editingArticle.content || '';
+            if (editingArticle.authorId) authorSelect.value = editingArticle.authorId;
+
+            if (editingArticle.category) {
+                const catTag = document.querySelector('#categoryTags .tag-option[data-value="' + CSS.escape(editingArticle.category) + '"]');
+                if (catTag) { catTag.classList.add('selected'); selectedCategory = editingArticle.category; }
+            }
+            (editingArticle.articleTypes || []).forEach(v => {
+                const tag = document.querySelector('#articleTypeTags .tag-option[data-value="' + CSS.escape(v) + '"]');
+                if (tag) { tag.classList.add('selected'); selectedArticleTypes.add(v); }
+            });
+            if (selectedArticleTypes.has('移籍記事')) {
+                document.getElementById('newsTypeGroup').style.display = 'block';
+                if (editingArticle.newsType) {
+                    const nt = document.querySelector('#newsTypeTags .tag-option[data-value="' + CSS.escape(editingArticle.newsType) + '"]');
+                    if (nt) { nt.classList.add('selected'); selectedNewsType = editingArticle.newsType; }
+                }
+            }
+            hashtags = (editingArticle.tags || []).slice();
+            renderHashtagChips();
+
+            if (editingArticle.image) {
+                thumbDataUrl = editingArticle.image;
+                thumbFocal = editingArticle.imagePosition || { x: 50, y: 50 };
+                renderThumbPicker();
+                document.getElementById('thumbRequiredNote').style.display = 'none';
+                document.getElementById('focalHint').style.display = 'block';
+            }
         }
 
         function escapeHtml(s) {
@@ -768,6 +831,33 @@
             const rep = myReporters.find(r => r.id === authorId);
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
+
+            if (editArticleId) {
+                submitBtn.textContent = '保存中...';
+                const res = await GegenPressAPI.articles.update(editArticleId, {
+                    title: title,
+                    description: desc,
+                    content: content,
+                    category: selectedCategory,
+                    articleTypes: Array.from(selectedArticleTypes),
+                    newsType: selectedNewsType,
+                    tags: hashtags,
+                    authorId: authorId,
+                    authorName: rep ? rep.name : '',
+                    image: thumbDataUrl,
+                    imagePosition: thumbFocal,
+                    edited: true
+                });
+                submitBtn.disabled = false;
+                submitBtn.textContent = '変更を保存する';
+                if (res && res.success) {
+                    window.location.href = 'gegen_press_article_detail.html?id=' + encodeURIComponent(editArticleId);
+                } else {
+                    alert((res && res.message) || '保存に失敗しました');
+                }
+                return;
+            }
+
             submitBtn.textContent = '投稿中...';
 
             const res = await GegenPressAPI.articles.create({

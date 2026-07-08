@@ -1040,6 +1040,8 @@
 
 
     <!-- プロフィールヘッダー -->
+    <div id="pageLoadingIndicator" style="text-align:center; padding:80px 20px; color:#999; font-size:13px;">読み込み中...</div>
+    <div id="pageContentWrap" style="opacity:0; transition:opacity 0.25s ease;">
     <section class="profile-header">
         <div class="profile-content">
             <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
@@ -1295,6 +1297,7 @@
             </div>
         </aside>
     </div>
+    </div><!-- /#pageContentWrap -->
 
     <!-- 記者編集モーダル -->
     <div class="modal-overlay" id="editModal">
@@ -1820,7 +1823,13 @@
             });
         }
 
-        loadReporterPage();
+        function revealPageContent() {
+            const loading = document.getElementById('pageLoadingIndicator');
+            const wrap = document.getElementById('pageContentWrap');
+            if (loading) loading.style.display = 'none';
+            if (wrap) wrap.style.opacity = '1';
+        }
+        loadReporterPage().finally(revealPageContent);
         loadRelatedReporters();
 
         // ============ 関連する記者（専門分野の重なりで判定） ============

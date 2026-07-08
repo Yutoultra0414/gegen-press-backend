@@ -1408,7 +1408,7 @@
                                 '<div class="hero-thumb"><span class="cat-tag">' + esc(a.category || '速報') + '</span>' + thumbHtmlFor(a) + '</div>' +
                                 '<div class="hero-body">' +
                                     '<div class="hero-title">' + esc(a.title) + '</div>' +
-                                    '<div class="card-meta"><span style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</span>' + esc(a.authorName || '') + '</div>' +
+                                    '<div class="card-meta"><span class="author-avatar-badge" data-author-id="' + esc(a.authorId || '') + '" style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;overflow:hidden;' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</span>' + esc(a.authorName || '') + '</div>' +
                                 '</div>' +
                             '</a>'
                         );
@@ -1436,6 +1436,33 @@
                     wrap.querySelectorAll('[data-article-id]').forEach(el => {
                         el.addEventListener('click', () => goArticle(el.getAttribute('data-article-id')));
                     });
+                    upgradeAuthorAvatars(wrap);
+                }
+
+                // 記者の実際のアイコン画像があれば、頭文字バッジを画像に差し替える
+                const _authorAvatarCache = {};
+                async function upgradeAuthorAvatars(root) {
+                    if (typeof GegenPressAPI === 'undefined') return;
+                    const ids = new Set();
+                    root.querySelectorAll('.author-avatar-badge[data-author-id]').forEach(el => {
+                        const id = el.getAttribute('data-author-id');
+                        if (id) ids.add(id);
+                    });
+                    for (const id of ids) {
+                        try {
+                            if (!(id in _authorAvatarCache)) {
+                                const rres = await GegenPressAPI.reporters.getById(id);
+                                _authorAvatarCache[id] = (rres && rres.success && rres.reporter && rres.reporter.profileImage) || null;
+                            }
+                            const img = _authorAvatarCache[id];
+                            if (img) {
+                                root.querySelectorAll('.author-avatar-badge[data-author-id="' + CSS.escape(id) + '"]').forEach(el => {
+                                    el.style.background = 'none';
+                                    el.innerHTML = '<img src="' + img + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                                });
+                            }
+                        } catch (e) { /* 取得できなければ頭文字バッジのまま */ }
+                    }
                 }
 
                 // Breaking News：新しい順

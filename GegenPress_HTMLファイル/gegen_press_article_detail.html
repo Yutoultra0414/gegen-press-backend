@@ -899,6 +899,8 @@
 
 
     <!-- ニュースヘッダー -->
+    <div id="pageLoadingIndicator" style="text-align:center; padding:80px 20px; color:#999; font-size:13px;">読み込み中...</div>
+    <div id="pageContentWrap" style="opacity:0; transition:opacity 0.25s ease;">
     <section class="article-header">
         <div class="article-header-content">
             <h1 class="article-title" id="articleTitle">マンチェスター・シティが超大型補強を発表</h1>
@@ -1039,7 +1041,10 @@
                         <button id="adjustThumbBtn" style="display:none; background:#fff; color:#333; border:1px solid #ccc; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer;">表示位置を調整</button>
                     </div>
                     <input type="file" id="thumbFileInput" accept="image/*" style="display:none;">
-                    <button id="deleteArticleBtn" style="display:none; background:#fff; color:#c0392b; border:1px solid #c0392b; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer;">このニュースを削除</button>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <a id="editArticleLink" href="#" style="display:none; background:#fff; color:#333; border:1px solid #ccc; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer; text-decoration:none;">このニュースを編集</a>
+                        <button id="deleteArticleBtn" style="display:none; background:#fff; color:#c0392b; border:1px solid #c0392b; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:bold; cursor:pointer;">このニュースを削除</button>
+                    </div>
                 </div>
             </div>
 
@@ -1085,6 +1090,7 @@
             </div>
         </aside>
     </div>
+    </div><!-- /#pageContentWrap -->
 
     <script src="api-client.js" onerror="console.warn('api-client.js 未読込: 見本データを表示します')"></script>
     <script>
@@ -1315,6 +1321,10 @@
             const ADMIN_UID = 'EcFjXMp6rpODK9i8E1DN1CPjZov2';
             const deleteBtn = document.getElementById('deleteArticleBtn');
             if (currentArticle && (currentArticle.createdBy === user.uid || currentArticle.authorId === user.uid || user.uid === ADMIN_UID)) {
+                const editLink = document.getElementById('editArticleLink');
+                editLink.href = 'gegen_press_write_article.html?id=' + encodeURIComponent(articleId);
+                editLink.style.display = 'inline-block';
+
                 deleteBtn.style.display = 'inline-block';
                 deleteBtn.addEventListener('click', async function () {
                     if (!confirm('このニュースを削除します。元に戻せません。本当に削除しますか？')) return;
@@ -1527,12 +1537,14 @@
                 const ratings = res.ratings || [];
                 const count = ratings.length;
                 const avg = count > 0 ? (ratings.reduce((s, r) => s + (r.rating || 0), 0) / count) : 0;
+                const trustPercent = count > 0 ? Math.round((avg / 5) * 100) : 0;
 
                 document.getElementById('infoRatingCount').textContent = count;
                 document.getElementById('infoAvgRating').textContent = count > 0 ? (avg.toFixed(1) + ' / 5.0') : 'まだ評価なし';
-                if (count > 0) {
-                    document.getElementById('articleStars').innerHTML = starsHtml(avg);
-                }
+                document.getElementById('infoTrust').textContent = count > 0 ? (trustPercent + '%') : '評価なし';
+                const ratingPercentEl = document.getElementById('ratingPercent');
+                if (ratingPercentEl) ratingPercentEl.textContent = count > 0 ? ('信頼度: ' + trustPercent + '%') : '信頼度: まだ評価なし';
+                document.getElementById('articleStars').innerHTML = starsHtml(avg);
             } catch (e) {
                 console.warn('評価集計の読み込みに失敗:', e);
             }
@@ -1551,6 +1563,12 @@
                 currentArticle = a;
 
                 document.getElementById('articleTitle').textContent = a.title || '';
+                if (a.edited) {
+                    const editedBadge = document.createElement('span');
+                    editedBadge.textContent = '※編集済み';
+                    editedBadge.style.cssText = 'font-size:12px; color:#999; font-weight:normal; margin-left:8px; vertical-align:middle;';
+                    document.getElementById('articleTitle').appendChild(editedBadge);
+                }
                 document.title = (a.title || 'Gegen Press!') + ' - Gegen Press!';
 
                 document.getElementById('authorAvatar').textContent = getInitials(a.authorName);
@@ -1592,12 +1610,6 @@
                 }
 
                 document.getElementById('articleTime').textContent = fmtDate(a.createdAt);
-
-                if (typeof a.trustScore === 'number') {
-                    document.getElementById('ratingPercent').textContent = '信頼度: ' + a.trustScore + '%';
-                    document.getElementById('infoTrust').textContent = a.trustScore + '%';
-                }
-                document.getElementById('articleStars').innerHTML = starsHtml(a.averageRating);
 
                 document.getElementById('infoViews').textContent = (a.views || 0).toLocaleString();
 
@@ -1659,7 +1671,13 @@
             }
         }
 
-        loadArticle().then(() => { initThumbButton(); initMyRating(); });
+        function revealPageContent() {
+            const loading = document.getElementById('pageLoadingIndicator');
+            const wrap = document.getElementById('pageContentWrap');
+            if (loading) loading.style.display = 'none';
+            if (wrap) wrap.style.opacity = '1';
+        }
+        loadArticle().then(() => { initThumbButton(); initMyRating(); }).finally(revealPageContent);
     </script>
 </body>
 </html>
