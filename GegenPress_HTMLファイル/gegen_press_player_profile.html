@@ -365,17 +365,22 @@
         <div class="profile-content">
             <div style="display:flex; flex-direction:column; align-items:center;">
                 <div class="profile-avatar" id="profileAvatar">?</div>
+                <div id="photoCredit" style="display:none; font-size:9.5px; color:rgba(255,255,255,0.7); text-align:center; margin-top:4px; max-width:110px; line-height:1.4;"></div>
                 <button id="setIconBtn">アイコンを設定</button>
                 <input type="file" id="iconFileInput" accept="image/*" style="display:none;">
             </div>
             <div class="profile-info">
                 <h1 id="playerName">読み込み中...</h1>
+                <span id="wikidataBadge" style="display:none; font-size:10px; font-weight:bold; background:rgba(255,255,255,0.2); color:#fff; padding:2px 8px; border-radius:10px; margin-left:8px; vertical-align:middle;">Wikidataで確認済み</span>
                 <p id="playerNameRomaji" style="font-size:12px; color:#fff; opacity:0.85; margin-top:-2px; margin-bottom:6px; display:none;"></p>
                 <p class="subtitle" id="playerClub"></p>
                 <div class="profile-meta">
                     <div class="meta-item"><div class="meta-value" id="metaPosition">-</div><div class="meta-label">ポジション</div></div>
                     <div class="meta-item"><div class="meta-value" id="metaNationality">-</div><div class="meta-label">国籍</div></div>
                     <div class="meta-item"><div class="meta-value" id="metaMarketValue">-</div><div class="meta-label">市場価値</div></div>
+                    <div class="meta-item" id="metaAgeWrap" style="display:none;"><div class="meta-value" id="metaAge">-</div><div class="meta-label">年齢</div></div>
+                    <div class="meta-item" id="metaHeightWrap" style="display:none;"><div class="meta-value" id="metaHeight">-</div><div class="meta-label">身長</div></div>
+                    <div class="meta-item" id="metaNationalTeamWrap" style="display:none;"><div class="meta-value" id="metaNationalTeam">-</div><div class="meta-label">代表</div></div>
                 </div>
                 <a id="editPlayerLink" href="#" style="display:none; margin-top:12px; font-size:12.5px; color:#e63946; font-weight:bold; text-decoration:none; border:1px solid #e63946; border-radius:6px; padding:6px 14px;">選手情報を編集</a>
             </div>
@@ -458,13 +463,27 @@
 
         function renderAvatar(p) {
             const el = document.getElementById('profileAvatar');
-            if (p.profileImage) {
+            // 表示優先順位: Wikimedia Commons由来の写真(photoUrl) > ユーザーがアップロードしたアイコン(profileImage) > 色付きイニシャル
+            if (p.photoUrl) {
+                el.innerHTML = '<img src="' + p.photoUrl + '" alt="">';
+                el.style.background = 'none';
+            } else if (p.profileImage) {
                 el.innerHTML = '<img src="' + p.profileImage + '" alt="">';
                 el.style.background = 'none';
             } else {
                 el.textContent = getInitials(p.name);
                 const g = colorFor(p.name);
                 el.style.background = g[0];
+            }
+
+            // Wikimedia Commonsの画像を使う場合、ライセンス上ここに作者・ライセンス表記が必要
+            const creditEl = document.getElementById('photoCredit');
+            if (p.photoUrl && p.photoAuthor && p.photoLicense) {
+                creditEl.style.display = 'block';
+                creditEl.innerHTML = '写真: ' + esc(p.photoAuthor) + '（' + esc(p.photoLicense) + '）' +
+                    (p.photoSource ? ' <a href="' + esc(p.photoSource) + '" target="_blank" rel="noopener" style="color:inherit;">出典</a>' : '');
+            } else {
+                creditEl.style.display = 'none';
             }
         }
 
@@ -501,6 +520,29 @@
             document.getElementById('metaPosition').textContent = p.position || '-';
             document.getElementById('metaNationality').textContent = p.nationality || '-';
             document.getElementById('metaMarketValue').textContent = p.marketValue || '-';
+
+            if (p.birthDate) {
+                const birth = new Date(p.birthDate);
+                if (!isNaN(birth)) {
+                    const today = new Date();
+                    let age = today.getFullYear() - birth.getFullYear();
+                    const m = today.getMonth() - birth.getMonth();
+                    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+                    document.getElementById('metaAge').textContent = age + '歳';
+                    document.getElementById('metaAgeWrap').style.display = 'block';
+                }
+            }
+            if (p.height) {
+                document.getElementById('metaHeight').textContent = p.height + 'cm';
+                document.getElementById('metaHeightWrap').style.display = 'block';
+            }
+            if (p.nationalTeam) {
+                document.getElementById('metaNationalTeam').textContent = p.nationalTeam;
+                document.getElementById('metaNationalTeamWrap').style.display = 'block';
+            }
+            if (p.source === 'wikidata') {
+                document.getElementById('wikidataBadge').style.display = 'inline-block';
+            }
             document.getElementById('playerBio').textContent = p.bio || 'まだ紹介文が登録されていません。';
             renderAvatar(p);
 

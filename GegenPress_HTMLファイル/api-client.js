@@ -313,13 +313,17 @@
           return { success: true, player: data };
         } catch (e) { return { success: false, message: String(e) }; }
       },
-      async checkDuplicate(name) {
+      async checkDuplicate(name, wikidataId) {
         try {
           var fb = await _ready;
           var snap = await fb.db.collection('players').get();
           var lower = (name || '').trim().toLowerCase();
-          var dups = docList(snap).filter(function (p) {
-            return (p.name || '').trim().toLowerCase() === lower;
+          var all = docList(snap);
+          // 名前の完全一致に加え、wikidataId が一致するもの（表記ゆれがあっても同一人物と分かる）も重複扱いにする
+          var dups = all.filter(function (p) {
+            var nameMatch = (p.name || '').trim().toLowerCase() === lower;
+            var idMatch = wikidataId && p.wikidataId && p.wikidataId === wikidataId;
+            return nameMatch || idMatch;
           });
           return { success: true, exists: dups.length > 0, duplicates: dups };
         } catch (e) { return { success: false, message: String(e) }; }
@@ -330,9 +334,9 @@
           if (!u) return { success: false, message: '選手の追加にはログインが必要です' };
           var fb = await _ready;
           if (!data.allowDuplicate) {
-            var dup = await this.checkDuplicate(data.name);
+            var dup = await this.checkDuplicate(data.name, data.wikidataId);
             if (dup.success && dup.exists) {
-              return { success: false, duplicates: dup.duplicates, message: '同名の選手が既に登録されています' };
+              return { success: false, duplicates: dup.duplicates, message: '同名または同一人物の選手が既に登録されています' };
             }
           }
           var docData = {
@@ -351,13 +355,31 @@
             transferFee: data.transferFee || null,
             bio: data.bio || '',
             profileImage: null,
+            // ---- Wikidata/Wikimedia Commons 由来のフィールド（任意。手動登録では空のまま） ----
+            birthDate: data.birthDate || null,
+            height: data.height || null, // cm単位の数値
+            preferredFoot: data.preferredFoot || null, // '右'|'左'|'両足'|null
+            shirtNumber: data.shirtNumber || null,
+            nationalTeam: data.nationalTeam || null,
+            wikidataId: data.wikidataId || null,
+            wikipediaUrl: data.wikipediaUrl || null,
+            aliases: data.aliases || [],
+            // 画像はWikimedia CommonsのURLをそのまま保存（自前でコピーを持たない）。
+            // ライセンス・作者・ソースが揃わない画像は photoUrl 自体を null にしてください（呼び出し側の責務）。
+            photoUrl: data.photoUrl || null,
+            photoLicense: data.photoLicense || null,
+            photoAuthor: data.photoAuthor || null,
+            photoSource: data.photoSource || null,
             views: 0,
             viewsByDay: {},
             createdBy: u.uid,
-            source: 'user',
+            source: data.source || 'user', // 'user'（手動登録） | 'wikidata'（クラブマスタと同様の管理者取込）
             createdAt: tsNow(), updatedAt: tsNow()
           };
-          var ref = await fb.db.collection('players').add(docData);
+          var ref = data.playerId
+            ? fb.db.collection('players').doc(data.playerId)
+            : fb.db.collection('players').doc();
+          await ref.set(docData);
           docData.id = ref.id;
           return { success: true, player: docData };
         } catch (e) { return { success: false, message: String(e) }; }

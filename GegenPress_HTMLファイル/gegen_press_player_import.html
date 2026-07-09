@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>選手データ取込（管理者用） - Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="clubs-data.js" onerror="console.warn('clubs-data.js が見つかりません')"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans JP', 'Roboto', 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
+        .page-strip { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 16px 40px; }
+        .page-strip h1 { font-size: 18px; font-weight: 900; }
+        .page-strip p { font-size: 11.5px; color: #999; margin-top: 2px; }
+        .container { max-width: 900px; margin: 20px auto; padding: 0 20px 100px; }
+        .card { background: #fff; border: 1px solid #eee; padding: 16px; margin-bottom: 16px; border-radius: 2px; }
+        .btn { background: #e63946; color: #fff; border: none; padding: 10px 18px; font-size: 13px; font-weight: bold; cursor: pointer; border-radius: 2px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-outline { background: #fff; color: #666; border: 1px solid #ccc; }
+        .empty-note { color: #999; font-size: 13px; padding: 20px 0; text-align: center; }
+        .denied { text-align: center; padding: 60px 20px; color: #999; }
+
+        .search-row { display: flex; gap: 8px; }
+        .search-row input { flex: 1; padding: 10px 12px; border: 1px solid #ccc; border-radius: 2px; font-size: 13px; font-family: inherit; }
+        .search-hint { font-size: 11.5px; color: #999; margin-top: 6px; }
+
+        .candidate-card { display: flex; gap: 12px; border: 1px solid #eee; border-radius: 2px; padding: 12px; margin-bottom: 10px; align-items: center; }
+        .candidate-photo { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #bbb; }
+        .candidate-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .candidate-body { flex: 1; min-width: 0; }
+        .candidate-body h3 { font-size: 14px; font-weight: bold; }
+        .candidate-body p { font-size: 11.5px; color: #888; margin-top: 2px; }
+        .candidate-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+        .candidate-tags span { font-size: 10.5px; background: #f0f0f0; color: #555; padding: 2px 7px; border-radius: 10px; }
+
+        .field-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px 12px; margin-top: 4px; }
+        .field-grid label { display: block; font-size: 10.5px; color: #999; margin-bottom: 3px; }
+        .field-grid input, .field-grid select {
+            width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 2px; font-size: 12.5px; font-family: inherit;
+        }
+        .full-row { grid-column: 1 / -1; }
+
+        .photo-preview { display: flex; gap: 12px; align-items: flex-start; margin: 12px 0; padding: 12px; background: #fafafa; border-radius: 4px; }
+        .photo-preview img { width: 80px; height: 80px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
+        .photo-preview .meta { font-size: 11.5px; color: #666; line-height: 1.7; }
+        .photo-none { font-size: 12px; color: #999; padding: 10px; background: #fafafa; border-radius: 4px; margin: 12px 0; }
+
+        .dup-banner { background: #fff3cd; border: 1px solid #ffe69c; border-radius: 4px; padding: 12px 14px; margin-bottom: 12px; font-size: 12.5px; color: #664d03; }
+        .dup-banner strong { display: block; margin-bottom: 6px; }
+        .dup-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+        .log-box { font-size: 11.5px; color: #666; max-height: 90px; overflow-y: auto; margin-top: 10px; }
+        .log-box div.err { color: #c5303c; }
+        .log-box div.ok { color: #2a9d8f; }
+        .status-note { font-size: 11.5px; color: #999; margin-top: 6px; }
+    </style>
+</head>
+<body>
+    <div class="page-strip">
+        <h1><a href="gegen_press_top.html" style="color:#e63946; text-decoration:none;">Gegen Press!</a> 選手データ取込（管理者用）</h1>
+        <p>Wikidata / Wikimedia Commons から選手情報を検索して取り込みます。画像はライセンス・作者が確認できたものだけを採用します。</p>
+    </div>
+
+    <div class="container">
+        <div id="deniedBox" class="denied" style="display:none;">このページは管理者のみ閲覧できます。</div>
+        <div id="loadingBox" class="empty-note">読み込み中...</div>
+
+        <div id="mainArea" style="display:none;">
+            <div class="card">
+                <div class="search-row">
+                    <input type="text" id="searchInput" placeholder="選手名を入力（例: Kylian Mbappe）英語表記が確実です">
+                    <button class="btn" id="searchBtn">検索</button>
+                </div>
+                <div class="search-hint">Wikidataの検索精度に依存します。日本語名でヒットしないことがあるので、英語表記推奨です。</div>
+                <div class="log-box" id="searchLog"></div>
+            </div>
+
+            <div id="candidatesWrap"></div>
+            <div id="confirmWrap"></div>
+        </div>
+    </div>
+
+    <script src="api-client.js" onerror="console.warn('api-client.js が見つかりません')"></script>
+    <script>
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function slugify(input) {
+            if (!input) return '';
+            return String(input)
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .replace(/-{2,}/g, '-');
+        }
+        function logMsg(elId, msg, isErr) {
+            const box = document.getElementById(elId);
+            const div = document.createElement('div');
+            div.className = isErr ? 'err' : 'ok';
+            div.textContent = msg;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // ポジション名の英→日 簡易対応表（無ければ英語のまま表示。確認画面で編集可）
+        const POSITION_JA = {
+            'goalkeeper': 'ゴールキーパー',
+            'defender': 'ディフェンダー',
+            'centre-back': 'センターバック', 'center back': 'センターバック', 'centre back': 'センターバック',
+            'full back': 'サイドバック', 'fullback': 'サイドバック', 'right back': 'サイドバック（右）', 'left back': 'サイドバック（左）',
+            'midfielder': 'ミッドフィールダー',
+            'defensive midfielder': '守備的ミッドフィールダー',
+            'attacking midfielder': '攻撃的ミッドフィールダー',
+            'winger': 'ウィンガー',
+            'forward': 'フォワード',
+            'striker': 'ストライカー',
+            'centre-forward': 'センターフォワード'
+        };
+        function translatePosition(en) {
+            if (!en) return '';
+            const key = en.toLowerCase().trim();
+            return POSITION_JA[key] || en;
+        }
+
+        // ==== Wikidata通信 ====
+        async function searchWikidata(term) {
+            const url = 'https://www.wikidata.org/w/api.php?action=wbsearchentities'
+                + '&search=' + encodeURIComponent(term) + '&language=en&format=json&type=item&limit=8&origin=*';
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('検索に失敗しました（HTTP ' + res.status + '）');
+            const json = await res.json();
+            return json.search || [];
+        }
+
+        // 候補群をまとめて1回のSPARQLで詳細取得（国籍・生年月日・身長・ポジション・画像・所属履歴）
+        async function fetchCandidateDetails(qids) {
+            const values = qids.map(q => 'wd:' + q).join(' ');
+            const sparql = `
+SELECT ?player ?playerLabel ?playerLabelJa ?countryLabel ?birthDate ?height ?positionLabel ?image
+       (GROUP_CONCAT(DISTINCT ?clubTeamLabel; separator="|") AS ?clubTeams)
+       (GROUP_CONCAT(DISTINCT ?natTeamLabel; separator="|") AS ?natTeams)
+WHERE {
+  VALUES ?player { ${values} }
+  OPTIONAL { ?player wdt:P27 ?country. }
+  OPTIONAL { ?player wdt:P569 ?birthDate. }
+  OPTIONAL { ?player wdt:P2048 ?height. }
+  OPTIONAL { ?player wdt:P413 ?position. }
+  OPTIONAL { ?player wdt:P18 ?image. }
+  OPTIONAL { ?player rdfs:label ?playerLabelJa. FILTER(LANG(?playerLabelJa)="ja") }
+  OPTIONAL {
+    ?player wdt:P54 ?clubTeam.
+    FILTER NOT EXISTS { ?clubTeam wdt:P31 wd:Q6979593 }
+    ?clubTeam rdfs:label ?clubTeamLabel. FILTER(LANG(?clubTeamLabel)="en")
+  }
+  OPTIONAL {
+    ?player wdt:P54 ?natTeam.
+    ?natTeam wdt:P31 wd:Q6979593 .
+    ?natTeam rdfs:label ?natTeamLabel. FILTER(LANG(?natTeamLabel)="en")
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,ja". }
+}
+GROUP BY ?player ?playerLabel ?playerLabelJa ?countryLabel ?birthDate ?height ?positionLabel ?image
+`.trim();
+            const url = 'https://query.wikidata.org/sparql?format=json&origin=*&query=' + encodeURIComponent(sparql);
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('詳細情報の取得に失敗しました（HTTP ' + res.status + '）');
+            const json = await res.json();
+            const rows = (json.results && json.results.bindings) || [];
+            const map = {};
+            rows.forEach(r => {
+                const qid = r.player.value.split('/').pop();
+                map[qid] = {
+                    qid,
+                    labelJa: r.playerLabelJa ? r.playerLabelJa.value : '',
+                    country: r.countryLabel ? r.countryLabel.value : '',
+                    birthDate: r.birthDate ? r.birthDate.value.slice(0, 10) : '',
+                    heightCm: r.height ? Math.round(parseFloat(r.height.value) * 100) : null,
+                    position: r.positionLabel ? r.positionLabel.value : '',
+                    imageFilename: r.image ? decodeURIComponent(r.image.value.split('/').pop()) : '',
+                    clubTeams: r.clubTeams && r.clubTeams.value ? r.clubTeams.value.split('|').filter(Boolean) : [],
+                    natTeams: r.natTeams && r.natTeams.value ? r.natTeams.value.split('|').filter(Boolean) : []
+                };
+            });
+            return map;
+        }
+
+        // 選択された1人だけ、Wikipedia日本語版リンクを追加取得（無ければ空のまま）
+        async function fetchWikipediaUrl(qid) {
+            try {
+                const url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' + qid
+                    + '&props=sitelinks&sitefilter=enwiki&format=json&origin=*';
+                const res = await fetch(url);
+                if (!res.ok) return null;
+                const json = await res.json();
+                const entity = json.entities && json.entities[qid];
+                const sitelink = entity && entity.sitelinks && entity.sitelinks.enwiki;
+                if (!sitelink) return null;
+                return 'https://en.wikipedia.org/wiki/' + encodeURIComponent(sitelink.title.replace(/ /g, '_'));
+            } catch (e) { return null; }
+        }
+
+        // Commonsのファイル名から、ライセンス・作者が確認できた場合のみ画像情報を返す。
+        // 確認できない場合は null を返す（＝画像を採用しない）。
+        async function fetchCommonsLicense(filename) {
+            if (!filename) return null;
+            try {
+                const url = 'https://commons.wikimedia.org/w/api.php?action=query&titles=' + encodeURIComponent('File:' + filename)
+                    + '&prop=imageinfo&iiprop=extmetadata|url&format=json&origin=*';
+                const res = await fetch(url);
+                if (!res.ok) return null;
+                const json = await res.json();
+                const pages = json.query && json.query.pages;
+                if (!pages) return null;
+                const page = pages[Object.keys(pages)[0]];
+                const info = page && page.imageinfo && page.imageinfo[0];
+                if (!info) return null;
+                const meta = info.extmetadata || {};
+                const stripHtml = (s) => (s || '').replace(/<[^>]+>/g, '').trim();
+                const license = meta.LicenseShortName ? stripHtml(meta.LicenseShortName.value) : '';
+                const author = meta.Artist ? stripHtml(meta.Artist.value) : (meta.Credit ? stripHtml(meta.Credit.value) : '');
+                if (!license || !author) return null; // ライセンス・作者のどちらかが取れない場合は不採用
+                return {
+                    url: 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(filename) + '?width=400',
+                    license: license,
+                    author: author,
+                    source: 'https://commons.wikimedia.org/wiki/File:' + encodeURIComponent(filename)
+                };
+            } catch (e) { return null; }
+        }
+
+        // ==== 検索フロー ====
+        let lastCandidates = [];
+        document.getElementById('searchBtn').addEventListener('click', doSearch);
+        document.getElementById('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
+
+        async function doSearch() {
+            const term = document.getElementById('searchInput').value.trim();
+            document.getElementById('confirmWrap').innerHTML = '';
+            const wrap = document.getElementById('candidatesWrap');
+            if (!term) { wrap.innerHTML = ''; return; }
+            wrap.innerHTML = '<div class="card"><div class="empty-note">検索中...</div></div>';
+            document.getElementById('searchLog').innerHTML = '';
+
+            try {
+                const results = await searchWikidata(term);
+                // 説明文にサッカー関連の語が含まれる候補を優先表示（無ければ全件表示）
+                const footballish = results.filter(r => /football|soccer|footballer/i.test(r.description || ''));
+                const candidates = footballish.length > 0 ? footballish : results;
+
+                if (candidates.length === 0) {
+                    wrap.innerHTML = '<div class="card"><div class="empty-note">候補が見つかりませんでした。英語表記で試してみてください。</div></div>';
+                    return;
+                }
+
+                const qids = candidates.map(c => c.id);
+                const details = await fetchCandidateDetails(qids);
+                lastCandidates = candidates.map(c => Object.assign({ label: c.label, description: c.description || '' }, details[c.id] || { qid: c.id }));
+
+                wrap.innerHTML = '<div class="card"><h3 style="font-size:13px; margin-bottom:10px;">検索結果（' + lastCandidates.length + '件）</h3>' +
+                    lastCandidates.map((c, i) => {
+                        const photoUrl = c.imageFilename
+                            ? 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(c.imageFilename) + '?width=100'
+                            : '';
+                        return (
+                            '<div class="candidate-card">' +
+                                '<div class="candidate-photo">' + (photoUrl ? '<img src="' + photoUrl + '" alt="">' : '?') + '</div>' +
+                                '<div class="candidate-body">' +
+                                    '<h3>' + esc(c.label) + (c.labelJa ? '（' + esc(c.labelJa) + '）' : '') + '</h3>' +
+                                    '<p>' + esc(c.description || '') + '</p>' +
+                                    '<div class="candidate-tags">' +
+                                        (c.country ? '<span>' + esc(c.country) + '</span>' : '') +
+                                        (c.position ? '<span>' + esc(translatePosition(c.position)) + '</span>' : '') +
+                                        (c.clubTeams[0] ? '<span>' + esc(c.clubTeams[c.clubTeams.length - 1]) + '</span>' : '') +
+                                    '</div>' +
+                                '</div>' +
+                                '<button class="btn btn-outline" data-select="' + i + '">この選手を選択</button>' +
+                            '</div>'
+                        );
+                    }).join('') +
+                '</div>';
+
+                wrap.querySelectorAll('[data-select]').forEach(btn => {
+                    btn.addEventListener('click', function () { selectCandidate(Number(this.getAttribute('data-select'))); });
+                });
+            } catch (e) {
+                wrap.innerHTML = '';
+                logMsg('searchLog', '✗ 検索に失敗しました: ' + (e.message || e), true);
+            }
+        }
+
+        // ==== 選択後: 追加詳細取得 → 重複チェック → 確認フォーム ====
+        async function selectCandidate(idx) {
+            const c = lastCandidates[idx];
+            const confirmWrap = document.getElementById('confirmWrap');
+            confirmWrap.innerHTML = '<div class="card"><div class="empty-note">詳細を取得中...</div></div>';
+            confirmWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            let photo = null;
+            let wikipediaUrl = null;
+            try {
+                [photo, wikipediaUrl] = await Promise.all([
+                    fetchCommonsLicense(c.imageFilename),
+                    fetchWikipediaUrl(c.qid)
+                ]);
+            } catch (e) { /* 取得できなくても続行（画像なし・リンクなしで確認画面へ） */ }
+
+            let dupCheck = { exists: false, duplicates: [] };
+            try {
+                if (typeof GegenPressAPI !== 'undefined') {
+                    const res = await GegenPressAPI.players.checkDuplicate(c.label, c.qid);
+                    if (res && res.success) dupCheck = res;
+                }
+            } catch (e) { /* 重複チェックに失敗しても続行 */ }
+
+            renderConfirmForm(c, photo, wikipediaUrl, dupCheck);
+        }
+
+        function renderConfirmForm(c, photo, wikipediaUrl, dupCheck) {
+            const wrap = document.getElementById('confirmWrap');
+            const playerId = slugify(c.label) + '-' + c.qid.toLowerCase();
+
+            let dupHtml = '';
+            if (dupCheck.exists && dupCheck.duplicates.length > 0) {
+                const d = dupCheck.duplicates[0];
+                dupHtml =
+                    '<div class="dup-banner">' +
+                        '<strong>⚠ 似た選手が既に登録されています</strong>' +
+                        esc(d.name) + '（' + esc(d.currentClub || '所属クラブ未設定') + '　登録: ' + esc(d.source === 'wikidata' ? 'Wikidata取込' : '手動登録') + '）' +
+                        '<div class="dup-actions">' +
+                            '<button class="btn" id="enrichExistingBtn" data-existing-id="' + esc(d.id) + '">この既存選手をWikidataの情報で更新する</button>' +
+                            '<button class="btn btn-outline" id="createNewAnywayBtn">気にせず新規登録する</button>' +
+                        '</div>' +
+                    '</div>';
+            }
+
+            const photoHtml = photo
+                ? '<div class="photo-preview"><img src="' + photo.url + '" alt="">' +
+                    '<div class="meta">ライセンス: ' + esc(photo.license) + '<br>作者: ' + esc(photo.author) +
+                    '<br><a href="' + esc(photo.source) + '" target="_blank" rel="noopener">Wikimedia Commonsで見る</a></div></div>'
+                : '<div class="photo-none">Wikimedia Commonsに、ライセンス・作者の両方が確認できる画像が見つかりませんでした。写真は登録されません（デフォルト表示になります）。</div>';
+
+            wrap.innerHTML =
+                '<div class="card">' +
+                    dupHtml +
+                    '<h3 style="font-size:14px; margin-bottom:10px;">内容を確認・編集してください</h3>' +
+                    photoHtml +
+                    '<div class="field-grid">' +
+                        field('name', '選手名（表示用）', c.label, false) +
+                        field('nameRomaji', 'ローマ字表記', c.label, false) +
+                        field('nameJa', '日本語名', c.labelJa || '', false) +
+                        field('birthDate', '生年月日', c.birthDate || '', false, 'date') +
+                        field('height', '身長(cm)', c.heightCm || '', false, 'number') +
+                        selectField('preferredFoot', '利き足', ['', '右', '左', '両足'], '') +
+                        field('position', 'ポジション', translatePosition(c.position), false) +
+                        field('nationality', '国籍', c.country || '', false) +
+                        field('nationalTeam', '代表チーム', (c.natTeams && c.natTeams[0]) || '', false) +
+                        field('shirtNumber', '背番号', '', false) +
+                    '</div>' +
+                    (c.clubTeams && c.clubTeams.length > 0
+                        ? '<p class="status-note">Wikidataの所属履歴（参考・自動判定不可）: ' + esc(c.clubTeams.join(' → ')) + '</p>' : '') +
+                    '<div style="margin-top:14px;">' +
+                        '<label style="font-size:10.5px; color:#999; display:block; margin-bottom:3px;">現所属クラブ（クラブマスタから選択）</label>' +
+                        '<select class="form-input" id="fCurrentClubContinent" style="width:100%; padding:6px 8px; border:1px solid #ddd; border-radius:2px; font-size:12.5px; margin-bottom:6px;"><option value="">大陸を選択してください</option></select>' +
+                        '<select class="form-input" id="fCurrentClubLeague" style="width:100%; padding:6px 8px; border:1px solid #ddd; border-radius:2px; font-size:12.5px; margin-bottom:6px;" disabled><option value="">まず大陸を選んでください</option></select>' +
+                        '<select class="form-input" id="fCurrentClubSelect" style="width:100%; padding:6px 8px; border:1px solid #ddd; border-radius:2px; font-size:12.5px;" disabled><option value="">まずリーグを選んでください</option></select>' +
+                    '</div>' +
+                    '<div style="margin-top:16px; display:flex; gap:10px; align-items:center;">' +
+                        '<button class="btn" id="saveNewBtn">この内容で新規登録する</button>' +
+                        '<span class="status-note" id="saveStatus"></span>' +
+                    '</div>' +
+                '</div>';
+
+            setupClubPickerForImport('fCurrentClubContinent', 'fCurrentClubLeague', 'fCurrentClubSelect');
+
+            if (dupCheck.exists && dupCheck.duplicates.length > 0) {
+                document.getElementById('createNewAnywayBtn').addEventListener('click', () => {
+                    wrap.querySelector('.dup-banner').style.display = 'none';
+                });
+                document.getElementById('enrichExistingBtn').addEventListener('click', function () {
+                    saveImportedPlayer(c, photo, wikipediaUrl, playerId, this.getAttribute('data-existing-id'));
+                });
+            }
+            document.getElementById('saveNewBtn').addEventListener('click', () => saveImportedPlayer(c, photo, wikipediaUrl, playerId, null));
+        }
+
+        function field(id, label, value, disabled, type) {
+            return '<div><label>' + esc(label) + '</label><input type="' + (type || 'text') + '" id="f_' + id + '" value="' + esc(value) + '"' + (disabled ? ' disabled' : '') + '></div>';
+        }
+        function selectField(id, label, options, selected) {
+            return '<div><label>' + esc(label) + '</label><select id="f_' + id + '">' +
+                options.map(o => '<option value="' + esc(o) + '"' + (o === selected ? ' selected' : '') + '>' + (o || '未設定') + '</option>').join('') +
+                '</select></div>';
+        }
+
+        // 選手追加ページ（add_player.html）と同じ、大陸→リーグ→クラブのカスケード選択
+        let MASTER_CLUBS_IMPORT = [];
+        async function setupClubPickerForImport(contId, leagueId, clubId) {
+            if (typeof GegenPressAPI === 'undefined' || !GegenPressAPI.clubs || !GegenPressAPI.clubs.getAll) return;
+            if (MASTER_CLUBS_IMPORT.length === 0) {
+                try {
+                    const res = await GegenPressAPI.clubs.getAll();
+                    if (res && res.success) {
+                        MASTER_CLUBS_IMPORT = (res.clubs || [])
+                            .filter(c => /^[a-z0-9-]+$/.test(c.id) && (c.displayNameJa || c.displayNameEn))
+                            .map(c => ({ clubId: c.id, label: c.displayNameJa || c.displayNameEn, leagueId: c.leagueId || null }));
+                    }
+                } catch (e) { /* クラブマスタが取れなくても手動選択なしで進める */ }
+            }
+            const LEAGUES = (typeof GegenPressClubsData !== 'undefined') ? GegenPressClubsData.LEAGUES : [];
+            const continents = (typeof GegenPressClubsData !== 'undefined') ? GegenPressClubsData.CONTINENTS_LEAGUE : [];
+            const contSel = document.getElementById(contId);
+            const leagueSel = document.getElementById(leagueId);
+            const clubSel = document.getElementById(clubId);
+            if (!contSel) return;
+            contSel.innerHTML = '<option value="">大陸を選択してください</option>' + continents.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
+            contSel.addEventListener('change', function () {
+                const list = LEAGUES.filter(l => l.continent === this.value);
+                leagueSel.disabled = list.length === 0;
+                leagueSel.innerHTML = '<option value="">リーグを選択してください</option>' +
+                    list.map(l => '<option value="' + esc(l.leagueId) + '">' + esc(l.nameJa) + '（' + esc(l.country) + '）</option>').join('');
+                clubSel.innerHTML = '<option value="">まずリーグを選んでください</option>';
+                clubSel.disabled = true;
+            });
+            leagueSel.addEventListener('change', function () {
+                const list = MASTER_CLUBS_IMPORT.filter(c => c.leagueId === this.value);
+                clubSel.disabled = false;
+                clubSel.innerHTML = '<option value="">未設定</option>' + list.map(c => '<option value="' + esc(c.clubId) + '">' + esc(c.label) + '</option>').join('');
+            });
+        }
+
+        // ==== 保存 ====
+        async function saveImportedPlayer(c, photo, wikipediaUrl, playerId, existingId) {
+            const btn = existingId ? document.getElementById('enrichExistingBtn') : document.getElementById('saveNewBtn');
+            const statusEl = document.getElementById('saveStatus');
+            btn.disabled = true;
+            statusEl.textContent = '保存中...';
+
+            const clubSel = document.getElementById('fCurrentClubSelect');
+            const clubOpt = clubSel && clubSel.selectedOptions[0];
+            const currentClubId = (clubSel && clubSel.value) || null;
+            const currentClub = (clubOpt && clubOpt.textContent !== '未設定') ? clubOpt.textContent : null;
+
+            const payload = {
+                name: document.getElementById('f_name').value.trim(),
+                nameRomaji: document.getElementById('f_nameRomaji').value.trim() || null,
+                position: document.getElementById('f_position').value.trim() || null,
+                nationality: document.getElementById('f_nationality').value.trim() || null,
+                currentClub: currentClub,
+                currentClubId: currentClubId,
+                birthDate: document.getElementById('f_birthDate').value || null,
+                height: document.getElementById('f_height').value ? Number(document.getElementById('f_height').value) : null,
+                preferredFoot: document.getElementById('f_preferredFoot').value || null,
+                shirtNumber: document.getElementById('f_shirtNumber').value.trim() || null,
+                nationalTeam: document.getElementById('f_nationalTeam').value.trim() || null,
+                wikidataId: c.qid,
+                wikipediaUrl: wikipediaUrl || null,
+                aliases: Array.from(new Set([c.label, document.getElementById('f_nameJa').value.trim()].filter(Boolean))),
+                photoUrl: photo ? photo.url : null,
+                photoLicense: photo ? photo.license : null,
+                photoAuthor: photo ? photo.author : null,
+                photoSource: photo ? photo.source : null,
+                source: 'wikidata',
+                allowDuplicate: true // このページでは事前に重複確認済みのため、API側の重複チェックは通過させる
+            };
+
+            try {
+                let res;
+                if (existingId) {
+                    res = await GegenPressAPI.players.update(existingId, payload);
+                } else {
+                    payload.playerId = playerId;
+                    res = await GegenPressAPI.players.create(payload);
+                }
+                if (res && res.success) {
+                    statusEl.textContent = '✓ 保存しました（' + (existingId ? '既存選手を更新' : '新規登録') + '）';
+                    btn.textContent = '完了';
+                } else {
+                    statusEl.textContent = '✗ ' + ((res && res.message) || '保存に失敗しました');
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                statusEl.textContent = '✗ エラー: ' + (e.message || e);
+                btn.disabled = false;
+            }
+        }
+
+        // ==== 管理者ゲート ====
+        async function init() {
+            if (typeof GegenPressAPI === 'undefined') {
+                document.getElementById('loadingBox').textContent = '読み込めませんでした。';
+                return;
+            }
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+            if (!user || !GegenPressAPI.isAdminUid(user.uid)) {
+                document.getElementById('loadingBox').style.display = 'none';
+                document.getElementById('deniedBox').style.display = 'block';
+                return;
+            }
+            document.getElementById('loadingBox').style.display = 'none';
+            document.getElementById('mainArea').style.display = 'block';
+        }
+        init();
+    </script>
+</body>
+</html>

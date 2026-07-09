@@ -681,6 +681,36 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">生年月日 <span class="optional-badge">任意</span></label>
+                    <input type="date" class="form-input" id="birthDate">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">身長(cm) <span class="optional-badge">任意</span></label>
+                    <input type="number" class="form-input" id="height" placeholder="例: 178">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">利き足 <span class="optional-badge">任意</span></label>
+                    <select class="form-input" id="preferredFoot">
+                        <option value="">未設定</option>
+                        <option value="右">右</option>
+                        <option value="左">左</option>
+                        <option value="両足">両足</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">背番号 <span class="optional-badge">任意</span></label>
+                    <input type="text" class="form-input" id="shirtNumber" placeholder="例: 7">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">代表チーム <span class="optional-badge">任意</span></label>
+                    <input type="text" class="form-input" id="nationalTeam" placeholder="例: フランス代表">
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">市場価値 <span class="optional-badge">任意</span></label>
                     <p class="form-hint">例: 8000万ユーロ　※自動取得ではなく手入力です（transfermarkt等を参考に入力してください）</p>
                     <input type="text" class="form-input" id="marketValue" placeholder="例: 8000万ユーロ">
@@ -1103,6 +1133,11 @@
                 tryApplyEditClubFields(); // 未読込みならここでは何もせず、initClubPickers側の完了時に再実行される
             }
             document.getElementById('playerPosition').value = editingPlayer.position || '';
+            document.getElementById('birthDate').value = editingPlayer.birthDate || '';
+            document.getElementById('height').value = editingPlayer.height || '';
+            document.getElementById('preferredFoot').value = editingPlayer.preferredFoot || '';
+            document.getElementById('shirtNumber').value = editingPlayer.shirtNumber || '';
+            document.getElementById('nationalTeam').value = editingPlayer.nationalTeam || '';
             document.getElementById('marketValue').value = editingPlayer.marketValue || '';
             if (editingPlayer.nationality) {
                 const natMatch = CLUBS_DATA ? CLUBS_DATA.NATIONALITIES.find(n => n.name === editingPlayer.nationality) : null;
@@ -1261,6 +1296,11 @@
                 currentClub: document.getElementById('currentClub').value.trim() || null,
                 currentClubId: document.getElementById('currentClubId').value.trim() || null,
                 position: document.getElementById('playerPosition').value.trim() || null,
+                birthDate: document.getElementById('birthDate').value || null,
+                height: document.getElementById('height').value ? Number(document.getElementById('height').value) : null,
+                preferredFoot: document.getElementById('preferredFoot').value || null,
+                shirtNumber: document.getElementById('shirtNumber').value.trim() || null,
+                nationalTeam: document.getElementById('nationalTeam').value.trim() || null,
                 marketValue: document.getElementById('marketValue').value.trim() || null,
                 nationality: document.getElementById('nationality').value.trim() || null,
                 transferStatus: selectedTransferStatus,

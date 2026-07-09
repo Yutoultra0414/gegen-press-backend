@@ -455,6 +455,9 @@
                 let badge = '';
                 if (p.transferStatus === 'rumor') badge = '<span class="transfer-badge rumor">移籍の噂</span>';
                 else if (p.transferStatus === 'completed') badge = '<span class="transfer-badge completed">移籍決定</span>';
+                const wikidataBadge = p.source === 'wikidata'
+                    ? '<span style="font-size:9.5px; font-weight:bold; background:#eef4ff; color:#1d3557; padding:2px 7px; border-radius:10px; margin-right:6px;">Wikidata</span>'
+                    : '';
                 const viewsHtml = (mode === 'views')
                     ? '<span style="font-size:11px; color:#999; margin-right:8px;">👁 ' + formatViews(p._recentViews || 0) + '</span>'
                     : '';
@@ -467,6 +470,7 @@
                         '</div>' +
                         badge +
                         viewsHtml +
+                        wikidataBadge +
                         '<div class="player-row-club">' + esc(p.currentClub || '') + '</div>' +
                     '</div>'
                 );
