@@ -124,10 +124,34 @@
     var CONTINENTS_CLUB = ['ヨーロッパ', 'アジア', '南米', '北中米', 'アフリカ', 'オセアニア'];
     var CONTINENTS_NATIONALITY = ['アジア', 'ヨーロッパ', '南米', '北中米', 'アフリカ', 'オセアニア'];
 
+    // クラブマスタ管理ページ（gegen_press_club_import.html）が対象とするリーグ一覧。
+    // 「大陸→国→リーグ→クラブ」の絞り込みで使う。新しいリーグを増やす時はここに1行追加するだけでよい。
+    var LEAGUES = [
+        { leagueId: 'premier-league', nameJa: 'プレミアリーグ', nameEn: 'Premier League', country: 'イングランド', continent: 'ヨーロッパ' },
+        { leagueId: 'championship', nameJa: 'チャンピオンシップ', nameEn: 'EFL Championship', country: 'イングランド', continent: 'ヨーロッパ' },
+        { leagueId: 'laliga', nameJa: 'ラ・リーガ', nameEn: 'La Liga', country: 'スペイン', continent: 'ヨーロッパ' },
+        { leagueId: 'bundesliga', nameJa: 'ブンデスリーガ', nameEn: 'Bundesliga', country: 'ドイツ', continent: 'ヨーロッパ' },
+        { leagueId: 'serie-a', nameJa: 'セリエA', nameEn: 'Serie A', country: 'イタリア', continent: 'ヨーロッパ' },
+        { leagueId: 'ligue-1', nameJa: 'リーグ・アン', nameEn: 'Ligue 1', country: 'フランス', continent: 'ヨーロッパ' },
+        { leagueId: 'eredivisie', nameJa: 'エールディヴィジ', nameEn: 'Eredivisie', country: 'オランダ', continent: 'ヨーロッパ' },
+        { leagueId: 'primeira-liga', nameJa: 'プリメイラ・リーガ', nameEn: 'Primeira Liga', country: 'ポルトガル', continent: 'ヨーロッパ' },
+        { leagueId: 'belgian-pro-league', nameJa: 'ベルギー・プロリーグ', nameEn: 'Belgian Pro League', country: 'ベルギー', continent: 'ヨーロッパ' },
+        { leagueId: 'scottish-premiership', nameJa: 'スコティッシュ・プレミアシップ', nameEn: 'Scottish Premiership', country: 'スコットランド', continent: 'ヨーロッパ' },
+        { leagueId: 'mls', nameJa: 'MLS', nameEn: 'Major League Soccer', country: 'アメリカ', continent: '北中米' },
+        { leagueId: 'j1', nameJa: 'J1リーグ', nameEn: 'J1 League', country: '日本', continent: 'アジア' },
+        { leagueId: 'j2', nameJa: 'J2リーグ', nameEn: 'J2 League', country: '日本', continent: 'アジア' },
+        { leagueId: 'brasileirao', nameJa: 'ブラジル全国選手権シリーズA', nameEn: 'Campeonato Brasileiro Série A', country: 'ブラジル', continent: '南米' },
+        { leagueId: 'liga-profesional-argentina', nameJa: 'アルゼンチン・プロフェッショナルリーグ', nameEn: 'Liga Profesional de Fútbol', country: 'アルゼンチン', continent: '南米' },
+        { leagueId: 'saudi-pro-league', nameJa: 'サウジ・プロリーグ', nameEn: 'Saudi Pro League', country: 'サウジアラビア', continent: 'アジア' }
+    ];
+    var CONTINENTS_LEAGUE = ['ヨーロッパ', 'アジア', '南米', '北中米', 'アフリカ', 'オセアニア'];
+
     global.GegenPressClubsData = {
         CLUBS: CLUBS,
         NATIONALITIES: NATIONALITIES,
         CONTINENTS_CLUB: CONTINENTS_CLUB,
-        CONTINENTS_NATIONALITY: CONTINENTS_NATIONALITY
+        CONTINENTS_NATIONALITY: CONTINENTS_NATIONALITY,
+        LEAGUES: LEAGUES,
+        CONTINENTS_LEAGUE: CONTINENTS_LEAGUE
     };
 })(window);

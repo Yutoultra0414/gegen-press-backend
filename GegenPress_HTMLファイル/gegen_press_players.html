@@ -365,6 +365,14 @@
             <span>探している選手が見つからない？あなたが追加できます。</span>
             <a href="gegen_press_add_player.html">選手を追加</a>
         </div>
+        <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px; margin-bottom:10px;">
+            <label for="sortSelect" style="font-size:12px; color:#888;">並び替え:</label>
+            <select id="sortSelect" style="font-size:12.5px; padding:6px 10px; border:1px solid #ddd; border-radius:2px; font-family:inherit;">
+                <option value="views">閲覧数が多い順（直近7日間）</option>
+                <option value="name">名前（あいうえお順）</option>
+                <option value="newest">登録が新しい順</option>
+            </select>
+        </div>
         <div class="players-list" id="playersList">
             <div class="empty-note">読み込み中...</div>
         </div>
@@ -393,6 +401,84 @@
             return PALETTE[h % PALETTE.length];
         }
 
+        // 直近7日間の閲覧数を合計する（トップページと同じロジック）
+        function sumRecentViews(player, days) {
+            const byDay = player.viewsByDay || {};
+            let total = 0;
+            const today = new Date();
+            for (let i = 0; i < days; i++) {
+                const d = new Date(today);
+                d.setUTCDate(d.getUTCDate() - i);
+                total += byDay[d.toISOString().slice(0, 10)] || 0;
+            }
+            return total;
+        }
+        function formatViews(n) {
+            if (n >= 10000) return (n / 10000).toFixed(1).replace(/\.0$/, '') + '万';
+            return String(n);
+        }
+
+        let allPlayers = [];
+        const sortSelect = document.getElementById('sortSelect');
+        const initialSort = new URLSearchParams(window.location.search).get('sort');
+        if (initialSort && ['views', 'name', 'newest'].includes(initialSort)) sortSelect.value = initialSort;
+
+        function renderPlayers() {
+            const list = document.getElementById('playersList');
+            const mode = sortSelect.value;
+            let players = allPlayers.slice();
+
+            if (mode === 'views') {
+                players.forEach(p => { p._recentViews = sumRecentViews(p, 7); });
+                players.sort((a, b) => b._recentViews - a._recentViews);
+            } else if (mode === 'name') {
+                const collator = (typeof Intl !== 'undefined') ? new Intl.Collator('ja') : null;
+                players.sort((a, b) => collator ? collator.compare(a.name || '', b.name || '') : (a.name || '').localeCompare(b.name || ''));
+            } else if (mode === 'newest') {
+                players.sort((a, b) => {
+                    const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                    const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                    return tb - ta;
+                });
+            }
+
+            if (players.length === 0) {
+                list.innerHTML = '<div class="empty-note">まだ選手が登録されていません。「選手を追加」から最初の1人を登録してみましょう。</div>';
+                return;
+            }
+            list.innerHTML = players.map(p => {
+                const g = colorFor(p.name);
+                const avatar = p.profileImage
+                    ? '<img src="' + p.profileImage + '" alt="">'
+                    : esc(getInitials(p.name));
+                const avatarStyle = p.profileImage ? '' : ('background: ' + g[0] + ';');
+                let badge = '';
+                if (p.transferStatus === 'rumor') badge = '<span class="transfer-badge rumor">移籍の噂</span>';
+                else if (p.transferStatus === 'completed') badge = '<span class="transfer-badge completed">移籍決定</span>';
+                const viewsHtml = (mode === 'views')
+                    ? '<span style="font-size:11px; color:#999; margin-right:8px;">👁 ' + formatViews(p._recentViews || 0) + '</span>'
+                    : '';
+                return (
+                    '<div class="player-row" data-id="' + esc(p.id) + '">' +
+                        '<div class="player-row-avatar" style="' + avatarStyle + '">' + avatar + '</div>' +
+                        '<div class="player-row-name">' +
+                            '<h3>' + esc(p.name) + (p.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(p.nameRomaji) + '</span>' : '') + '</h3>' +
+                            '<p>' + esc(p.position || '') + (p.nationality ? ' ・ ' + esc(p.nationality) : '') + '</p>' +
+                        '</div>' +
+                        badge +
+                        viewsHtml +
+                        '<div class="player-row-club">' + esc(p.currentClub || '') + '</div>' +
+                    '</div>'
+                );
+            }).join('');
+            list.querySelectorAll('.player-row').forEach(el => {
+                el.addEventListener('click', () => {
+                    window.location.href = 'gegen_press_player_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                });
+            });
+        }
+        sortSelect.addEventListener('change', renderPlayers);
+
         async function loadPlayers() {
             const list = document.getElementById('playersList');
             if (typeof GegenPressAPI === 'undefined') {
@@ -401,36 +487,12 @@
             }
             try {
                 const res = await GegenPressAPI.players.getAll();
-                if (!res || !res.success || !res.players || res.players.length === 0) {
-                    list.innerHTML = '<div class="empty-note">まだ選手が登録されていません。「選手を追加」から最初の1人を登録してみましょう。</div>';
+                if (!res || !res.success || !res.players) {
+                    list.innerHTML = '<div class="empty-note">読み込みに失敗しました。</div>';
                     return;
                 }
-                list.innerHTML = res.players.map(p => {
-                    const g = colorFor(p.name);
-                    const avatar = p.profileImage
-                        ? '<img src="' + p.profileImage + '" alt="">'
-                        : esc(getInitials(p.name));
-                    const avatarStyle = p.profileImage ? '' : ('background: ' + g[0] + ';');
-                    let badge = '';
-                    if (p.transferStatus === 'rumor') badge = '<span class="transfer-badge rumor">移籍の噂</span>';
-                    else if (p.transferStatus === 'completed') badge = '<span class="transfer-badge completed">移籍決定</span>';
-                    return (
-                        '<div class="player-row" data-id="' + esc(p.id) + '">' +
-                            '<div class="player-row-avatar" style="' + avatarStyle + '">' + avatar + '</div>' +
-                            '<div class="player-row-name">' +
-                                '<h3>' + esc(p.name) + (p.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(p.nameRomaji) + '</span>' : '') + '</h3>' +
-                                '<p>' + esc(p.position || '') + (p.nationality ? ' ・ ' + esc(p.nationality) : '') + '</p>' +
-                            '</div>' +
-                            badge +
-                            '<div class="player-row-club">' + esc(p.currentClub || '') + '</div>' +
-                        '</div>'
-                    );
-                }).join('');
-                list.querySelectorAll('.player-row').forEach(el => {
-                    el.addEventListener('click', () => {
-                        window.location.href = 'gegen_press_player_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
-                    });
-                });
+                allPlayers = res.players;
+                renderPlayers();
             } catch (e) {
                 list.innerHTML = '<div class="empty-note">読み込み中にエラーが発生しました。</div>';
             }

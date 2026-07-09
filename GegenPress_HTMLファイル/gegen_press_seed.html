@@ -75,6 +75,16 @@
         <div id="resetLog" style="font-size:12px; line-height:1.9; background:#1d1d1d; color:#ffd7d7; border-radius:6px; padding:12px; min-height:60px; max-height:280px; overflow-y:auto; white-space:pre-wrap; font-family:Consolas, monospace; margin-top:10px;">まだ実行していません。</div>
     </div>
 
+    <div class="section" style="border-top:2px solid #eee; padding-top:16px; margin-top:16px;">
+        <h2 style="color:#c0392b;">4. 選手のリセット（全削除）</h2>
+        <p style="font-size:13px; color:#666; margin-bottom:10px; line-height:1.6;">
+            players（選手）コレクションの中身を、ユーザー投稿分も含めて<strong>全件削除</strong>します。
+            クラブマスタ導入前の古いデータ（currentClubIdが無く、アイコンが表示されない選手）を一掃したい場合に使ってください。
+        </p>
+        <button class="btn-white" id="resetPlayersBtn" disabled style="border-color:#c0392b; color:#c0392b;">選手を全削除する</button>
+        <div id="resetPlayersLog" style="font-size:12px; line-height:1.9; background:#1d1d1d; color:#ffd7d7; border-radius:6px; padding:12px; min-height:60px; max-height:280px; overflow-y:auto; white-space:pre-wrap; font-family:Consolas, monospace; margin-top:10px;">まだ実行していません。</div>
+    </div>
+
     <div class="note">
         投入されるデータ: 記者 rep_fabrizio / rep_skysports / rep_marca / rep_goal / rep_as / rep_calcio、記事 art_001〜art_006。<br>
         すでに投入済みの場合、上書きはセキュリティルールにより拒否されます（エラーになりますが正常です）。
@@ -105,8 +115,11 @@ const logEl = document.getElementById('log');
 const seedBtn = document.getElementById('seedBtn');
 const resetBtn = document.getElementById('resetBtn');
 const resetLogEl = document.getElementById('resetLog');
+const resetPlayersBtn = document.getElementById('resetPlayersBtn');
+const resetPlayersLogEl = document.getElementById('resetPlayersLog');
 function log(msg) { logEl.textContent += '\n' + msg; logEl.scrollTop = logEl.scrollHeight; }
 function resetLog(msg) { resetLogEl.textContent += '\n' + msg; resetLogEl.scrollTop = resetLogEl.scrollHeight; }
+function resetPlayersLog(msg) { resetPlayersLogEl.textContent += '\n' + msg; resetPlayersLogEl.scrollTop = resetPlayersLogEl.scrollHeight; }
 
 async function refreshStatus() {
     try {
@@ -115,10 +128,12 @@ async function refreshStatus() {
             statusEl.textContent = 'ログイン中: ' + (u.email || u.displayName || u.uid) + '（UID: ' + u.uid + '）';
             seedBtn.disabled = false;
             resetBtn.disabled = false;
+            resetPlayersBtn.disabled = false;
         } else {
             statusEl.textContent = '未ログインです。Googleまたはメールでログインしてください。';
             seedBtn.disabled = true;
             resetBtn.disabled = true;
+            resetPlayersBtn.disabled = true;
         }
     } catch (e) {
         statusEl.textContent = 'Firebase接続エラー: ' + e;
@@ -221,6 +236,32 @@ resetBtn.addEventListener('click', async () => {
     }
     resetBtn.textContent = '記者・記事を全削除する';
     resetBtn.disabled = false;
+});
+
+resetPlayersBtn.addEventListener('click', async () => {
+    if (!confirm('players（選手）の全データを削除します。元に戻せません。本当に実行しますか？')) return;
+    resetPlayersBtn.disabled = true;
+    resetPlayersBtn.textContent = '削除中...';
+    resetPlayersLogEl.textContent = '削除を開始します。';
+    try {
+        const db = await GegenPressAPI._db();
+        resetPlayersLog('選手(players)を削除中...');
+        const playersSnap = await db.collection('players').get();
+        resetPlayersLog('対象: ' + playersSnap.size + '件');
+        for (const doc of playersSnap.docs) {
+            try {
+                await db.collection('players').doc(doc.id).delete();
+                resetPlayersLog('  削除OK  ' + doc.id + '（' + (doc.data().name || '') + '）');
+            } catch (e) {
+                resetPlayersLog('  削除NG  ' + doc.id + ' : ' + (e.code || e.message || e));
+            }
+        }
+        resetPlayersLog('完了しました。');
+    } catch (e) {
+        resetPlayersLog('エラー: ' + e);
+    }
+    resetPlayersBtn.textContent = '選手を全削除する';
+    resetPlayersBtn.disabled = false;
 });
 </script>
 </body>

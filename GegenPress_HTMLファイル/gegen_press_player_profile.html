@@ -480,6 +480,7 @@
             }
             const p = res.player;
             currentPlayer = p;
+            try { GegenPressAPI.players.incrementView(playerId); } catch (e) {}
             document.title = p.name + ' - Gegen Press!';
             document.getElementById('playerName').textContent = p.name;
             const romajiEl = document.getElementById('playerNameRomaji');

@@ -341,13 +341,18 @@
             position: data.position || null,
             nationality: data.nationality || null,
             currentClub: data.currentClub || null,
+            currentClubId: data.currentClubId || null,
             marketValue: data.marketValue || null,
             transferStatus: data.transferStatus || null, // 'rumor' | 'completed' | null
             fromClub: data.fromClub || null,
+            fromClubId: data.fromClubId || null,
             toClub: data.toClub || null,
+            toClubId: data.toClubId || null,
             transferFee: data.transferFee || null,
             bio: data.bio || '',
             profileImage: null,
+            views: 0,
+            viewsByDay: {},
             createdBy: u.uid,
             source: 'user',
             createdAt: tsNow(), updatedAt: tsNow()
@@ -367,6 +372,19 @@
             if (k !== 'allowDuplicate') patch[k] = data[k];
           });
           patch.updatedAt = tsNow();
+          await fb.db.collection('players').doc(id).update(patch);
+          return { success: true };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      // 選手プロフィールの閲覧数を1増やす（ログイン不要）。
+      // 直近7日間の「話題の選手」集計のため、日付ごとの内訳も viewsByDay に記録する。
+      async incrementView(id) {
+        try {
+          var fb = await _ready;
+          var todayKey = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"（UTC基準）
+          var patch = {};
+          patch.views = firebase.firestore.FieldValue.increment(1);
+          patch['viewsByDay.' + todayKey] = firebase.firestore.FieldValue.increment(1);
           await fb.db.collection('players').doc(id).update(patch);
           return { success: true };
         } catch (e) { return { success: false, message: String(e) }; }

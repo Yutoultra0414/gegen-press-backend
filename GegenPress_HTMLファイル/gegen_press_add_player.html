@@ -659,9 +659,15 @@
                 <!-- 所属クラブ -->
                 <div class="form-group">
                     <label class="form-label">現所属クラブ <span class="optional-badge">任意</span></label>
-                    <p class="form-hint">「クラブマスタ管理」ページで登録されたクラブから選べます。一覧にない場合は「その他」を選んで直接入力してください。</p>
-                    <select class="form-input" id="currentClubSelect">
-                        <option value="">読み込み中...</option>
+                    <p class="form-hint">大陸→リーグの順に絞り込むと、そのリーグの登録済みクラブから選べます。一覧にない場合は「その他」を選んで直接入力してください。</p>
+                    <select class="form-input" id="currentClubContinent" style="margin-bottom:8px;">
+                        <option value="">大陸を選択してください</option>
+                    </select>
+                    <select class="form-input" id="currentClubLeague" style="margin-bottom:8px;" disabled>
+                        <option value="">まず大陸を選んでください</option>
+                    </select>
+                    <select class="form-input" id="currentClubSelect" disabled>
+                        <option value="">まずリーグを選んでください</option>
                     </select>
                     <input type="hidden" id="currentClubId" value="">
                     <input type="text" class="form-input" id="currentClub" placeholder="クラブ名を入力" style="display:none; margin-top:10px;">
@@ -701,14 +707,26 @@
                         <span class="expertise-tag" data-transfer="completed">移籍決定</span>
                     </div>
                     <p class="form-hint">移籍元クラブ</p>
-                    <select class="form-input" id="fromClubSelect" style="margin-bottom:6px;">
-                        <option value="">読み込み中...</option>
+                    <select class="form-input" id="fromClubContinent" style="margin-bottom:6px;">
+                        <option value="">大陸を選択してください</option>
+                    </select>
+                    <select class="form-input" id="fromClubLeague" style="margin-bottom:6px;" disabled>
+                        <option value="">まず大陸を選んでください</option>
+                    </select>
+                    <select class="form-input" id="fromClubSelect" style="margin-bottom:6px;" disabled>
+                        <option value="">まずリーグを選んでください</option>
                     </select>
                     <input type="hidden" id="fromClubId" value="">
                     <input type="text" class="form-input" id="fromClub" placeholder="移籍元クラブを入力" style="display:none; margin-bottom:10px;">
                     <p class="form-hint">移籍先クラブ</p>
-                    <select class="form-input" id="toClubSelect" style="margin-bottom:6px;">
-                        <option value="">読み込み中...</option>
+                    <select class="form-input" id="toClubContinent" style="margin-bottom:6px;">
+                        <option value="">大陸を選択してください</option>
+                    </select>
+                    <select class="form-input" id="toClubLeague" style="margin-bottom:6px;" disabled>
+                        <option value="">まず大陸を選んでください</option>
+                    </select>
+                    <select class="form-input" id="toClubSelect" style="margin-bottom:6px;" disabled>
+                        <option value="">まずリーグを選んでください</option>
                     </select>
                     <input type="hidden" id="toClubId" value="">
                     <input type="text" class="form-input" id="toClub" placeholder="移籍先クラブを入力" style="display:none; margin-bottom:10px;">
@@ -789,7 +807,7 @@
         // 「クラブマスタ管理」ページ（gegen_press_club_import.html）から登録された
         // クラブのみを候補に出す。まだ登録されていないクラブは「その他（自由入力）」から。
         // =========================================================
-        let MASTER_CLUBS = []; // { clubId, label } の配列（登録済みクラブのみ）
+        let MASTER_CLUBS = []; // { clubId, label, leagueId } の配列（登録済みクラブのみ）
         const JA_COLLATOR = (typeof Intl !== 'undefined') ? new Intl.Collator('ja') : null;
 
         async function loadMasterClubs() {
@@ -801,7 +819,7 @@
                     // clubId形式（半角英数字とハイフンのみ）のものだけを対象にする。
                     // 旧形式（クラブ名がドキュメントIDのロゴのみのデータ）は候補に出さない。
                     .filter(c => /^[a-z0-9-]+$/.test(c.id) && (c.displayNameJa || c.displayNameEn))
-                    .map(c => ({ clubId: c.id, label: c.displayNameJa || c.displayNameEn }));
+                    .map(c => ({ clubId: c.id, label: c.displayNameJa || c.displayNameEn, leagueId: c.leagueId || null }));
                 if (JA_COLLATOR) list.sort((a, b) => JA_COLLATOR.compare(a.label, b.label));
                 else list.sort((a, b) => a.label.localeCompare(b.label));
                 return list;
@@ -812,50 +830,107 @@
         }
 
         /**
-         * selectElId: クラブ選択用<select>のID
-         * hiddenIdElId: 選択したclubIdを保持する<input type=hidden>のID
-         * textElId: 表示名を保持する既存の<input type=text>のID（他ページとの互換用）
+         * 大陸→リーグ→クラブの3段階カスケード選択を1セット構築する。
+         * 「国」は今のリーグ一覧では基本的にリーグ1つ＝国1つのため、リーグの選択肢名に
+         * 国名を添えることで代替しています（例:「プレミアリーグ（イングランド）」）。
          */
-        function setupClubPicker(selectElId, hiddenIdElId, textElId) {
-            const sel = document.getElementById(selectElId);
+        function setupClubPicker(continentElId, leagueElId, selectElId, hiddenIdElId, textElId) {
+            const contSel = document.getElementById(continentElId);
+            const leagueSel = document.getElementById(leagueElId);
+            const clubSel = document.getElementById(selectElId);
             const hiddenId = document.getElementById(hiddenIdElId);
             const textEl = document.getElementById(textElId);
+            const LEAGUES = (CLUBS_DATA && CLUBS_DATA.LEAGUES) || [];
+            const continents = (CLUBS_DATA && CLUBS_DATA.CONTINENTS_LEAGUE) || [];
 
-            sel.innerHTML = '<option value="">未設定</option>' +
-                MASTER_CLUBS.map(c => '<option value="' + escapeHtml(c.clubId) + '">' + escapeHtml(c.label) + '</option>').join('') +
+            contSel.innerHTML = '<option value="">大陸を選択してください</option>' +
+                continents.map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('') +
                 '<option value="__other__">その他（一覧にないクラブを直接入力）</option>';
 
-            sel.addEventListener('change', function () {
+            function showFreeText() {
+                hiddenId.value = '';
+                textEl.style.display = 'block';
+                textEl.value = '';
+                textEl.focus();
+            }
+            function hideFreeText() {
+                textEl.style.display = 'none';
+                textEl.value = '';
+            }
+
+            function fillLeaguesForContinent(continent) {
+                if (continent === '__other__') {
+                    leagueSel.innerHTML = '<option value="__other__" selected>その他</option>';
+                    leagueSel.disabled = true;
+                    clubSel.innerHTML = '<option value="__other__" selected>その他</option>';
+                    clubSel.disabled = true;
+                    showFreeText();
+                    return;
+                }
+                const list = LEAGUES.filter(l => l.continent === continent);
+                leagueSel.disabled = list.length === 0;
+                leagueSel.innerHTML = '<option value="">リーグを選択してください</option>' +
+                    list.map(l => '<option value="' + escapeHtml(l.leagueId) + '">' + escapeHtml(l.nameJa) + '（' + escapeHtml(l.country) + '）</option>').join('') +
+                    '<option value="__other__">その他（一覧にないリーグ・クラブ）</option>';
+                clubSel.innerHTML = '<option value="">まずリーグを選んでください</option>';
+                clubSel.disabled = true;
+                hiddenId.value = '';
+                hideFreeText();
+            }
+
+            function fillClubsForLeague(leagueId) {
+                if (leagueId === '__other__') {
+                    clubSel.innerHTML = '<option value="__other__" selected>その他</option>';
+                    clubSel.disabled = true;
+                    showFreeText();
+                    return;
+                }
+                const list = MASTER_CLUBS.filter(c => c.leagueId === leagueId);
+                clubSel.disabled = false;
+                clubSel.innerHTML = '<option value="">未設定</option>' +
+                    list.map(c => '<option value="' + escapeHtml(c.clubId) + '">' + escapeHtml(c.label) + '</option>').join('') +
+                    '<option value="__other__">その他（一覧にないクラブを直接入力）</option>';
+                hiddenId.value = '';
+                hideFreeText();
+            }
+
+            contSel.addEventListener('change', function () { fillLeaguesForContinent(this.value); });
+            leagueSel.addEventListener('change', function () { fillClubsForLeague(this.value); });
+            clubSel.addEventListener('change', function () {
                 if (this.value === '__other__') {
-                    hiddenId.value = '';
-                    textEl.style.display = 'block';
-                    textEl.value = '';
-                    textEl.focus();
+                    showFreeText();
                 } else if (this.value) {
                     const match = MASTER_CLUBS.find(c => c.clubId === this.value);
                     hiddenId.value = this.value;
-                    textEl.style.display = 'none';
+                    hideFreeText();
                     textEl.value = match ? match.label : '';
                 } else {
                     hiddenId.value = '';
-                    textEl.style.display = 'none';
-                    textEl.value = '';
+                    hideFreeText();
                 }
             });
 
-            // 編集モードなどで外部からプログラム的に選択するためのヘルパー
             return {
                 selectByClubId: function (clubId) {
                     const match = MASTER_CLUBS.find(c => c.clubId === clubId);
                     if (!match) return false;
-                    sel.value = clubId;
+                    const league = match.leagueId ? LEAGUES.find(l => l.leagueId === match.leagueId) : null;
+                    if (league) {
+                        contSel.value = league.continent;
+                        fillLeaguesForContinent(league.continent);
+                        leagueSel.value = league.leagueId;
+                        fillClubsForLeague(league.leagueId);
+                        clubSel.value = clubId;
+                    }
+                    // リーグ情報が無い/リーグ一覧に無いクラブでも、名前だけは編集画面に表示する
                     hiddenId.value = clubId;
-                    textEl.style.display = 'none';
+                    hideFreeText();
                     textEl.value = match.label;
                     return true;
                 },
                 selectFreeText: function (text) {
-                    sel.value = '__other__';
+                    contSel.value = '__other__';
+                    fillLeaguesForContinent('__other__');
                     hiddenId.value = '';
                     textEl.style.display = 'block';
                     textEl.value = text || '';
@@ -873,9 +948,9 @@
                 document.getElementById('clubInfoBox').textContent =
                     'クラブマスタにまだクラブが登録されていません。「クラブマスタ管理」ページからロゴを登録すると、ここで選べるようになります。それまでは「その他」から直接入力してください。';
             }
-            currentClubPicker = setupClubPicker('currentClubSelect', 'currentClubId', 'currentClub');
-            fromClubPicker = setupClubPicker('fromClubSelect', 'fromClubId', 'fromClub');
-            toClubPicker = setupClubPicker('toClubSelect', 'toClubId', 'toClub');
+            currentClubPicker = setupClubPicker('currentClubContinent', 'currentClubLeague', 'currentClubSelect', 'currentClubId', 'currentClub');
+            fromClubPicker = setupClubPicker('fromClubContinent', 'fromClubLeague', 'fromClubSelect', 'fromClubId', 'fromClub');
+            toClubPicker = setupClubPicker('toClubContinent', 'toClubLeague', 'toClubSelect', 'toClubId', 'toClub');
             pickersReady = true;
             tryApplyEditClubFields();
         }

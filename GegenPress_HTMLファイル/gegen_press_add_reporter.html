@@ -656,8 +656,11 @@
                 <!-- 所属メディア -->
                 <div class="form-group">
                     <label class="form-label">所属メディア <span class="optional-badge">任意</span></label>
-                    <p class="form-hint">例: Sky Sports、Marca、The Athletic など。同じメディア名を登録した記者同士はメディアページでまとめて表示されます。</p>
-                    <input type="text" class="form-input" id="mediaOutlet" placeholder="所属メディアを入力">
+                    <p class="form-hint">「メディアを追加」で登録済みのメディアから選べます。一覧にない場合は「その他」から直接入力するか、先にメディアを登録してください。</p>
+                    <select class="form-input" id="mediaOutletSelect" style="margin-bottom:8px;">
+                        <option value="">読み込み中...</option>
+                    </select>
+                    <input type="text" class="form-input" id="mediaOutlet" placeholder="所属メディアを入力" style="display:none;">
                 </div>
 
                 <!-- 記者の種別 -->
@@ -763,6 +766,43 @@
             document.getElementById('loginNotice').style.display = 'block';
             document.getElementById('submitBtn').disabled = true;
         }
+
+        // =========================================================
+        // 所属メディアのプルダウン（「メディアを追加」で登録済みのメディア一覧から選ぶ）
+        // =========================================================
+        async function initMediaOutletPicker() {
+            const sel = document.getElementById('mediaOutletSelect');
+            const textEl = document.getElementById('mediaOutlet');
+            let mediaList = [];
+            if (API_AVAILABLE && GegenPressAPI.media && GegenPressAPI.media.getAll) {
+                try {
+                    const res = await GegenPressAPI.media.getAll();
+                    if (res && res.success) mediaList = (res.media || []).map(m => m.name || m.id).filter(Boolean);
+                } catch (e) { console.warn('メディア一覧の読み込みに失敗:', e); }
+            }
+            const collator = (typeof Intl !== 'undefined') ? new Intl.Collator('ja') : null;
+            mediaList.sort((a, b) => collator ? collator.compare(a, b) : a.localeCompare(b));
+
+            if (mediaList.length === 0) {
+                sel.style.display = 'none';
+                textEl.style.display = 'block';
+                return;
+            }
+            sel.innerHTML = '<option value="">未設定</option>' +
+                mediaList.map(m => '<option value="' + m.replace(/"/g, '&quot;') + '">' + m.replace(/</g, '&lt;') + '</option>').join('') +
+                '<option value="__other__">その他（一覧にないメディアを直接入力）</option>';
+            sel.addEventListener('change', function () {
+                if (this.value === '__other__') {
+                    textEl.style.display = 'block';
+                    textEl.value = '';
+                    textEl.focus();
+                } else {
+                    textEl.style.display = 'none';
+                    textEl.value = this.value;
+                }
+            });
+        }
+        initMediaOutletPicker();
 
         // =========================================================
         // 専門分野タグの選択
