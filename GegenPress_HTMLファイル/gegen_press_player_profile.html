@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>選手プロフィール - Gegen Press!</title>
     <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Hiragino Sans', 'Meiryo', 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
+        body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Meiryo', 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
 
         header {
-            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            background: #fff;
             border-bottom: 3px solid #e63946;
             padding: 14px 40px;
             display: flex; justify-content: space-between; align-items: center;
@@ -22,7 +25,7 @@
         .back-button { background: #e63946; color: #fff; border: none; padding: 9px 18px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; }
 
         .profile-header {
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            background: #e63946;
             padding: 22px 40px;
             position: relative;
             overflow: hidden;
@@ -38,7 +41,7 @@
         }
         .profile-avatar {
             width: 100px; height: 100px; border-radius: 8px;
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            background: #e63946;
             display: flex; align-items: center; justify-content: center;
             font-size: 32px; font-weight: 900; color: #fff;
             border: 3px solid rgba(255,255,255,0.85); overflow: hidden; flex-shrink: 0;
@@ -159,7 +162,7 @@
         }
         .gp-mypage .gp-en { color: #fff; font-size: 12px; }
         .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
-        .gp-mypage:hover { background: #ff6b6b; }
+        .gp-mypage:hover { background: #c5303c; }
         header.gp-header .search-bar {
             width: 150px !important;
             margin: 0 !important;
@@ -420,7 +423,7 @@
             return '<a href="gegen_press_club_profile.html?name=' + encodeURIComponent(clubName) + '" title="' + esc(clubName) + '" ' +
                 'style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; ' +
                 'font-size:9px; font-weight:900; color:#fff; text-decoration:none; margin-right:4px; ' +
-                'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%);">' + esc(getInitials(clubName)) + '</a>';
+                'background: ' + g[0] + ';">' + esc(getInitials(clubName)) + '</a>';
         }
 
         const playerId = new URLSearchParams(window.location.search).get('id');
@@ -434,7 +437,7 @@
             } else {
                 el.textContent = getInitials(p.name);
                 const g = colorFor(p.name);
-                el.style.background = 'linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%)';
+                el.style.background = g[0];
             }
         }
 

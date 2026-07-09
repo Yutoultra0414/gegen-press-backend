@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>検索結果 | Gegen Press!</title>
     <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,7 +16,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Noto Sans JP', 'Segoe UI', 'Hiragino Sans', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f5f5;
             color: #333;
         
@@ -22,13 +25,13 @@
 
         /* ヘッダー */
         header {
-            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            background: #fff;
             border-bottom: 3px solid #e63946;
             padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.15);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.09);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -79,12 +82,12 @@
         }
 
         .back-button:hover {
-            background-color: #ff6b6b;
+            background-color: #c5303c;
         }
 
         /* 検索ヘッダー */
         .search-header {
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            background: #e63946;
             padding: 60px 40px;
             position: relative;
             overflow: hidden;
@@ -160,7 +163,7 @@
         }
 
         .filter-box {
-            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            background: #fff;
             border: 2px solid #ddd;
             border-radius: 8px;
             padding: 20px;
@@ -251,7 +254,7 @@
         }
 
         .result-item {
-            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            background: #fff;
             border: 2px solid #ddd;
             border-left: 4px solid #e63946;
             border-radius: 6px;
@@ -262,7 +265,7 @@
 
         .result-item:hover {
             border-color: #e63946;
-            box-shadow: 0 8px 20px rgba(230, 57, 70, 0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
             transform: translateX(5px);
         }
 
@@ -299,7 +302,7 @@
         .author-avatar {
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            background: #e63946;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -546,7 +549,7 @@
         }
         .gp-mypage .gp-en { color: #fff; font-size: 12px; }
         .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
-        .gp-mypage:hover { background: #ff6b6b; }
+        .gp-mypage:hover { background: #c5303c; }
         header.gp-header .search-bar {
             width: 150px !important;
             margin: 0 !important;
@@ -912,7 +915,7 @@
         }
         function avatarStyle(name) {
             const g = avatarColor(name);
-            return 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%); color:#fff;';
+            return 'background: ' + g[0] + '; color:#fff;';
         }
         function fmtDate(ts) {
             try {

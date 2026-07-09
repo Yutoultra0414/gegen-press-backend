@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>マイページ - Gegen Press!</title>
     <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+            font-family: 'Noto Sans JP', 'Hiragino Sans', 'Meiryo', sans-serif;
             background-color: #f5f5f5; color: #333;
             font-size: 13px;
         }
@@ -24,7 +27,7 @@
         .account-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
         .my-avatar {
             width: 88px; height: 88px; border-radius: 50%;
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            background: #e63946;
             color: #fff; font-size: 30px; font-weight: 900;
             display: flex; align-items: center; justify-content: center;
             overflow: hidden; flex-shrink: 0;
@@ -74,7 +77,7 @@
             text-decoration: none; color: inherit;
         }
         .authored-article:last-child { border-bottom: none; }
-        .authored-article-title { font-size: 13px; font-weight: bold; color: #1a0dab; margin-bottom: 3px; }
+        .authored-article-title { font-size: 13px; font-weight: bold; color: #1d3557; margin-bottom: 3px; }
         .authored-article-meta { font-size: 11px; color: #999; }
 
         /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
@@ -118,7 +121,7 @@
         }
         .gp-mypage .gp-en { color: #fff; font-size: 12px; }
         .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
-        .gp-mypage:hover { background: #ff6b6b; }
+        .gp-mypage:hover { background: #c5303c; }
         .gp-page-strip { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 9px 24px; }
         .gp-page-strip h1 { font-size: 16px; font-weight: 900; color: #333; max-width: 1280px; margin: 0 auto; letter-spacing: 0.5px; }
         @media (max-width: 768px) {

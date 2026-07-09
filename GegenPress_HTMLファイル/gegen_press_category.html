@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ニュース一覧 | Gegen Press!</title>
     <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,7 +16,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Noto Sans JP', 'Segoe UI', 'Hiragino Sans', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f5f5;
             color: #333;
         
@@ -22,13 +25,13 @@
 
         /* ヘッダー */
         header {
-            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            background: #fff;
             border-bottom: 3px solid #e63946;
             padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.15);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.09);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -79,12 +82,12 @@
         }
 
         .back-button:hover {
-            background-color: #ff6b6b;
+            background-color: #c5303c;
         }
 
         /* ページタイトル */
         .page-title-section {
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            background: #e63946;
             padding: 34px 40px;
             position: relative;
             overflow: hidden;
@@ -189,14 +192,24 @@
         }
 
         .section-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            background: #e63946;
+            font-size: 15px;
+            font-weight: 900;
+            color: #111;
+            background: none;
             margin-bottom: 12px;
-            text-transform: uppercase;
             letter-spacing: 0.5px;
-            padding: 9px 14px;
+            padding: 0 0 8px;
+            position: relative;
+            border-bottom: 2px solid #e8e8e8;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 48px;
+            height: 2px;
+            background: #e63946;
         }
 
         .empty-note {
@@ -225,14 +238,14 @@
         }
 
         .hero-card:hover {
-            box-shadow: 0 10px 26px rgba(230,57,70,0.18);
+            box-shadow: 0 10px 26px rgba(0,0,0,0.11);
             transform: translateY(-2px);
         }
 
         .hero-thumb {
             width: 100%;
             aspect-ratio: 16 / 9;
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            background: #14213d;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -317,7 +330,7 @@
         }
 
         .side-card:hover {
-            box-shadow: 0 6px 16px rgba(230,57,70,0.15);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.09);
         }
 
         .side-thumb {
@@ -326,7 +339,7 @@
             flex-shrink: 0;
             border-radius: 2px;
             overflow: hidden;
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            background: #14213d;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -380,13 +393,13 @@
         }
 
         .league-feature:hover {
-            box-shadow: 0 10px 24px rgba(230,57,70,0.16);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.1);
         }
 
         .league-feature-thumb {
             width: 38%;
             flex-shrink: 0;
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            background: #14213d;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -456,13 +469,13 @@
         }
 
         .league-card:hover {
-            box-shadow: 0 8px 18px rgba(230,57,70,0.15);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.09);
         }
 
         .league-card-thumb {
             width: 100%;
             height: 112px;
-            background: linear-gradient(135deg, #e63946 0%, #a4161a 100%);
+            background: #14213d;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -679,7 +692,7 @@
         }
         .gp-mypage .gp-en { color: #fff; font-size: 12px; }
         .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
-        .gp-mypage:hover { background: #ff6b6b; }
+        .gp-mypage:hover { background: #c5303c; }
         header.gp-header .search-bar {
             width: 150px !important;
             margin: 0 !important;
@@ -945,7 +958,7 @@
         }
         function avatarStyle(name) {
             const g = avatarColor(name);
-            return 'background: linear-gradient(135deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%);';
+            return 'background: ' + g[0] + ';';
         }
         function fmtDate(ts) {
             try {

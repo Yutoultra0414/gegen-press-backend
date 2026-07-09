@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>メディア情報 - Gegen Press!</title>
     <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Hiragino Sans', 'Meiryo', 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
+        body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Meiryo', 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
 
         .media-header {
             background: linear-gradient(135deg, #1d3557 0%, #14213d 100%);
@@ -42,7 +45,7 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 11px; font-weight: 900; color: #fff; overflow: hidden;
         }
-        .reporter-name { font-size: 12.5px; font-weight: bold; color: #1a0dab; }
+        .reporter-name { font-size: 12.5px; font-weight: bold; color: #1d3557; }
         .reporter-meta { font-size: 11px; color: #888; }
 
         /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
@@ -86,7 +89,7 @@
         }
         .gp-mypage .gp-en { color: #fff; font-size: 11px; }
         .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
-        .gp-mypage:hover { background: #ff6b6b; }
+        .gp-mypage:hover { background: #c5303c; }
         @media (max-width: 768px) {
             header.gp-header { flex-wrap: wrap !important; padding: 8px 14px !important; gap: 0 !important; row-gap: 6px !important; }
             .gp-logo { order: 1; }
