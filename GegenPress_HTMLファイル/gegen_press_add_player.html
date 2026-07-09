@@ -659,13 +659,11 @@
                 <!-- 所属クラブ -->
                 <div class="form-group">
                     <label class="form-label">現所属クラブ <span class="optional-badge">任意</span></label>
-                    <p class="form-hint">まず大陸を選ぶと、クラブがあいうえお順で絞り込まれます。一覧にない場合は「その他」を選んで直接入力してください。</p>
-                    <select class="form-input" id="clubContinentSelect" style="margin-bottom:8px;">
-                        <option value="">大陸を選択してください</option>
+                    <p class="form-hint">「クラブマスタ管理」ページで登録されたクラブから選べます。一覧にない場合は「その他」を選んで直接入力してください。</p>
+                    <select class="form-input" id="currentClubSelect">
+                        <option value="">読み込み中...</option>
                     </select>
-                    <select class="form-input" id="currentClubSelect" disabled>
-                        <option value="">まず大陸を選んでください</option>
-                    </select>
+                    <input type="hidden" id="currentClubId" value="">
                     <input type="text" class="form-input" id="currentClub" placeholder="クラブ名を入力" style="display:none; margin-top:10px;">
                     <div id="clubInfoBox" style="display:none; margin-top:10px; font-size:12.5px; color:#555; background:#f5f5f5; border-radius:6px; padding:10px 12px;"></div>
                 </div>
@@ -702,8 +700,18 @@
                         <span class="expertise-tag" data-transfer="rumor">移籍の噂</span>
                         <span class="expertise-tag" data-transfer="completed">移籍決定</span>
                     </div>
-                    <input type="text" class="form-input" id="fromClub" placeholder="移籍元クラブ" style="margin-bottom:10px;">
-                    <input type="text" class="form-input" id="toClub" placeholder="移籍先クラブ" style="margin-bottom:10px;">
+                    <p class="form-hint">移籍元クラブ</p>
+                    <select class="form-input" id="fromClubSelect" style="margin-bottom:6px;">
+                        <option value="">読み込み中...</option>
+                    </select>
+                    <input type="hidden" id="fromClubId" value="">
+                    <input type="text" class="form-input" id="fromClub" placeholder="移籍元クラブを入力" style="display:none; margin-bottom:10px;">
+                    <p class="form-hint">移籍先クラブ</p>
+                    <select class="form-input" id="toClubSelect" style="margin-bottom:6px;">
+                        <option value="">読み込み中...</option>
+                    </select>
+                    <input type="hidden" id="toClubId" value="">
+                    <input type="text" class="form-input" id="toClub" placeholder="移籍先クラブを入力" style="display:none; margin-bottom:10px;">
                     <input type="text" class="form-input" id="transferFee" placeholder="移籍金（例: 8000万ユーロ）">
                 </div>
 
@@ -765,94 +773,127 @@
         }
 
         // =========================================================
-        // クラブ / 国籍ドロップダウンの初期化（大陸→あいうえお順のカスケード選択）
+        // 国籍ドロップダウンの初期化（大陸→あいうえお順のカスケード選択）
         // clubs-data.js が読み込まれていない場合は自由入力にフォールバック
         // =========================================================
         const CLUBS_DATA = (typeof GegenPressClubsData !== 'undefined') ? GegenPressClubsData : null;
-        const JA_COLLATOR = (typeof Intl !== 'undefined') ? new Intl.Collator('ja') : null;
         function jaSort(list, keyFn) {
             const arr = list.slice();
             if (JA_COLLATOR) arr.sort((a, b) => JA_COLLATOR.compare(keyFn(a), keyFn(b)));
             else arr.sort((a, b) => keyFn(a).localeCompare(keyFn(b)));
             return arr;
         }
-        function flagForCountry(countryName) {
-            if (!CLUBS_DATA) return '';
-            const n = CLUBS_DATA.NATIONALITIES.find(x => x.name === countryName);
-            return n ? n.flag : '';
+
+        // =========================================================
+        // 所属クラブ選択（現所属・移籍元・移籍先）
+        // 「クラブマスタ管理」ページ（gegen_press_club_import.html）から登録された
+        // クラブのみを候補に出す。まだ登録されていないクラブは「その他（自由入力）」から。
+        // =========================================================
+        let MASTER_CLUBS = []; // { clubId, label } の配列（登録済みクラブのみ）
+        const JA_COLLATOR = (typeof Intl !== 'undefined') ? new Intl.Collator('ja') : null;
+
+        async function loadMasterClubs() {
+            if (!API_AVAILABLE || !GegenPressAPI.clubs || !GegenPressAPI.clubs.getAll) return [];
+            try {
+                const res = await GegenPressAPI.clubs.getAll();
+                if (!res || !res.success) return [];
+                const list = (res.clubs || [])
+                    // clubId形式（半角英数字とハイフンのみ）のものだけを対象にする。
+                    // 旧形式（クラブ名がドキュメントIDのロゴのみのデータ）は候補に出さない。
+                    .filter(c => /^[a-z0-9-]+$/.test(c.id) && (c.displayNameJa || c.displayNameEn))
+                    .map(c => ({ clubId: c.id, label: c.displayNameJa || c.displayNameEn }));
+                if (JA_COLLATOR) list.sort((a, b) => JA_COLLATOR.compare(a.label, b.label));
+                else list.sort((a, b) => a.label.localeCompare(b.label));
+                return list;
+            } catch (e) {
+                console.warn('クラブマスタの読み込みに失敗:', e);
+                return [];
+            }
         }
 
-        function populateClubSelect() {
-            const contSel = document.getElementById('clubContinentSelect');
-            const sel = document.getElementById('currentClubSelect');
-            const freeInput = document.getElementById('currentClub');
-            if (!CLUBS_DATA) {
-                // データファイル未読込 → 自由入力のみ
-                contSel.style.display = 'none';
-                sel.style.display = 'none';
-                freeInput.style.display = 'block';
-                return;
-            }
-            const continents = CLUBS_DATA.CONTINENTS_CLUB || [];
-            contSel.innerHTML = '<option value="">大陸を選択してください</option>' +
-                continents.map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('') +
-                '<option value="__other__">その他（自由入力）</option>';
+        /**
+         * selectElId: クラブ選択用<select>のID
+         * hiddenIdElId: 選択したclubIdを保持する<input type=hidden>のID
+         * textElId: 表示名を保持する既存の<input type=text>のID（他ページとの互換用）
+         */
+        function setupClubPicker(selectElId, hiddenIdElId, textElId) {
+            const sel = document.getElementById(selectElId);
+            const hiddenId = document.getElementById(hiddenIdElId);
+            const textEl = document.getElementById(textElId);
 
-            function fillClubsForContinent(continent) {
-                if (continent === '__other__') {
-                    sel.innerHTML = '<option value="__other__" selected>その他（自由入力）</option>';
-                    sel.disabled = true;
-                    freeInput.style.display = 'block';
-                    freeInput.value = '';
-                    freeInput.focus();
-                    document.getElementById('clubInfoBox').style.display = 'none';
-                    return;
-                }
-                const list = jaSort(CLUBS_DATA.CLUBS.filter(c => c.continent === continent), c => c.name);
-                sel.disabled = list.length === 0;
-                sel.innerHTML = '<option value="">クラブを選択してください（あいうえお順）</option>' +
-                    list.map(c => {
-                        const flag = flagForCountry(c.country);
-                        return '<option value="' + escapeHtml(c.name) + '" data-league="' + escapeHtml(c.league) + '" data-country="' + escapeHtml(c.country) + '">' +
-                            (flag ? flag + ' ' : '') + escapeHtml(c.name) + '</option>';
-                    }).join('') +
-                    '<option value="__other__">その他（自由入力）</option>';
-                freeInput.style.display = 'none';
-                freeInput.value = '';
-                document.getElementById('clubInfoBox').style.display = 'none';
-            }
-
-            contSel.addEventListener('change', function () { fillClubsForContinent(this.value); });
+            sel.innerHTML = '<option value="">未設定</option>' +
+                MASTER_CLUBS.map(c => '<option value="' + escapeHtml(c.clubId) + '">' + escapeHtml(c.label) + '</option>').join('') +
+                '<option value="__other__">その他（一覧にないクラブを直接入力）</option>';
 
             sel.addEventListener('change', function () {
-                const infoBox = document.getElementById('clubInfoBox');
                 if (this.value === '__other__') {
-                    freeInput.style.display = 'block';
-                    freeInput.value = '';
-                    freeInput.focus();
-                    infoBox.style.display = 'none';
+                    hiddenId.value = '';
+                    textEl.style.display = 'block';
+                    textEl.value = '';
+                    textEl.focus();
                 } else if (this.value) {
-                    freeInput.style.display = 'none';
-                    freeInput.value = this.value;
-                    const opt = this.options[this.selectedIndex];
-                    infoBox.style.display = 'block';
-                    infoBox.textContent = (opt.getAttribute('data-country') || '') + ' ・ ' + (opt.getAttribute('data-league') || '');
+                    const match = MASTER_CLUBS.find(c => c.clubId === this.value);
+                    hiddenId.value = this.value;
+                    textEl.style.display = 'none';
+                    textEl.value = match ? match.label : '';
                 } else {
-                    freeInput.style.display = 'none';
-                    freeInput.value = '';
-                    infoBox.style.display = 'none';
+                    hiddenId.value = '';
+                    textEl.style.display = 'none';
+                    textEl.value = '';
                 }
             });
 
             // 編集モードなどで外部からプログラム的に選択するためのヘルパー
-            window._selectClubProgrammatically = function (continent, clubName) {
-                contSel.value = continent;
-                fillClubsForContinent(continent);
-                sel.value = clubName;
-                sel.dispatchEvent(new Event('change'));
+            return {
+                selectByClubId: function (clubId) {
+                    const match = MASTER_CLUBS.find(c => c.clubId === clubId);
+                    if (!match) return false;
+                    sel.value = clubId;
+                    hiddenId.value = clubId;
+                    textEl.style.display = 'none';
+                    textEl.value = match.label;
+                    return true;
+                },
+                selectFreeText: function (text) {
+                    sel.value = '__other__';
+                    hiddenId.value = '';
+                    textEl.style.display = 'block';
+                    textEl.value = text || '';
+                }
             };
         }
-        populateClubSelect();
+
+        let currentClubPicker, fromClubPicker, toClubPicker;
+        let pickersReady = false;
+
+        async function initClubPickers() {
+            MASTER_CLUBS = await loadMasterClubs();
+            if (MASTER_CLUBS.length === 0) {
+                document.getElementById('clubInfoBox').style.display = 'block';
+                document.getElementById('clubInfoBox').textContent =
+                    'クラブマスタにまだクラブが登録されていません。「クラブマスタ管理」ページからロゴを登録すると、ここで選べるようになります。それまでは「その他」から直接入力してください。';
+            }
+            currentClubPicker = setupClubPicker('currentClubSelect', 'currentClubId', 'currentClub');
+            fromClubPicker = setupClubPicker('fromClubSelect', 'fromClubId', 'fromClub');
+            toClubPicker = setupClubPicker('toClubSelect', 'toClubId', 'toClub');
+            pickersReady = true;
+            tryApplyEditClubFields();
+        }
+        initClubPickers();
+
+        // editingPlayer の読み込みと、クラブ一覧(MASTER_CLUBS)の読み込みは非同期で順不同に終わるため、
+        // 両方揃った時点で一度だけクラブ選択欄に反映する。
+        function applyOneClubField(picker, clubId, freeText) {
+            if (!picker) return;
+            if (clubId && picker.selectByClubId(clubId)) return; // クラブマスタに登録済みならそれを選択
+            if (freeText) picker.selectFreeText(freeText); // 無ければ従来通り自由入力欄に反映
+        }
+        function tryApplyEditClubFields() {
+            if (!pickersReady || !editingPlayer) return;
+            applyOneClubField(currentClubPicker, editingPlayer.currentClubId, editingPlayer.currentClub);
+            applyOneClubField(fromClubPicker, editingPlayer.fromClubId, editingPlayer.fromClub);
+            applyOneClubField(toClubPicker, editingPlayer.toClubId, editingPlayer.toClub);
+        }
 
         function populateNationalitySelect() {
             const contSel = document.getElementById('nationalityContinentSelect');
@@ -983,15 +1024,8 @@
             document.getElementById('reporterName').value = editingPlayer.name || '';
             document.getElementById('nameRomaji').value = editingPlayer.nameRomaji || '';
 
-            if (editingPlayer.currentClub) {
-                const clubMatch = CLUBS_DATA ? CLUBS_DATA.CLUBS.find(c => c.name === editingPlayer.currentClub) : null;
-                if (clubMatch && window._selectClubProgrammatically) {
-                    window._selectClubProgrammatically(clubMatch.continent, clubMatch.name);
-                } else {
-                    document.getElementById('clubContinentSelect').value = '__other__';
-                    document.getElementById('clubContinentSelect').dispatchEvent(new Event('change'));
-                    document.getElementById('currentClub').value = editingPlayer.currentClub;
-                }
+            if (editingPlayer.currentClub || editingPlayer.currentClubId || editingPlayer.fromClub || editingPlayer.fromClubId || editingPlayer.toClub || editingPlayer.toClubId) {
+                tryApplyEditClubFields(); // 未読込みならここでは何もせず、initClubPickers側の完了時に再実行される
             }
             document.getElementById('playerPosition').value = editingPlayer.position || '';
             document.getElementById('marketValue').value = editingPlayer.marketValue || '';
@@ -1012,8 +1046,6 @@
                     t.classList.toggle('selected', t.getAttribute('data-transfer') === editingPlayer.transferStatus);
                 });
             }
-            document.getElementById('fromClub').value = editingPlayer.fromClub || '';
-            document.getElementById('toClub').value = editingPlayer.toClub || '';
             document.getElementById('transferFee').value = editingPlayer.transferFee || '';
         }
         loadPlayerForEdit();
@@ -1152,12 +1184,15 @@
                 name: name,
                 nameRomaji: document.getElementById('nameRomaji').value.trim() || null,
                 currentClub: document.getElementById('currentClub').value.trim() || null,
+                currentClubId: document.getElementById('currentClubId').value.trim() || null,
                 position: document.getElementById('playerPosition').value.trim() || null,
                 marketValue: document.getElementById('marketValue').value.trim() || null,
                 nationality: document.getElementById('nationality').value.trim() || null,
                 transferStatus: selectedTransferStatus,
                 fromClub: document.getElementById('fromClub').value.trim() || null,
+                fromClubId: document.getElementById('fromClubId').value.trim() || null,
                 toClub: document.getElementById('toClub').value.trim() || null,
+                toClubId: document.getElementById('toClubId').value.trim() || null,
                 transferFee: document.getElementById('transferFee').value.trim() || null,
                 bio: document.getElementById('reporterBio').value.trim() || '',
                 // 重複チェックで既存があったが、それでも追加する場合に true

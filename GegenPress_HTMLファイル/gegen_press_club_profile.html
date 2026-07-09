@@ -331,13 +331,72 @@
         }
 
         const clubName = new URLSearchParams(window.location.search).get('name');
+        const clubIdParam = new URLSearchParams(window.location.search).get('id');
+        let clubMasterData = null; // clubIdParam指定時にクラブマスタから取得したデータ
 
-        function renderHeader() {
+        // リーグIDから日本語名を出す簡易テーブル（gegen_press_club_import.htmlと同じ一覧）
+        const LEAGUE_JA = {
+            'premier-league': 'プレミアリーグ', 'championship': 'チャンピオンシップ', 'laliga': 'ラ・リーガ',
+            'bundesliga': 'ブンデスリーガ', 'serie-a': 'セリエA', 'ligue-1': 'リーグ・アン',
+            'eredivisie': 'エールディヴィジ', 'primeira-liga': 'プリメイラ・リーガ',
+            'belgian-pro-league': 'ベルギー・プロリーグ', 'scottish-premiership': 'スコティッシュ・プレミアシップ',
+            'mls': 'MLS', 'j1': 'J1リーグ', 'j2': 'J2リーグ', 'brasileirao': 'ブラジル全国選手権シリーズA',
+            'liga-profesional-argentina': 'アルゼンチン・プロフェッショナルリーグ', 'saudi-pro-league': 'サウジ・プロリーグ'
+        };
+
+        async function renderHeader() {
+            if (clubIdParam) {
+                // ==== 新方式: クラブマスタ（clubId）からの表示 ====
+                if (typeof GegenPressAPI === 'undefined' || !GegenPressAPI.clubs || !GegenPressAPI.clubs.getById) {
+                    document.getElementById('clubName').textContent = '読み込めませんでした';
+                    return;
+                }
+                const res = await GegenPressAPI.clubs.getById(clubIdParam);
+                if (!res || !res.success || !res.club) {
+                    document.getElementById('clubName').textContent = 'クラブが見つかりませんでした';
+                    return;
+                }
+                clubMasterData = res.club;
+                const label = clubMasterData.displayNameJa || clubMasterData.displayNameEn || clubIdParam;
+                document.title = label + ' - Gegen Press!';
+                document.getElementById('clubName').textContent = label;
+                if (clubMasterData.displayNameJa && clubMasterData.displayNameEn && clubMasterData.displayNameJa !== clubMasterData.displayNameEn) {
+                    document.getElementById('clubSub').textContent = clubMasterData.displayNameEn;
+                }
+                const badgeEl = document.getElementById('clubBadgeLg');
+                if (clubMasterData.logo) {
+                    badgeEl.style.background = '#fff';
+                    badgeEl.innerHTML = '<img src="' + clubMasterData.logo + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                } else {
+                    const g = colorFor(label);
+                    badgeEl.style.background = g[0];
+                    badgeEl.textContent = getInitials(label);
+                }
+                const badges = [];
+                if (clubMasterData.country) badges.push(esc(clubMasterData.country));
+                if (clubMasterData.leagueId) badges.push(esc(LEAGUE_JA[clubMasterData.leagueId] || clubMasterData.leagueId));
+                if (clubMasterData.stadium) badges.push(esc(clubMasterData.stadium));
+                if (clubMasterData.founded) badges.push(esc(clubMasterData.founded) + '年創設');
+                document.getElementById('clubBadges').innerHTML = badges.map(b => '<span>' + b + '</span>').join('');
+                if (clubMasterData.website) {
+                    document.getElementById('clubSub').innerHTML =
+                        (document.getElementById('clubSub').textContent ? document.getElementById('clubSub').textContent + '　' : '') +
+                        '<a href="' + esc(clubMasterData.website) + '" target="_blank" rel="noopener" style="color:#fff; text-decoration:underline;">公式サイト</a>';
+                }
+
+                // ログイン中（管理者）ならロゴ設定ボタンを表示。保存先は clubs.saveFull（clubId方式）
+                let user = null;
+                try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+                if (user && GegenPressAPI.isAdminUid(user.uid)) document.getElementById('setClubLogoBtn').style.display = 'inline-block';
+                return;
+            }
+
+            // ==== 旧方式: クラブ名（?name=）からの表示 ====
             document.getElementById('clubName').textContent = clubName || 'クラブが指定されていません';
             document.title = (clubName || 'クラブ情報') + ' - Gegen Press!';
             if (!clubName) return;
             const g = colorFor(clubName);
-            document.getElementById('clubBadgeLg').style.background = 'linear-gradient(135deg,' + g[0] + ' 0%,' + g[1] + ' 100%)';
+            document.getElementById('clubBadgeLg').style.background = g[0];
             document.getElementById('clubBadgeLg').textContent = getInitials(clubName);
 
             // clubs-data.js に登録されているクラブであれば、リーグ・国を表示
@@ -399,16 +458,18 @@
         document.getElementById('clubLogoInput').addEventListener('change', async function () {
             const file = this.files && this.files[0];
             this.value = '';
-            if (!file || !clubName) return;
+            if (!file || (!clubName && !clubIdParam)) return;
             if (!file.type || file.type.indexOf('image/') !== 0) { alert('画像ファイルを選択してください'); return; }
             const btn = document.getElementById('setClubLogoBtn');
             btn.disabled = true; btn.textContent = '処理中...';
             try {
                 const dataUrl = await fileToJpeg(file, 300);
-                const res = await GegenPressAPI.clubs.setLogo(clubName, dataUrl);
+                const res = clubIdParam
+                    ? await GegenPressAPI.clubs.saveFull(clubIdParam, { logo: dataUrl })
+                    : await GegenPressAPI.clubs.setLogo(clubName, dataUrl);
                 if (res && res.success) {
                     const badgeEl = document.getElementById('clubBadgeLg');
-                    badgeEl.style.background = 'none';
+                    badgeEl.style.background = '#fff';
                     badgeEl.innerHTML = '<img src="' + dataUrl + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
                     alert('ロゴを設定しました。');
                 } else {
@@ -423,7 +484,7 @@
         async function loadClubData() {
             const squadEl = document.getElementById('squadList');
             const transferEl = document.getElementById('transferList');
-            if (!clubName) {
+            if (!clubName && !clubIdParam) {
                 squadEl.innerHTML = '<p class="empty-note">クラブが指定されていません。</p>';
                 transferEl.innerHTML = '';
                 return;
@@ -440,8 +501,10 @@
                 }
                 const players = res.players;
 
-                // 在籍選手
-                const squad = players.filter(p => p.currentClub === clubName);
+                // 在籍選手（clubId指定時は currentClubId で、旧方式は currentClub の名前一致で絞り込む）
+                const squad = clubIdParam
+                    ? players.filter(p => p.currentClubId === clubIdParam)
+                    : players.filter(p => p.currentClub === clubName);
                 if (squad.length === 0) {
                     squadEl.innerHTML = '<p class="empty-note">このクラブの在籍選手はまだ登録されていません。</p>';
                 } else {
@@ -460,7 +523,9 @@
                 }
 
                 // 直近の移籍動向（このクラブが絡む移籍のみ）
-                const transfers = players.filter(p => p.transferStatus && (p.fromClub === clubName || p.toClub === clubName));
+                const transfers = clubIdParam
+                    ? players.filter(p => p.transferStatus && (p.fromClubId === clubIdParam || p.toClubId === clubIdParam))
+                    : players.filter(p => p.transferStatus && (p.fromClub === clubName || p.toClub === clubName));
                 if (transfers.length === 0) {
                     transferEl.innerHTML = '<p class="empty-note">このクラブが関わる移籍情報はまだ登録されていません。</p>';
                 } else {

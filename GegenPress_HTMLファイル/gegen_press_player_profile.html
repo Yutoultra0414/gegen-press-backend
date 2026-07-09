@@ -416,14 +416,41 @@
             for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
             return PALETTE[h % PALETTE.length];
         }
-        // クラブ名から色付きの略称バッジ（本物のロゴ画像は用意できていないための代替表現）
-        function clubBadgeLinkHtml(clubName) {
-            if (!clubName) return '';
-            const g = colorFor(clubName);
-            return '<a href="gegen_press_club_profile.html?name=' + encodeURIComponent(clubName) + '" title="' + esc(clubName) + '" ' +
+        // クラブ名から色付きの略称バッジ（ロゴがクラブマスタに無い場合の代替表現）
+        // logoUrl が渡された場合はそちらを優先して画像で表示する。
+        function clubBadgeLinkHtml(clubName, clubId, logoUrl) {
+            if (!clubName && !clubId) return '';
+            const href = clubId
+                ? 'gegen_press_club_profile.html?id=' + encodeURIComponent(clubId)
+                : 'gegen_press_club_profile.html?name=' + encodeURIComponent(clubName || '');
+            const label = clubName || clubId;
+            if (logoUrl) {
+                return '<a href="' + href + '" title="' + esc(label) + '" ' +
+                    'style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; ' +
+                    'overflow:hidden; margin-right:4px; background:#fff; border:1px solid rgba(255,255,255,0.5);">' +
+                    '<img src="' + logoUrl + '" alt="" style="width:100%; height:100%; object-fit:cover;"></a>';
+            }
+            const g = colorFor(label);
+            return '<a href="' + href + '" title="' + esc(label) + '" ' +
                 'style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; ' +
                 'font-size:9px; font-weight:900; color:#fff; text-decoration:none; margin-right:4px; ' +
-                'background: ' + g[0] + ';">' + esc(getInitials(clubName)) + '</a>';
+                'background: ' + g[0] + ';">' + esc(getInitials(label)) + '</a>';
+        }
+
+        // clubId をキーにしたクラブマスタのキャッシュ（同じクラブを何度も問い合わせないため）
+        const clubMasterCache = new Map();
+        async function fetchClubMaster(clubId) {
+            if (!clubId) return null;
+            if (clubMasterCache.has(clubId)) return clubMasterCache.get(clubId);
+            let result = null;
+            try {
+                if (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.clubs && GegenPressAPI.clubs.getById) {
+                    const res = await GegenPressAPI.clubs.getById(clubId);
+                    if (res && res.success && res.club) result = res.club;
+                }
+            } catch (e) { /* 取得できなければ従来のバッジ表示にフォールバック */ }
+            clubMasterCache.set(clubId, result);
+            return result;
         }
 
         const playerId = new URLSearchParams(window.location.search).get('id');
@@ -461,8 +488,12 @@
                 romajiEl.style.display = 'block';
             }
             const clubEl = document.getElementById('playerClub');
-            if (p.currentClub) {
-                clubEl.innerHTML = '<a href="gegen_press_club_profile.html?name=' + encodeURIComponent(p.currentClub) + '" style="color:#fff; text-decoration:underline;">' + esc(p.currentClub) + '</a>';
+            if (p.currentClub || p.currentClubId) {
+                const href = p.currentClubId
+                    ? 'gegen_press_club_profile.html?id=' + encodeURIComponent(p.currentClubId)
+                    : 'gegen_press_club_profile.html?name=' + encodeURIComponent(p.currentClub || '');
+                clubEl.innerHTML = '<span id="playerClubIcon" style="display:inline-flex; vertical-align:middle; margin-right:4px;"></span>' +
+                    '<a href="' + href + '" style="color:#fff; text-decoration:underline;">' + esc(p.currentClub || p.currentClubId) + '</a>';
             } else {
                 clubEl.textContent = '所属クラブ未設定';
             }
@@ -478,14 +509,17 @@
                     ? '<span class="transfer-badge rumor">移籍の噂</span>'
                     : '<span class="transfer-badge completed">移籍決定</span>';
                 document.getElementById('transferBox').innerHTML =
-                    clubBadgeLinkHtml(p.fromClub) +
+                    '<span id="fromClubIcon" style="display:inline-flex;">' + clubBadgeLinkHtml(p.fromClub, p.fromClubId) + '</span>' +
                     '<span class="transfer-club">' + esc(p.fromClub || '不明') + '</span>' +
                     '<span class="transfer-arrow">→</span>' +
-                    clubBadgeLinkHtml(p.toClub) +
+                    '<span id="toClubIcon" style="display:inline-flex;">' + clubBadgeLinkHtml(p.toClub, p.toClubId) + '</span>' +
                     '<span class="transfer-club">' + esc(p.toClub || '不明') + '</span>' +
                     (p.transferFee ? '<span style="color:#888;">（' + esc(p.transferFee) + '）</span>' : '') +
                     badge;
             }
+
+            // クラブマスタにロゴが登録されていれば、色付きイニシャルの代わりに本物のロゴ画像に差し替える
+            enhanceClubIcons(p);
 
             // アイコン設定ボタン（ログイン中のみ表示。保存可否はサーバー側ルールが判定）
             let user = null;
@@ -497,6 +531,28 @@
                 editLink.href = 'gegen_press_add_player.html?id=' + encodeURIComponent(playerId);
                 editLink.style.display = 'inline-block';
             }
+        }
+
+        // 所属クラブ／移籍元／移籍先のロゴを、クラブマスタからまとめて非同期取得して差し替える
+        async function enhanceClubIcons(p) {
+            const targets = [
+                { clubId: p.currentClubId, name: p.currentClub, elId: 'playerClubIcon', size: 22 },
+                { clubId: p.fromClubId, name: p.fromClub, elId: 'fromClubIcon' },
+                { clubId: p.toClubId, name: p.toClub, elId: 'toClubIcon' }
+            ].filter(t => t.clubId);
+            if (targets.length === 0) return;
+
+            await Promise.all(targets.map(async (t) => {
+                const club = await fetchClubMaster(t.clubId);
+                const el = document.getElementById(t.elId);
+                if (!el) return;
+                if (t.elId === 'playerClubIcon') {
+                    // メインのクラブ表示は26pxの丸アイコン1つだけ
+                    el.innerHTML = clubBadgeLinkHtml(t.name, t.clubId, club && club.logo);
+                } else {
+                    el.innerHTML = clubBadgeLinkHtml(t.name, t.clubId, club && club.logo);
+                }
+            }));
         }
 
         function fileToSquareJpeg(file, size) {
