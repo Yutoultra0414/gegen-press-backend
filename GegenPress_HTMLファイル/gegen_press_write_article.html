@@ -659,7 +659,7 @@
             }
             editingArticle = res.article;
 
-            if (editingArticle.createdBy && editingArticle.createdBy !== currentUserObj.uid) {
+            if (editingArticle.createdBy && editingArticle.createdBy !== currentUserObj.uid && !GegenPressAPI.isAdminUid(currentUserObj.uid)) {
                 loginNotice.style.display = 'block';
                 loginNotice.textContent = 'このニュースを編集する権限がありません（投稿した本人のみ編集できます）。';
                 formCard.style.display = 'none';

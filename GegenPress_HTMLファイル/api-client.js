@@ -116,6 +116,14 @@
     _db: function () { return _ready.then(function (fb) { return fb.db; }); },
     _currentUser: currentUser,
 
+    // ===== 管理者 =====
+    // 管理者を増やしたい場合は、ここに UID を追加するだけでOK。
+    // （Firestoreのセキュリティルール側は別途、同じUIDを追記してデプロイする必要があります）
+    ADMIN_UIDS: ['EcFjXMp6rpODK9i8E1DN1CPjZov2', 'DKjQNLTtVldXTMEXFQ1TJiOaxNE2'],
+    isAdminUid: function (uid) {
+      return !!uid && this.ADMIN_UIDS.indexOf(uid) !== -1;
+    },
+
     // ===== 認証 =====
     auth: {
       async signup(email, password, username) {

@@ -966,10 +966,11 @@
             }
             editingPlayer = res.player;
 
-            // 権限チェック（作成者本人以外は編集不可。最終判断はサーバー側のルールに委ねます）
+            // 権限チェック（作成者本人 or 管理者以外は編集不可。最終判断はサーバー側のルールに委ねます）
             let user = null;
             try { user = await GegenPressAPI._currentUser(); } catch (e) {}
-            if (!user || (editingPlayer.createdBy && editingPlayer.createdBy !== user.uid)) {
+            const isAdminUser = user && GegenPressAPI.isAdminUid(user.uid);
+            if (!user || (editingPlayer.createdBy && editingPlayer.createdBy !== user.uid && !isAdminUser)) {
                 document.getElementById('loginNotice').style.display = 'block';
                 document.getElementById('loginNotice').textContent = 'この選手情報を編集する権限がありません（登録した本人のみ編集できます）。';
                 document.getElementById('formCard').style.display = 'none';

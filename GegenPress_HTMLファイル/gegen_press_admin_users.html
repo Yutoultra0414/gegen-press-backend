@@ -52,7 +52,7 @@
 
     <script src="api-client.js" onerror="console.warn('api-client.js が見つかりません')"></script>
     <script>
-        const ADMIN_UID = 'EcFjXMp6rpODK9i8E1DN1CPjZov2';
+        // 管理者判定は GegenPressAPI.isAdminUid() に一元化しています（api-client.js参照）
 
         function esc(s) {
             return String(s == null ? '' : s)
@@ -76,7 +76,7 @@
             }
             let user = null;
             try { user = await GegenPressAPI._currentUser(); } catch (e) {}
-            if (!user || user.uid !== ADMIN_UID) {
+            if (!user || !GegenPressAPI.isAdminUid(user.uid)) {
                 document.getElementById('loadingBox').style.display = 'none';
                 document.getElementById('deniedBox').style.display = 'block';
                 return;

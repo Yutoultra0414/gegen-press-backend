@@ -1796,7 +1796,8 @@
         // 編集ボタン・バッジの表示判定
         function applyOwnerUI() {
             const isOwner = DEMO_SHOW_EDIT ||
-                (currentReporter.createdBy && currentReporter.createdBy === currentUserId);
+                (currentReporter.createdBy && currentReporter.createdBy === currentUserId) ||
+                (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.isAdminUid(currentUserId));
             if (isOwner) {
                 document.getElementById('editReporterBtn').style.display = 'inline-block';
                 if (DEMO_SHOW_EDIT || currentReporter.source === 'user') {

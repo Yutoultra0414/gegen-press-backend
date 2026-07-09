@@ -1363,9 +1363,8 @@
             }
 
             // 削除ボタンは投稿者本人 or 管理者のみ表示（最終的な可否はFirestoreルールが判定）
-            const ADMIN_UID = 'EcFjXMp6rpODK9i8E1DN1CPjZov2';
             const deleteBtn = document.getElementById('deleteArticleBtn');
-            if (currentArticle && (currentArticle.createdBy === user.uid || currentArticle.authorId === user.uid || user.uid === ADMIN_UID)) {
+            if (currentArticle && (currentArticle.createdBy === user.uid || currentArticle.authorId === user.uid || GegenPressAPI.isAdminUid(user.uid))) {
                 const editLink = document.getElementById('editArticleLink');
                 editLink.href = 'gegen_press_write_article.html?id=' + encodeURIComponent(articleId);
                 editLink.style.display = 'inline-block';
