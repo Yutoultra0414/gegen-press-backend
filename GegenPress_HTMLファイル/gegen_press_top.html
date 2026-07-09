@@ -1782,10 +1782,11 @@
                     }).slice(0, 5);
                 wrap.innerHTML = sorted.map(p => {
                     const g = avatarColor(p.name);
-                    const avatar = p.profileImage
-                        ? '<img src="' + p.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
+                    const playerPhoto = p.photoUrl || p.profileImage;
+                    const avatar = playerPhoto
+                        ? '<img src="' + playerPhoto + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
                         : esc(getInitials(p.name));
-                    const avatarStyleAttr = p.profileImage ? '' : ('background: ' + g[0] + '; color:#fff;');
+                    const avatarStyleAttr = playerPhoto ? '' : ('background: ' + g[0] + '; color:#fff;');
                     let badge = '';
                     if (p.transferStatus === 'rumor') badge = '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#fff3cd;color:#856404;">移籍の噂</span>';
                     else if (p.transferStatus === 'completed') badge = '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#d4edda;color:#155724;">移籍決定</span>';

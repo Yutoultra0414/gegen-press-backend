@@ -510,8 +510,8 @@
                 } else {
                     squadEl.innerHTML = squad.map(p =>
                         '<a class="squad-row" href="gegen_press_player_profile.html?id=' + encodeURIComponent(p.id) + '">' +
-                            (p.profileImage
-                                ? '<div class="squad-avatar" style="overflow:hidden;"><img src="' + p.profileImage + '" style="width:100%;height:100%;object-fit:cover;"></div>'
+                            ((p.photoUrl || p.profileImage)
+                                ? '<div class="squad-avatar" style="overflow:hidden;"><img src="' + (p.photoUrl || p.profileImage) + '" style="width:100%;height:100%;object-fit:cover;"></div>'
                                 : smallBadge(p.name)) +
                             '<div style="flex:1; min-width:0;">' +
                                 '<div class="squad-name">' + esc(p.name) + (p.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:10.5px;">' + esc(p.nameRomaji) + '</span>' : '') + '</div>' +

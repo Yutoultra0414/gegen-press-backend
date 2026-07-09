@@ -448,10 +448,11 @@
             }
             list.innerHTML = players.map(p => {
                 const g = colorFor(p.name);
-                const avatar = p.profileImage
-                    ? '<img src="' + p.profileImage + '" alt="">'
+                const playerPhoto = p.photoUrl || p.profileImage;
+                const avatar = playerPhoto
+                    ? '<img src="' + playerPhoto + '" alt="">'
                     : esc(getInitials(p.name));
-                const avatarStyle = p.profileImage ? '' : ('background: ' + g[0] + ';');
+                const avatarStyle = playerPhoto ? '' : ('background: ' + g[0] + ';');
                 let badge = '';
                 if (p.transferStatus === 'rumor') badge = '<span class="transfer-badge rumor">移籍の噂</span>';
                 else if (p.transferStatus === 'completed') badge = '<span class="transfer-badge completed">移籍決定</span>';
