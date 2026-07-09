@@ -615,10 +615,20 @@
           var u = await currentUser();
           if (!u) return { success: false, message: 'コメントの投稿にはログインが必要です' };
           var fb = await _ready;
+          // username が渡されなかった場合、Googleアカウントの本名（displayName）に
+          // フォールバックすると本名が晒されてしまうため、必ずマイページで設定した
+          // 表示名(users/{uid}.username)を参照する。それも無ければ「匿名ユーザー」。
+          var finalUsername = username;
+          if (!finalUsername) {
+            try {
+              var udoc = await fb.db.collection('users').doc(u.uid).get();
+              if (udoc.exists && udoc.data().username) finalUsername = udoc.data().username;
+            } catch (e) { /* 取得できなければ下のフォールバックへ */ }
+          }
           var docData = {
             articleId: articleId, content: content, rating: rating || null,
             parentId: parentId || null,
-            userId: u.uid, username: username || u.displayName || '匿名ユーザー', createdAt: tsNow()
+            userId: u.uid, username: finalUsername || '匿名ユーザー', createdAt: tsNow()
           };
           var ref = await fb.db.collection('comments').add(docData);
           docData.id = ref.id;
