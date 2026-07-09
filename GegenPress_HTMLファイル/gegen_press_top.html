@@ -1653,14 +1653,14 @@
         loadTrendingMedia();
 
         // クラブ名から色付きの略称バッジHTMLを作る（本物のクラブロゴ画像は用意できていないための代替表現）
-        function clubBadgeHtml(clubName, size) {
+        function clubBadgeHtml(clubName, size, clubId) {
             size = size || 34;
             if (!clubName) {
-                return '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:10px;color:#999;flex-shrink:0;">?</div>';
+                return '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:6px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:10px;color:#999;flex-shrink:0;">?</div>';
             }
             const g = avatarColor(clubName);
-            return '<div class="club-badge" data-club="' + esc(clubName) + '" title="' + esc(clubName) + '" ' +
-                'style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;' +
+            return '<div class="club-badge" data-club="' + esc(clubName) + '"' + (clubId ? ' data-club-id="' + esc(clubId) + '"' : '') + ' title="' + esc(clubName) + '" ' +
+                'style="width:' + size + 'px;height:' + size + 'px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;' +
                 'font-size:' + Math.round(size * 0.32) + 'px;font-weight:900;color:#fff;cursor:pointer;background:' + g[0] + ';">' +
                 esc(getInitials(clubName)) + '</div>';
         }
@@ -1668,31 +1668,60 @@
             root.querySelectorAll('.club-badge').forEach(el => {
                 el.addEventListener('click', function (e) {
                     e.stopPropagation();
-                    window.location.href = 'gegen_press_club_profile.html?name=' + encodeURIComponent(this.getAttribute('data-club'));
+                    const clubId = this.getAttribute('data-club-id');
+                    window.location.href = clubId
+                        ? 'gegen_press_club_profile.html?id=' + encodeURIComponent(clubId)
+                        : 'gegen_press_club_profile.html?name=' + encodeURIComponent(this.getAttribute('data-club'));
                 });
             });
             upgradeClubBadgesWithLogos(root);
         }
 
-        // ユーザーがアップロード済みのクラブロゴがあれば、略称バッジを実画像に差し替える
+        // クラブマスタ（clubId）にロゴが登録されていれば、略称バッジを実画像に差し替える。
+        // clubIdが無い（旧データ）場合のみ、従来のクラブ名ベースの検索にフォールバックする。
+        // ロゴは丸くトリミングせず、全体が見える正方形に近い形で表示する（ロゴが欠けて見えるのを防ぐため）。
         const _clubLogoCache = {};
         async function upgradeClubBadgesWithLogos(root) {
             if (typeof GegenPressAPI === 'undefined' || !GegenPressAPI.clubs) return;
-            const names = new Set();
-            root.querySelectorAll('.club-badge[data-club]').forEach(el => names.add(el.getAttribute('data-club')));
-            for (const name of names) {
+            const byId = new Map();   // clubId -> Set(elements)
+            const byName = new Map(); // clubName -> Set(elements)
+            root.querySelectorAll('.club-badge[data-club]').forEach(el => {
+                const clubId = el.getAttribute('data-club-id');
+                const name = el.getAttribute('data-club');
+                if (clubId) {
+                    if (!byId.has(clubId)) byId.set(clubId, []);
+                    byId.get(clubId).push(el);
+                } else {
+                    if (!byName.has(name)) byName.set(name, []);
+                    byName.get(name).push(el);
+                }
+            });
+
+            function applyLogo(el, logo) {
+                el.style.background = '#fff';
+                el.innerHTML = '<img src="' + logo + '" alt="" style="width:100%;height:100%;object-fit:contain;padding:2px;box-sizing:border-box;border-radius:6px;">';
+            }
+
+            for (const [clubId, els] of byId) {
                 try {
-                    if (!(name in _clubLogoCache)) {
+                    const cacheKey = 'id:' + clubId;
+                    if (!(cacheKey in _clubLogoCache)) {
+                        const res = await GegenPressAPI.clubs.getById(clubId);
+                        _clubLogoCache[cacheKey] = (res && res.success && res.club && res.club.logo) ? res.club.logo : null;
+                    }
+                    const logo = _clubLogoCache[cacheKey];
+                    if (logo) els.forEach(el => applyLogo(el, logo));
+                } catch (e) { /* ロゴ取得に失敗した場合は略称バッジのまま表示 */ }
+            }
+            for (const [name, els] of byName) {
+                try {
+                    const cacheKey = 'name:' + name;
+                    if (!(cacheKey in _clubLogoCache)) {
                         const res = await GegenPressAPI.clubs.getByName(name);
-                        _clubLogoCache[name] = (res && res.success && res.club && res.club.logo) ? res.club.logo : null;
+                        _clubLogoCache[cacheKey] = (res && res.success && res.club && res.club.logo) ? res.club.logo : null;
                     }
-                    const logo = _clubLogoCache[name];
-                    if (logo) {
-                        root.querySelectorAll('.club-badge[data-club="' + CSS.escape(name) + '"]').forEach(el => {
-                            el.style.background = 'none';
-                            el.innerHTML = '<img src="' + logo + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
-                        });
-                    }
+                    const logo = _clubLogoCache[cacheKey];
+                    if (logo) els.forEach(el => applyLogo(el, logo));
                 } catch (e) { /* ロゴ取得に失敗した場合は略称バッジのまま表示 */ }
             }
         }
@@ -1723,9 +1752,9 @@
                         : '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#d4edda;color:#155724;flex-shrink:0;">移籍決定</span>';
                     return (
                         '<div style="display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid #eee;">' +
-                            clubBadgeHtml(p.fromClub, 34) +
+                            clubBadgeHtml(p.fromClub, 34, p.fromClubId) +
                             '<span style="color:#ccc; font-size:13px; flex-shrink:0;">→</span>' +
-                            clubBadgeHtml(p.toClub, 34) +
+                            clubBadgeHtml(p.toClub, 34, p.toClubId) +
                             '<div style="flex:1; min-width:0; margin-left:4px;">' +
                                 '<a href="gegen_press_player_profile.html?id=' + encodeURIComponent(p.id) + '" style="font-size:13px; font-weight:bold; color:#1d3557; text-decoration:none;">' + esc(p.name) + '</a>' +
                                 '<div style="font-size:11px; color:#888;">' + esc(p.fromClub || '不明') + ' → ' + esc(p.toClub || '不明') +
@@ -1801,7 +1830,7 @@
                                 '<div style="font-size:11px; color:#888;">' + esc(p.currentClub || '') + '</div>' +
                             '</div>' +
                             '<div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0;">' +
-                                '<div style="display:flex; align-items:center; gap:8px;">' + clubBadgeHtml(p.currentClub, 28) + badge + '</div>' +
+                                '<div style="display:flex; align-items:center; gap:8px;">' + clubBadgeHtml(p.currentClub, 28, p.currentClubId) + badge + '</div>' +
                                 viewsHtml +
                             '</div>' +
                         '</div>'

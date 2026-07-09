@@ -431,9 +431,9 @@
             const label = clubName || clubId;
             if (logoUrl) {
                 return '<a href="' + href + '" title="' + esc(label) + '" ' +
-                    'style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; ' +
+                    'style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:6px; ' +
                     'overflow:hidden; margin-right:4px; background:#fff; border:1px solid rgba(255,255,255,0.5);">' +
-                    '<img src="' + logoUrl + '" alt="" style="width:100%; height:100%; object-fit:cover;"></a>';
+                    '<img src="' + logoUrl + '" alt="" style="width:100%; height:100%; object-fit:contain; padding:2px; box-sizing:border-box;"></a>';
             }
             const g = colorFor(label);
             return '<a href="' + href + '" title="' + esc(label) + '" ' +

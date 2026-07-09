@@ -27,7 +27,7 @@
             position: relative; z-index: 1;
         }
         .club-badge-lg {
-            width: 72px; height: 72px; border-radius: 50%;
+            width: 72px; height: 72px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             font-size: 22px; font-weight: 900; color: #fff;
             border: 3px solid rgba(255,255,255,0.85); flex-shrink: 0;
@@ -366,7 +366,7 @@
                 const badgeEl = document.getElementById('clubBadgeLg');
                 if (clubMasterData.logo) {
                     badgeEl.style.background = '#fff';
-                    badgeEl.innerHTML = '<img src="' + clubMasterData.logo + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                    badgeEl.innerHTML = '<img src="' + clubMasterData.logo + '" alt="" style="width:100%;height:100%;object-fit:contain;padding:6px;box-sizing:border-box;border-radius:8px;">';
                 } else {
                     const g = colorFor(label);
                     badgeEl.style.background = g[0];
@@ -441,7 +441,7 @@
                 if (res && res.success && res.club && res.club.logo) {
                     const badgeEl = document.getElementById('clubBadgeLg');
                     badgeEl.style.background = 'none';
-                    badgeEl.innerHTML = '<img src="' + res.club.logo + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                    badgeEl.innerHTML = '<img src="' + res.club.logo + '" alt="" style="width:100%;height:100%;object-fit:contain;padding:6px;box-sizing:border-box;border-radius:8px;">';
                 }
             } catch (e) { /* ロゴが無い/取得失敗の場合は略称バッジのまま */ }
 
@@ -470,7 +470,7 @@
                 if (res && res.success) {
                     const badgeEl = document.getElementById('clubBadgeLg');
                     badgeEl.style.background = '#fff';
-                    badgeEl.innerHTML = '<img src="' + dataUrl + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                    badgeEl.innerHTML = '<img src="' + dataUrl + '" alt="" style="width:100%;height:100%;object-fit:contain;padding:6px;box-sizing:border-box;border-radius:8px;">';
                     alert('ロゴを設定しました。');
                 } else {
                     alert((res && res.message) || 'ロゴの保存に失敗しました。（Firestoreのルールが未反映の可能性があります）');
