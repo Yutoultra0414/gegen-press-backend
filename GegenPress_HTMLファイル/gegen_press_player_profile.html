@@ -383,6 +383,7 @@
                     <div class="meta-item" id="metaNationalTeamWrap" style="display:none;"><div class="meta-value" id="metaNationalTeam">-</div><div class="meta-label">代表</div></div>
                 </div>
                 <a id="editPlayerLink" href="#" style="display:none; margin-top:12px; font-size:12.5px; color:#e63946; font-weight:bold; text-decoration:none; border:1px solid #e63946; border-radius:6px; padding:6px 14px;">選手情報を編集</a>
+                <p id="editPermissionDiag" style="display:none; margin-top:10px; font-size:10.5px; color:rgba(255,255,255,0.75); line-height:1.7; max-width:420px;"></p>
             </div>
         </div>
     </section>
@@ -569,10 +570,20 @@
             try { user = await GegenPressAPI._currentUser(); } catch (e) {}
             if (user) document.getElementById('setIconBtn').style.display = 'inline-block';
             // 編集リンク（登録した本人 or 管理者のみ表示。最終判断はサーバー側のルールに委ねます）
-            if (user && ((p.createdBy && p.createdBy === user.uid) || GegenPressAPI.isAdminUid(user.uid))) {
+            const isOwnerOrAdmin = user && ((p.createdBy && p.createdBy === user.uid) || GegenPressAPI.isAdminUid(user.uid));
+            if (isOwnerOrAdmin) {
                 const editLink = document.getElementById('editPlayerLink');
                 editLink.href = 'gegen_press_add_player.html?id=' + encodeURIComponent(playerId);
                 editLink.style.display = 'inline-block';
+            } else if (user) {
+                // ログイン中なのに編集権限が無い場合、原因をその場で確認できるようにする
+                const diag = document.getElementById('editPermissionDiag');
+                diag.style.display = 'block';
+                diag.innerHTML =
+                    '編集ボタンが表示されない場合: ' +
+                    '登録者UID <code>' + esc(p.createdBy || '（記録なし）') + '</code> / ' +
+                    '現在のUID <code>' + esc(user.uid) + '</code> / ' +
+                    '管理者判定: <code>' + (GegenPressAPI.isAdminUid(user.uid) ? '管理者です' : '管理者ではありません') + '</code>';
             }
         }
 

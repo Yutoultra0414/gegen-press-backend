@@ -1121,7 +1121,19 @@
             const isAdminUser = user && GegenPressAPI.isAdminUid(user.uid);
             if (!user || (editingPlayer.createdBy && editingPlayer.createdBy !== user.uid && !isAdminUser)) {
                 document.getElementById('loginNotice').style.display = 'block';
-                document.getElementById('loginNotice').textContent = 'この選手情報を編集する権限がありません（登録した本人のみ編集できます）。';
+                if (!user) {
+                    document.getElementById('loginNotice').textContent = 'この選手情報を編集するにはログインが必要です。';
+                } else {
+                    // 原因を推測できるよう、UIDの不一致を具体的に表示する。
+                    // 多くの場合、登録した時と今とでログイン方法（Google/メール）が違うと別アカウント扱いになり、
+                    // Firebase上のUIDが変わってしまうことが原因です。
+                    document.getElementById('loginNotice').innerHTML =
+                        'この選手情報を編集する権限がありません（登録した本人のみ編集できます）。<br>' +
+                        '<span style="font-size:11px; opacity:0.8;">登録者UID: ' + escapeHtml(editingPlayer.createdBy || '（記録なし）') + '<br>' +
+                        '現在ログイン中のUID: ' + escapeHtml(user.uid) + '<br>' +
+                        'これらが一致しない場合、登録時と現在でログイン方法（Google／メール）が異なる可能性があります。' +
+                        '同じログイン方法でログインし直すか、管理者にご連絡ください。</span>';
+                }
                 document.getElementById('formCard').style.display = 'none';
                 return;
             }

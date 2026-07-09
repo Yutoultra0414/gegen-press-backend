@@ -242,28 +242,7 @@
             color: #e63946;
             width: 60px;
             text-align: center;
-        }
-
-        .medal {
-            display: inline-block;
-            width: 40px;
-            text-align: center;
-            font-weight: bold;
-            color: #e63946;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
-
-        .medal-gold {
-            color: #ffd700;
-        }
-
-        .medal-silver {
-            color: #c0c0c0;
-        }
-
-        .medal-bronze {
-            color: #cd7f32;
+            font-variant-numeric: tabular-nums; /* 1桁・2桁が混ざっても数字の幅を揃える */
         }
 
         /* 記者情報 */
@@ -818,7 +797,7 @@
                 <tbody id="rankingBody">
                     <!-- 1位 -->
                     <tr class="rank-1" data-reporter-id="rep_fabrizio" onclick="goReporterProfile('rep_fabrizio')" style="cursor: pointer;">
-                        <td class="rank-number"><span class="medal medal-gold"></span>1</td>
+                        <td class="rank-number">1</td>
                         <td>
                             <div class="reporter-info">
                                 <div class="reporter-avatar">F</div>
@@ -834,7 +813,7 @@
 
                     <!-- 2位 -->
                     <tr class="rank-2" data-reporter-id="rep_skysports" onclick="goReporterProfile('rep_skysports')" style="cursor: pointer;">
-                        <td class="rank-number"><span class="medal medal-silver"></span>2</td>
+                        <td class="rank-number">2</td>
                         <td>
                             <div class="reporter-info">
                                 <div class="reporter-avatar">S</div>
@@ -850,7 +829,7 @@
 
                     <!-- 3位 -->
                     <tr class="rank-3" data-reporter-id="rep_marca" onclick="goReporterProfile('rep_marca')" style="cursor: pointer;">
-                        <td class="rank-number"><span class="medal medal-bronze"></span>3</td>
+                        <td class="rank-number">3</td>
                         <td>
                             <div class="reporter-info">
                                 <div class="reporter-avatar">M</div>
@@ -1080,9 +1059,7 @@
                 tr.setAttribute('data-reporter-id', r.id);
                 tr.addEventListener('click', () => goReporterProfile(r.id));
 
-                const medal = rank === 1 ? '<span class="medal medal-gold"></span>'
-                            : rank === 2 ? '<span class="medal medal-silver"></span>'
-                            : rank === 3 ? '<span class="medal medal-bronze"></span>' : '';
+                // 順位数字の色は rank-1/2/3 クラス側のCSSで表現するため、ここでは番号だけを出す
                 const g = avatarColor(r.name);
                 const score = Math.round((r.computedAverage / 5) * 100);
                 const avatarInner = r.profileImage
@@ -1091,7 +1068,7 @@
                 const avatarBg = r.profileImage ? '' : 'background: ' + g[0] + '; color:#fff;';
 
                 tr.innerHTML =
-                    '<td class="rank-number">' + medal + rank + '</td>' +
+                    '<td class="rank-number">' + rank + '</td>' +
                     '<td><div class="reporter-info">' +
                         '<div class="reporter-avatar" style="' + avatarBg + 'overflow:hidden;">' + avatarInner + '</div>' +
                         '<div class="reporter-details">' +
@@ -1195,15 +1172,13 @@
             }
             tbody.innerHTML = list.map((m, i) => {
                 const rank = i + 1;
-                const medal = rank === 1 ? '<span class="medal medal-gold"></span>'
-                            : rank === 2 ? '<span class="medal medal-silver"></span>'
-                            : rank === 3 ? '<span class="medal medal-bronze"></span>' : '';
+                // 順位数字の色は rank-1/2/3 クラス側のCSSで表現するため、ここでは番号だけを出す
                 const g = avatarColor(m.name);
                 const score = Math.round((m.average / 5) * 100);
                 const rating = m.count > 0 ? m.average.toFixed(1) : '-';
                 return (
                     '<tr class="' + (rank <= 3 ? 'rank-' + rank : '') + '" style="cursor:pointer;" data-media-row="' + esc(m.name) + '">' +
-                        '<td class="rank-number">' + medal + rank + '</td>' +
+                        '<td class="rank-number">' + rank + '</td>' +
                         '<td><div class="reporter-info">' +
                             '<div class="reporter-avatar media-logo-badge" data-media-name="' + esc(m.name) + '" style="overflow:hidden; background: ' + g[0] + '; color:#fff;">' + esc(getInitials(m.name)) + '</div>' +
                             '<div class="reporter-details"><h3>' + esc(m.name) + '</h3><p>所属記者 ' + m.reporterCount + '名</p></div>' +
