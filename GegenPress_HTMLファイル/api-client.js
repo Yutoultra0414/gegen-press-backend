@@ -674,7 +674,11 @@
       getProfile: function (id) { return this.get(id); }
     },
 
-    // ===== クラブ（ロゴ画像のみを保持する簡易コレクション。ドキュメントIDはクラブ名そのもの） =====
+    // ===== クラブ（旧: ロゴ画像のみを保持する簡易コレクション。ドキュメントIDはクラブ名そのもの） =====
+    // ※ getByName/setLogo は既存ページ（クラブページ等）との互換のために残しています。
+    //    新しいクラブマスタ機能（clubId をドキュメントIDにする方式）は getAll/saveFull/deleteById を使います。
+    //    このため clubs コレクションには「クラブ名がID」の古いドキュメントと
+    //    「clubIdがID」の新しいドキュメントが一時的に混在する可能性があります。
     clubs: {
       async getByName(name) {
         try {
@@ -693,6 +697,67 @@
           await fb.db.collection('clubs').doc(name).set({
             name: name, logo: logoDataUrl, updatedBy: u.uid, updatedAt: tsNow()
           }, { merge: true });
+          return { success: true };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async getAll() {
+        try {
+          var fb = await _ready;
+          var snap = await fb.db.collection('clubs').get();
+          return { success: true, clubs: docList(snap) };
+        } catch (e) { return { success: false, message: String(e), clubs: [] }; }
+      },
+      async getById(clubId) {
+        try {
+          var fb = await _ready;
+          var doc = await fb.db.collection('clubs').doc(clubId).get();
+          if (!doc.exists) return { success: true, club: null };
+          var data = doc.data(); data.id = doc.id;
+          return { success: true, club: data };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      // クラブマスタの新規作成・更新（clubId をドキュメントIDとする）。管理者のみ（Firestoreルール側で強制）。
+      async saveFull(clubId, data) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: false, message: 'ログインが必要です' };
+          var fb = await _ready;
+          var ref = fb.db.collection('clubs').doc(clubId);
+          var existing = await ref.get();
+          var payload = Object.assign({}, data, { clubId: clubId, updatedBy: u.uid, updatedAt: tsNow() });
+          if (!existing.exists) payload.createdAt = tsNow();
+          await ref.set(payload, { merge: true });
+          return { success: true };
+        } catch (e) { return { success: false, message: String(e) }; }
+      },
+      async deleteById(clubId) {
+        try {
+          var fb = await _ready;
+          await fb.db.collection('clubs').doc(clubId).delete();
+          return { success: true };
+        } catch (e) { return { success: false, message: String(e) }; }
+      }
+    },
+
+    // ===== リーグマスタ（ドキュメントID＝leagueId） =====
+    leagues: {
+      async getAll() {
+        try {
+          var fb = await _ready;
+          var snap = await fb.db.collection('leagues').get();
+          return { success: true, leagues: docList(snap) };
+        } catch (e) { return { success: false, message: String(e), leagues: [] }; }
+      },
+      async saveFull(leagueId, data) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: false, message: 'ログインが必要です' };
+          var fb = await _ready;
+          var ref = fb.db.collection('leagues').doc(leagueId);
+          var existing = await ref.get();
+          var payload = Object.assign({}, data, { leagueId: leagueId, updatedBy: u.uid, updatedAt: tsNow() });
+          if (!existing.exists) payload.createdAt = tsNow();
+          await ref.set(payload, { merge: true });
           return { success: true };
         } catch (e) { return { success: false, message: String(e) }; }
       }

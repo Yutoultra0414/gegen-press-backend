@@ -389,7 +389,7 @@
             // ログイン中ならロゴ設定ボタンを表示
             let user = null;
             try { user = await GegenPressAPI._currentUser(); } catch (e) {}
-            if (user) document.getElementById('setClubLogoBtn').style.display = 'inline-block';
+            if (user && GegenPressAPI.isAdminUid(user.uid)) document.getElementById('setClubLogoBtn').style.display = 'inline-block';
         }
         loadClubLogo();
 

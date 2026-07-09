@@ -412,6 +412,17 @@
         }
         .comment-reply-link::before { content: '└ '; color: #ccc; }
         .comment-reply-link:hover { color: #e63946; }
+        .comment-delete-link {
+            font-size: 11.5px;
+            color: #bbb;
+            cursor: pointer;
+            margin-top: 4px;
+            margin-left: 10px;
+            display: inline-block;
+        }
+        .comment-delete-link:hover { color: #e63946; }
+        .comment-delete-link.by-admin { color: #c5303c; }
+        .comment-delete-link.by-admin::after { content: '（管理者）'; font-size: 10px; margin-left: 2px; }
         .comment-replies {
             margin-top: 4px;
             padding-left: 16px;
@@ -1482,7 +1493,12 @@
         }
 
         // ==== コメント一覧の読み込み ====
-        function commentHtml(c, no) {
+        function commentHtml(c, no, currentUid, currentIsAdmin) {
+            const isOwner = currentUid && c.userId === currentUid;
+            const canDelete = isOwner || currentIsAdmin;
+            const deleteHtml = canDelete
+                ? '<span class="comment-delete-link' + (isOwner ? '' : ' by-admin') + '" data-delete-comment="' + esc(c.id) + '">削除</span>'
+                : '';
             return (
                 '<div class="comment" data-comment-id="' + esc(c.id) + '">' +
                     '<div class="comment-header">' +
@@ -1493,6 +1509,7 @@
                     '</div>' +
                     '<div class="comment-text">' + esc(c.content || '') + '</div>' +
                     '<span class="comment-reply-link" data-reply-toggle="' + esc(c.id) + '">返信する</span>' +
+                    deleteHtml +
                     '<div class="comment-reply-form" id="reply-form-' + esc(c.id) + '">' +
                         '<textarea placeholder="返信を入力してください..." id="reply-text-' + esc(c.id) + '"></textarea>' +
                         '<button type="button" data-reply-submit="' + esc(c.id) + '">返信を投稿</button>' +
@@ -1514,6 +1531,17 @@
                     listEl.innerHTML = '<p style="color:#999; font-size:14px;">まだコメントがありません。最初のコメントを投稿してみましょう。</p>';
                     return;
                 }
+
+                // 削除ボタンの表示可否判定に使うため、ログイン中のユーザー情報を先に取得しておく
+                let currentUid = null, currentIsAdmin = false;
+                try {
+                    const cu = await GegenPressAPI._currentUser();
+                    if (cu) {
+                        currentUid = cu.uid;
+                        currentIsAdmin = GegenPressAPI.isAdminUid(cu.uid);
+                    }
+                } catch (e) { /* 未ログインなら削除ボタンは出さない */ }
+
                 const sortAsc = (a, b) => {
                     const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
                     const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
@@ -1523,7 +1551,7 @@
                 const topLevel = comments.filter(c => !c.parentId).sort((a, b) => -sortAsc(a, b));
                 const repliesOf = (id) => comments.filter(c => c.parentId === id).sort(sortAsc);
 
-                listEl.innerHTML = topLevel.map((c, i) => commentHtml(c, topLevel.length - i)).join('');
+                listEl.innerHTML = topLevel.map((c, i) => commentHtml(c, topLevel.length - i, currentUid, currentIsAdmin)).join('');
 
                 // 返信・さらにその返信…と、何階層でも再帰的に描画する
                 function renderChildren(parentId) {
@@ -1531,7 +1559,7 @@
                     if (kids.length === 0) return;
                     const wrap = document.getElementById('replies-' + parentId);
                     if (wrap) {
-                        wrap.innerHTML = kids.map(k => commentHtml(k, '')).join('');
+                        wrap.innerHTML = kids.map(k => commentHtml(k, '', currentUid, currentIsAdmin)).join('');
                         kids.forEach(k => renderChildren(k.id));
                     }
                 }
@@ -1563,13 +1591,38 @@
                     try { user = await GegenPressAPI._currentUser(); } catch (e) {}
                     if (!user) { alert('返信の投稿にはログインが必要です'); return; }
                     this.disabled = true; this.textContent = '投稿中...';
-                    const res = await GegenPressAPI.comments.create(articleId, text, null, null, parentId);
+                    const res = await GegenPressAPI.comments.create(articleId, text, null, (commentName.value || '').trim() || null, parentId);
                     this.disabled = false; this.textContent = '返信を投稿';
                     if (res && res.success) {
                         textEl.value = '';
                         loadComments();
                     } else {
                         alert((res && res.message) || '返信の投稿に失敗しました');
+                    }
+                });
+            });
+            root.querySelectorAll('[data-delete-comment]').forEach(el => {
+                el.addEventListener('click', async function () {
+                    const id = this.getAttribute('data-delete-comment');
+                    const isAdminDelete = this.classList.contains('by-admin');
+                    const msg = isAdminDelete
+                        ? 'このコメントを運営者権限で削除します。このコメントへの返信も表示されなくなります。元に戻せません。よろしいですか？'
+                        : 'このコメントを削除します。このコメントへの返信も表示されなくなります。元に戻せません。よろしいですか？';
+                    if (!confirm(msg)) return;
+                    this.textContent = '削除中...';
+                    try {
+                        const res = await GegenPressAPI.comments.delete(id);
+                        if (res && res.success) {
+                            loadComments();
+                        } else {
+                            alert((res && res.message && String(res.message).indexOf('permission') >= 0)
+                                ? 'このコメントを削除する権限がありません。'
+                                : ((res && res.message) || '削除に失敗しました。'));
+                            this.textContent = '削除';
+                        }
+                    } catch (e) {
+                        alert('削除中にエラーが発生しました: ' + (e.message || e));
+                        this.textContent = '削除';
                     }
                 });
             });

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クラブマスタ管理（管理者用） - Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans JP', 'Roboto', 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
+        .page-strip { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 16px 40px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+        .page-strip h1 { font-size: 18px; font-weight: 900; }
+        .page-strip p { font-size: 11.5px; color: #999; margin-top: 2px; }
+        .container { max-width: 1000px; margin: 20px auto; padding: 0 20px 100px; }
+        .card { background: #fff; border: 1px solid #eee; padding: 16px; margin-bottom: 16px; border-radius: 2px; }
+        .btn { background: #e63946; color: #fff; border: none; padding: 10px 18px; font-size: 13px; font-weight: bold; cursor: pointer; text-decoration: none; display:inline-block; border-radius: 2px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-outline { background: #fff; color: #e63946; border: 1px solid #e63946; }
+        .btn-sm { padding: 6px 12px; font-size: 11.5px; }
+        .empty-note { color: #999; font-size: 13px; padding: 20px 0; text-align:center; }
+        .denied { text-align:center; padding: 60px 20px; color:#999; }
+
+        .dropzone {
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #888;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+        .dropzone.dragover { border-color: #e63946; background: #fff5f5; color: #e63946; }
+        .dropzone strong { display: block; font-size: 14px; color: #333; margin-bottom: 6px; }
+
+        .club-card { border: 1px solid #eee; border-radius: 2px; padding: 14px; margin-bottom: 12px; display: flex; gap: 14px; }
+        .club-card-logo { width: 64px; height: 64px; flex-shrink: 0; border: 1px solid #eee; border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fafafa; }
+        .club-card-logo img { max-width: 100%; max-height: 100%; }
+        .club-card-body { flex: 1; min-width: 0; }
+        .club-card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+        .club-id-badge { font-family: monospace; font-size: 12px; background: #f0f0f0; padding: 2px 8px; border-radius: 2px; color: #555; }
+        .status-badge { font-size: 11px; font-weight: bold; padding: 3px 9px; border-radius: 10px; }
+        .status-badge.matched { background: #d4edda; color: #155724; }
+        .status-badge.review { background: #fff3cd; color: #856404; }
+        .status-badge.manual { background: #f0f0f0; color: #666; }
+        .status-badge.searching { background: #eef4ff; color: #1d3557; }
+
+        .field-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px 12px; margin-top: 8px; }
+        .field-grid label { display: block; font-size: 10.5px; color: #999; margin-bottom: 3px; }
+        .field-grid input, .field-grid select {
+            width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 2px; font-size: 12.5px; font-family: inherit;
+        }
+        .field-color-row { display: flex; gap: 6px; align-items: center; }
+        .field-color-row input[type=color] { width: 32px; height: 30px; padding: 2px; border: 1px solid #ddd; border-radius: 2px; }
+
+        .candidates { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .candidate-btn {
+            background: #fff; border: 1px solid #1d3557; color: #1d3557; border-radius: 12px;
+            padding: 5px 12px; font-size: 11.5px; cursor: pointer;
+        }
+        .candidate-btn:hover { background: #1d3557; color: #fff; }
+        .candidate-btn small { opacity: 0.7; margin-left: 4px; }
+
+        .card-actions { margin-top: 10px; display: flex; gap: 8px; align-items: center; }
+        .remove-link { font-size: 11.5px; color: #bbb; cursor: pointer; margin-left: auto; }
+        .remove-link:hover { color: #e63946; }
+
+        .save-bar {
+            position: sticky; bottom: 0; background: #fff; border-top: 1px solid #eee;
+            padding: 14px 20px; margin: 0 -20px; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+        }
+        .log-box { font-size: 11.5px; color: #666; max-height: 90px; overflow-y: auto; }
+        .log-box div.err { color: #c5303c; }
+        .log-box div.ok { color: #2a9d8f; }
+
+        table.existing { width: 100%; border-collapse: collapse; font-size: 12px; }
+        table.existing th, table.existing td { border-bottom: 1px solid #eee; padding: 6px 8px; text-align: left; }
+        table.existing th { background: #f5f5f5; }
+        .del-btn { color: #c5303c; cursor: pointer; font-size: 11.5px; }
+    </style>
+</head>
+<body>
+    <div class="page-strip">
+        <div>
+            <h1><a href="gegen_press_top.html" style="color:#e63946; text-decoration:none;">Gegen Press!</a> クラブマスタ管理（管理者用）</h1>
+            <p>ロゴ画像をドラッグ&ドロップすると、Wikidataの公開データで自動的にクラブ情報を埋めます。内容を確認してから保存してください。</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="deniedBox" class="denied" style="display:none;">このページは管理者のみ閲覧できます。</div>
+        <div id="loadingBox" class="empty-note">読み込み中...</div>
+
+        <div id="mainArea" style="display:none;">
+            <div class="card">
+                <div class="dropzone" id="dropzone">
+                    <strong>ここにロゴ画像をドラッグ&ドロップ</strong>
+                    SVGまたはPNG・複数選択可・クリックしてファイルを選ぶこともできます
+                    <input type="file" id="fileInput" accept=".svg,.png,image/svg+xml,image/png" multiple style="display:none;">
+                </div>
+            </div>
+
+            <div id="clubCardsWrap"></div>
+
+            <div class="card" id="saveBarCard" style="display:none;">
+                <div class="save-bar">
+                    <div class="log-box" id="logBox"></div>
+                    <button class="btn" id="saveAllBtn">すべてFirestoreに保存</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="font-size:14px; margin-bottom:10px;">登録済みクラブ一覧</h2>
+                <div id="existingWrap"><p class="empty-note">読み込み中...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js" onerror="console.warn('api-client.js が見つかりません')"></script>
+    <script>
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // ==== clubId 正規化（Node版ツールと同じルール） ====
+        function slugify(input) {
+            if (!input) return '';
+            return String(input)
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .replace(/-{2,}/g, '-');
+        }
+        function clubIdFromFilename(filename) {
+            return slugify(filename.replace(/\.[a-zA-Z0-9]+$/, ''));
+        }
+
+        // ==== 簡易ファジーマッチ（Levenshtein） ====
+        function levenshtein(a, b) {
+            if (a === b) return 0;
+            const al = a.length, bl = b.length;
+            if (al === 0) return bl;
+            if (bl === 0) return al;
+            let prev = new Array(bl + 1), curr = new Array(bl + 1);
+            for (let j = 0; j <= bl; j++) prev[j] = j;
+            for (let i = 1; i <= al; i++) {
+                curr[0] = i;
+                for (let j = 1; j <= bl; j++) {
+                    const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                    curr[j] = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost);
+                }
+                [prev, curr] = [curr, prev];
+            }
+            return prev[bl];
+        }
+        function similarity(a, b) {
+            const na = String(a || '').toLowerCase(), nb = String(b || '').toLowerCase();
+            const maxLen = Math.max(na.length, nb.length);
+            if (maxLen === 0) return 1;
+            return 1 - levenshtein(na, nb) / maxLen;
+        }
+
+        // ==== SVGからの代表色抽出（依存なし） ====
+        function extractColorsFromSvgText(text) {
+            const IGNORE = new Set(['#ffffff', '#fff', '#000000', '#000', 'none', 'transparent']);
+            const matches = text.match(/(?:fill|stop-color)\s*[:=]\s*["']?(#[0-9a-fA-F]{3,6})["']?/g) || [];
+            const counts = new Map();
+            for (const m of matches) {
+                const hexMatch = m.match(/#[0-9a-fA-F]{3,6}/);
+                if (!hexMatch) continue;
+                const hex = hexMatch[0].toLowerCase();
+                if (IGNORE.has(hex)) continue;
+                counts.set(hex, (counts.get(hex) || 0) + 1);
+            }
+            const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+            return { primaryColor: sorted[0] ? sorted[0][0] : '#e63946', secondaryColor: sorted[1] ? sorted[1][0] : '#1d3557' };
+        }
+
+        // ==== 対象リーグ一覧（QIDはハードコードせず、リーグ名の一致判定にのみ使う） ====
+        const LEAGUES = [
+            { leagueId: 'premier-league', nameEn: 'Premier League', nameJa: 'プレミアリーグ' },
+            { leagueId: 'championship', nameEn: 'EFL Championship', nameJa: 'チャンピオンシップ' },
+            { leagueId: 'laliga', nameEn: 'La Liga', nameJa: 'ラ・リーガ' },
+            { leagueId: 'bundesliga', nameEn: 'Bundesliga', nameJa: 'ブンデスリーガ' },
+            { leagueId: 'serie-a', nameEn: 'Serie A', nameJa: 'セリエA' },
+            { leagueId: 'ligue-1', nameEn: 'Ligue 1', nameJa: 'リーグ・アン' },
+            { leagueId: 'eredivisie', nameEn: 'Eredivisie', nameJa: 'エールディヴィジ' },
+            { leagueId: 'primeira-liga', nameEn: 'Primeira Liga', nameJa: 'プリメイラ・リーガ' },
+            { leagueId: 'belgian-pro-league', nameEn: 'Belgian Pro League', nameJa: 'ベルギー・プロリーグ' },
+            { leagueId: 'scottish-premiership', nameEn: 'Scottish Premiership', nameJa: 'スコティッシュ・プレミアシップ' },
+            { leagueId: 'mls', nameEn: 'Major League Soccer', nameJa: 'MLS' },
+            { leagueId: 'j1', nameEn: 'J1 League', nameJa: 'J1リーグ' },
+            { leagueId: 'j2', nameEn: 'J2 League', nameJa: 'J2リーグ' },
+            { leagueId: 'brasileirao', nameEn: 'Campeonato Brasileiro Série A', nameJa: 'ブラジル全国選手権シリーズA' },
+            { leagueId: 'liga-profesional-argentina', nameEn: 'Liga Profesional de Fútbol', nameJa: 'アルゼンチン・プロフェッショナルリーグ' },
+            { leagueId: 'saudi-pro-league', nameEn: 'Saudi Pro League', nameJa: 'サウジ・プロリーグ' },
+            { leagueId: 'other', nameEn: 'その他 / 未設定', nameJa: 'その他 / 未設定' }
+        ];
+        function guessLeagueId(leagueLabel) {
+            if (!leagueLabel) return '';
+            const best = LEAGUES.filter(l => l.leagueId !== 'other')
+                .map(l => ({ id: l.leagueId, score: similarity(leagueLabel, l.nameEn) }))
+                .sort((a, b) => b.score - a.score)[0];
+            return (best && best.score > 0.55) ? best.id : '';
+        }
+        function leagueOptionsHtml(selectedId) {
+            return LEAGUES.map(l =>
+                '<option value="' + esc(l.leagueId) + '"' + (l.leagueId === selectedId ? ' selected' : '') + '>' + esc(l.nameJa) + '</option>'
+            ).join('');
+        }
+
+        // ==== Wikidata通信（ブラウザから直接。origin=* でCORSを有効化） ====
+        // 注意: この機能はサンドボックス環境では実際に通信テストができていません。
+        // うまく検索・自動入力ができない場合は、下の「手動入力にする」を使ってください。
+        async function searchWikidata(term) {
+            const url = 'https://www.wikidata.org/w/api.php?action=wbsearchentities&search='
+                + encodeURIComponent(term) + '&language=en&format=json&type=item&limit=6&origin=*';
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('検索に失敗しました（HTTP ' + res.status + '）');
+            const json = await res.json();
+            return json.search || [];
+        }
+        async function fetchWikidataDetail(qid) {
+            const sparql = 'SELECT ?clubLabel ?clubLabelJa (GROUP_CONCAT(DISTINCT ?altLabel;separator="|") AS ?aliases) '
+                + '?countryLabel ?leagueLabel ?stadiumLabel ?inception ?website WHERE {'
+                + ' BIND(wd:' + qid + ' AS ?club) .'
+                + ' OPTIONAL { ?club wdt:P17 ?country. }'
+                + ' OPTIONAL { ?club wdt:P118 ?league. }'
+                + ' OPTIONAL { ?club wdt:P115 ?stadium. }'
+                + ' OPTIONAL { ?club wdt:P571 ?inception. }'
+                + ' OPTIONAL { ?club wdt:P856 ?website. }'
+                + ' OPTIONAL { ?club skos:altLabel ?altLabel. FILTER(LANG(?altLabel)="en") }'
+                + ' OPTIONAL { ?club rdfs:label ?clubLabelJa. FILTER(LANG(?clubLabelJa)="ja") }'
+                + ' SERVICE wikibase:label { bd:serviceParam wikibase:language "en,ja". }'
+                + '} GROUP BY ?clubLabel ?clubLabelJa ?countryLabel ?leagueLabel ?stadiumLabel ?inception ?website LIMIT 1';
+            const url = 'https://query.wikidata.org/sparql?format=json&origin=*&query=' + encodeURIComponent(sparql);
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('詳細情報の取得に失敗しました（HTTP ' + res.status + '）');
+            const json = await res.json();
+            const row = json.results && json.results.bindings && json.results.bindings[0];
+            if (!row) return null;
+            return {
+                label: row.clubLabel ? row.clubLabel.value : '',
+                labelJa: row.clubLabelJa ? row.clubLabelJa.value : '',
+                aliases: row.aliases && row.aliases.value ? row.aliases.value.split('|').filter(Boolean) : [],
+                country: row.countryLabel ? row.countryLabel.value : '',
+                leagueLabel: row.leagueLabel ? row.leagueLabel.value : '',
+                stadium: row.stadiumLabel ? row.stadiumLabel.value : '',
+                founded: row.inception ? row.inception.value.slice(0, 4) : '',
+                website: row.website ? row.website.value : ''
+            };
+        }
+
+        const AUTO_ACCEPT_THRESHOLD = 0.85;
+        let cardSeq = 0;
+        const cards = new Map(); // seq -> { clubId, file, ... }
+
+        function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('ファイルを読み込めませんでした'));
+                reader.readAsDataURL(file);
+            });
+        }
+        function fileToText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('ファイルを読み込めませんでした'));
+                reader.readAsText(file);
+            });
+        }
+        // ラスター画像（PNG等）を最大幅400pxのPNGに縮小（透過を保つ）。大きすぎる場合のみJPEGにフォールバック。
+        function resizeRasterImage(file, maxWidth) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('ファイルを読み込めませんでした'));
+                reader.onload = function () {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error('画像として読み込めませんでした'));
+                    img.onload = function () {
+                        const w = Math.min(img.width, maxWidth);
+                        const h = Math.round(img.height * w / img.width);
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        let out = canvas.toDataURL('image/png');
+                        if (out.length > 400000) out = canvas.toDataURL('image/jpeg', 0.85);
+                        resolve(out);
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderCard(seq) {
+            const c = cards.get(seq);
+            const el = document.getElementById('card-' + seq);
+            if (!el) return;
+
+            let statusHtml = '';
+            if (c.status === 'searching') statusHtml = '<span class="status-badge searching">検索中...</span>';
+            else if (c.status === 'matched') statusHtml = '<span class="status-badge matched">自動一致</span>';
+            else if (c.status === 'review') statusHtml = '<span class="status-badge review">要確認</span>';
+            else statusHtml = '<span class="status-badge manual">手動入力</span>';
+
+            let candidatesHtml = '';
+            if (c.status === 'review' && c.candidates && c.candidates.length > 0) {
+                candidatesHtml = '<div class="candidates">' + c.candidates.map((cand, i) =>
+                    '<span class="candidate-btn" data-seq="' + seq + '" data-cand="' + i + '">'
+                    + esc(cand.label) + '<small>' + Math.round(cand.score * 100) + '%</small></span>'
+                ).join('') + '<span class="candidate-btn" data-seq="' + seq + '" data-cand="manual">これらにない（手動入力）</span></div>';
+            }
+
+            el.innerHTML =
+                '<div class="club-card-logo">' + (c.logoDataUrl ? '<img src="' + c.logoDataUrl + '">' : '?') + '</div>' +
+                '<div class="club-card-body">' +
+                    '<div class="club-card-top">' +
+                        '<div><span class="club-id-badge">' + esc(c.clubId) + '</span> ' + statusHtml + '</div>' +
+                        '<span class="remove-link" data-remove="' + seq + '">削除</span>' +
+                    '</div>' +
+                    candidatesHtml +
+                    '<div class="field-grid">' +
+                        field('displayNameJa', '表示名（日本語）', c.displayNameJa, seq) +
+                        field('displayNameEn', '表示名（英語）', c.displayNameEn, seq) +
+                        field('shortName', '略称', c.shortName, seq) +
+                        field('country', '国', c.country, seq) +
+                        leagueField(seq, c.leagueId) +
+                        field('stadium', 'スタジアム', c.stadium, seq) +
+                        field('founded', '創設年', c.founded, seq) +
+                        field('website', '公式サイト', c.website, seq) +
+                        field('aliases', '表記ゆれ（カンマ区切り）', (c.aliases || []).join(', '), seq, true) +
+                    '</div>' +
+                    '<div class="field-color-row" style="margin-top:8px;">' +
+                        '<label style="margin:0;">カラー:</label>' +
+                        '<input type="color" data-field="primaryColor" data-seq="' + seq + '" value="' + (c.primaryColor || '#e63946') + '">' +
+                        '<input type="color" data-field="secondaryColor" data-seq="' + seq + '" value="' + (c.secondaryColor || '#1d3557') + '">' +
+                    '</div>' +
+                '</div>';
+
+            bindCardEvents(seq);
+        }
+        function field(name, label, value, seq, full) {
+            return '<div' + (full ? ' style="grid-column: 1 / -1;"' : '') + '>' +
+                '<label>' + esc(label) + '</label>' +
+                '<input type="text" data-field="' + name + '" data-seq="' + seq + '" value="' + esc(value || '') + '">' +
+            '</div>';
+        }
+        function leagueField(seq, selectedId) {
+            return '<div><label>リーグ</label><select data-field="leagueId" data-seq="' + seq + '">' + leagueOptionsHtml(selectedId) + '</select></div>';
+        }
+
+        function bindCardEvents(seq) {
+            const el = document.getElementById('card-' + seq);
+            el.querySelectorAll('[data-field]').forEach(input => {
+                input.addEventListener('change', function () {
+                    const c = cards.get(seq);
+                    const f = this.getAttribute('data-field');
+                    c[f] = f === 'aliases' ? this.value.split(',').map(s => s.trim()).filter(Boolean) : this.value;
+                });
+            });
+            el.querySelectorAll('[data-remove]').forEach(b => {
+                b.addEventListener('click', function () {
+                    cards.delete(seq);
+                    el.remove();
+                    updateSaveBarVisibility();
+                });
+            });
+            el.querySelectorAll('.candidate-btn').forEach(b => {
+                b.addEventListener('click', async function () {
+                    const s = Number(this.getAttribute('data-seq'));
+                    const candIdx = this.getAttribute('data-cand');
+                    const c = cards.get(s);
+                    if (candIdx === 'manual') {
+                        c.status = 'manual';
+                        renderCard(s);
+                        return;
+                    }
+                    const cand = c.candidates[Number(candIdx)];
+                    await applyWikidataMatch(s, cand.qid);
+                });
+            });
+        }
+
+        async function applyWikidataMatch(seq, qid) {
+            const c = cards.get(seq);
+            c.status = 'searching';
+            renderCard(seq);
+            try {
+                const detail = await fetchWikidataDetail(qid);
+                if (detail) {
+                    c.displayNameEn = detail.label || c.clubId;
+                    c.displayNameJa = detail.labelJa || '';
+                    c.country = detail.country || '';
+                    c.stadium = detail.stadium || '';
+                    c.founded = detail.founded || '';
+                    c.website = detail.website || '';
+                    c.aliases = Array.from(new Set([detail.label].concat(detail.aliases || []).filter(Boolean)));
+                    c.leagueId = guessLeagueId(detail.leagueLabel) || c.leagueId || '';
+                    c.wikidataQid = qid;
+                    c.status = 'matched';
+                } else {
+                    c.status = 'manual';
+                }
+            } catch (e) {
+                logMsg('✗ ' + c.clubId + ': Wikidata詳細取得に失敗しました（' + e.message + '）。手動入力に切り替えます。', true);
+                c.status = 'manual';
+            }
+            renderCard(seq);
+        }
+
+        async function processFile(file) {
+            const seq = cardSeq++;
+            const clubId = clubIdFromFilename(file.name);
+            const ext = file.name.toLowerCase().endsWith('.svg') ? 'svg' : 'raster';
+
+            const c = {
+                clubId, file, ext, status: 'searching',
+                displayNameJa: '', displayNameEn: '', shortName: '', country: '', leagueId: '',
+                stadium: '', founded: '', website: '', aliases: [], primaryColor: '#e63946', secondaryColor: '#1d3557',
+                logoDataUrl: null, wikidataQid: null, candidates: []
+            };
+            cards.set(seq, c);
+
+            const wrap = document.getElementById('clubCardsWrap');
+            const cardEl = document.createElement('div');
+            cardEl.className = 'club-card';
+            cardEl.id = 'card-' + seq;
+            wrap.appendChild(cardEl);
+            renderCard(seq);
+            updateSaveBarVisibility();
+
+            // ロゴのプレビュー/保存用データを準備
+            try {
+                if (ext === 'svg') {
+                    const text = await fileToText(file);
+                    const colors = extractColorsFromSvgText(text);
+                    c.primaryColor = colors.primaryColor;
+                    c.secondaryColor = colors.secondaryColor;
+                    c.logoDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(text)));
+                } else {
+                    c.logoDataUrl = await resizeRasterImage(file, 400);
+                }
+            } catch (e) {
+                logMsg('✗ ' + clubId + ': ロゴの読み込みに失敗しました（' + e.message + '）', true);
+            }
+            renderCard(seq);
+
+            // Wikidataで検索
+            try {
+                const guess = clubId.replace(/-/g, ' ');
+                const results = await searchWikidata(guess);
+                const scored = results.map(r => ({
+                    qid: r.id, label: r.label, description: r.description || '',
+                    score: similarity(guess, r.label)
+                })).sort((a, b) => b.score - a.score);
+
+                if (scored.length === 0) {
+                    c.status = 'manual';
+                    renderCard(seq);
+                    return;
+                }
+                if (scored[0].score >= AUTO_ACCEPT_THRESHOLD) {
+                    await applyWikidataMatch(seq, scored[0].qid);
+                } else {
+                    c.status = 'review';
+                    c.candidates = scored.slice(0, 3);
+                    renderCard(seq);
+                }
+            } catch (e) {
+                logMsg('✗ ' + clubId + ': Wikidata検索に失敗しました（' + e.message + '）。手動入力に切り替えます。', true);
+                c.status = 'manual';
+                renderCard(seq);
+            }
+        }
+
+        function updateSaveBarVisibility() {
+            document.getElementById('saveBarCard').style.display = cards.size > 0 ? 'block' : 'none';
+        }
+
+        function logMsg(msg, isErr) {
+            const box = document.getElementById('logBox');
+            const div = document.createElement('div');
+            div.className = isErr ? 'err' : 'ok';
+            div.textContent = msg;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // ==== ドラッグ&ドロップ ====
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', function () {
+            handleFiles(this.files);
+            this.value = '';
+        });
+        function handleFiles(fileList) {
+            Array.from(fileList).forEach(file => {
+                if (!/\.(svg|png)$/i.test(file.name)) {
+                    logMsg('✗ ' + file.name + ': SVGまたはPNGのみ対応しています', true);
+                    return;
+                }
+                processFile(file);
+            });
+        }
+
+        // ==== 保存 ====
+        document.getElementById('saveAllBtn').addEventListener('click', async function () {
+            this.disabled = true; this.textContent = '保存中...';
+            let okCount = 0, ngCount = 0;
+            for (const [seq, c] of cards.entries()) {
+                if (!c.displayNameEn && !c.displayNameJa) {
+                    logMsg('✗ ' + c.clubId + ': 表示名が空のため保存をスキップしました', true);
+                    ngCount++;
+                    continue;
+                }
+                try {
+                    const res = await GegenPressAPI.clubs.saveFull(c.clubId, {
+                        displayNameJa: c.displayNameJa || null,
+                        displayNameEn: c.displayNameEn || null,
+                        shortName: c.shortName || null,
+                        country: c.country || null,
+                        leagueId: c.leagueId || null,
+                        logo: c.logoDataUrl || null,
+                        primaryColor: c.primaryColor || null,
+                        secondaryColor: c.secondaryColor || null,
+                        stadium: c.stadium || null,
+                        founded: c.founded || null,
+                        website: c.website || null,
+                        aliases: c.aliases || [],
+                        wikidataQid: c.wikidataQid || null
+                    });
+                    if (res && res.success) {
+                        logMsg('✓ ' + c.clubId + ' を保存しました');
+                        okCount++;
+                    } else {
+                        logMsg('✗ ' + c.clubId + ': ' + ((res && res.message) || '保存に失敗しました'), true);
+                        ngCount++;
+                    }
+                } catch (e) {
+                    logMsg('✗ ' + c.clubId + ': ' + (e.message || e), true);
+                    ngCount++;
+                }
+            }
+            this.disabled = false; this.textContent = 'すべてFirestoreに保存';
+            logMsg('=== 完了: 成功 ' + okCount + '件 / 失敗 ' + ngCount + '件 ===');
+            if (okCount > 0) loadExisting();
+        });
+
+        // ==== 登録済みクラブ一覧（削除も可能） ====
+        async function loadExisting() {
+            const wrap = document.getElementById('existingWrap');
+            try {
+                const res = await GegenPressAPI.clubs.getAll();
+                const list = (res && res.success && res.clubs) ? res.clubs : [];
+                if (list.length === 0) {
+                    wrap.innerHTML = '<p class="empty-note">まだ登録されていません。</p>';
+                    return;
+                }
+                wrap.innerHTML = '<table class="existing"><thead><tr>' +
+                    '<th>ドキュメントID</th><th>表示名</th><th>リーグ</th><th>形式</th><th></th>' +
+                    '</tr></thead><tbody>' +
+                    list.map(c => {
+                        const looksLegacy = !/^[a-z0-9-]+$/.test(c.id); // clubIdは半角英数+ハイフンのみのはず
+                        return '<tr>' +
+                            '<td>' + esc(c.id) + '</td>' +
+                            '<td>' + esc(c.displayNameJa || c.displayNameEn || c.name || '（旧形式データ）') + '</td>' +
+                            '<td>' + esc(c.leagueId || '-') + '</td>' +
+                            '<td>' + (looksLegacy ? '<span style="color:#c5303c;">旧形式（クラブ名がID）</span>' : '新clubId形式') + '</td>' +
+                            '<td><span class="del-btn" data-del="' + esc(c.id) + '">削除</span></td>' +
+                        '</tr>';
+                    }).join('') + '</tbody></table>' +
+                    '<p style="font-size:11px; color:#999; margin-top:8px;">「旧形式（クラブ名がID）」は、このツール導入前にクラブページから個別登録された古いロゴデータです。新しいクラブマスタとは別物として残っています。不要であれば削除して問題ありません。</p>';
+
+                wrap.querySelectorAll('[data-del]').forEach(btn => {
+                    btn.addEventListener('click', async function () {
+                        const id = this.getAttribute('data-del');
+                        if (!confirm('「' + id + '」を削除します。元に戻せません。よろしいですか？')) return;
+                        const res = await GegenPressAPI.clubs.deleteById(id);
+                        if (res && res.success) loadExisting();
+                        else alert((res && res.message) || '削除に失敗しました');
+                    });
+                });
+            } catch (e) {
+                wrap.innerHTML = '<p class="empty-note">読み込みに失敗しました。</p>';
+            }
+        }
+
+        // ==== 管理者ゲート ====
+        async function init() {
+            if (typeof GegenPressAPI === 'undefined') {
+                document.getElementById('loadingBox').textContent = '読み込めませんでした。';
+                return;
+            }
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+            if (!user || !GegenPressAPI.isAdminUid(user.uid)) {
+                document.getElementById('loadingBox').style.display = 'none';
+                document.getElementById('deniedBox').style.display = 'block';
+                return;
+            }
+            document.getElementById('loadingBox').style.display = 'none';
+            document.getElementById('mainArea').style.display = 'block';
+            loadExisting();
+        }
+        init();
+    </script>
+</body>
+</html>
