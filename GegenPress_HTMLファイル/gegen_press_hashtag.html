@@ -308,10 +308,10 @@
                     return tb - ta;
                 });
                 wrap.innerHTML = list.map(a => {
-                    const pos = (a.imagePosition && typeof a.imagePosition.x === 'number')
+                    const pos = (a.imagePosition && typeof a.imagePosition.x === 'number' && typeof a.imagePosition.y === 'number')
                         ? (a.imagePosition.x + '% ' + a.imagePosition.y + '%') : '50% 50%';
                     const thumb = a.image
-                        ? '<img src="' + a.image + '" alt="" style="object-position:' + pos + ';">'
+                        ? '<img src="' + esc(a.image) + '" alt="" style="object-position:' + pos + ';">'
                         : esc(a.category || 'Gegen Press!');
                     const tagsHtml = (a.tags || []).map(t =>
                         '<span onclick="event.stopPropagation(); window.location.href=\'gegen_press_hashtag.html?tag=' + encodeURIComponent(t) + '\';">#' + esc(t) + '</span>'

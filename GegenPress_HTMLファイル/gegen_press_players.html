@@ -450,7 +450,7 @@
                 const g = colorFor(p.name);
                 const playerPhoto = p.photoUrl || p.profileImage;
                 const avatar = playerPhoto
-                    ? '<img src="' + playerPhoto + '" alt="">'
+                    ? '<img src="' + esc(playerPhoto) + '" alt="">'
                     : esc(getInitials(p.name));
                 const avatarStyle = playerPhoto ? '' : ('background: ' + g[0] + ';');
                 let badge = '';

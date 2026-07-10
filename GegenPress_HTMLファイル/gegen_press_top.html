@@ -1465,7 +1465,7 @@
         function avatarHtml(cls, name, profileImage) {
             if (profileImage) {
                 return '<div class="' + cls + '" style="overflow:hidden;">' +
-                    '<img src="' + profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"></div>';
+                    '<img src="' + esc(profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"></div>';
             }
             return '<div class="' + cls + '" style="' + avatarStyle(name) + '">' + esc(getInitials(name)) + '</div>';
         }
@@ -1496,10 +1496,10 @@
                 const articles = (ares && ares.success && ares.articles) ? ares.articles : [];
 
                 function thumbHtmlFor(a) {
-                    const pos = (a.imagePosition && typeof a.imagePosition.x === 'number')
+                    const pos = (a.imagePosition && typeof a.imagePosition.x === 'number' && typeof a.imagePosition.y === 'number')
                         ? (a.imagePosition.x + '% ' + a.imagePosition.y + '%') : '50% 50%';
                     return a.image
-                        ? '<img src="' + a.image + '" alt="" style="object-position:' + pos + ';">'
+                        ? '<img src="' + esc(a.image) + '" alt="" style="object-position:' + pos + ';">'
                         : esc(a.category || 'Gegen Press!');
                 }
 
@@ -1574,7 +1574,7 @@
                             if (img) {
                                 root.querySelectorAll('.author-avatar-badge[data-author-id="' + CSS.escape(id) + '"]').forEach(el => {
                                     el.style.background = 'none';
-                                    el.innerHTML = '<img src="' + img + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                                    el.innerHTML = '<img src="' + esc(img) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
                                 });
                             }
                         } catch (e) { /* 取得できなければ頭文字バッジのまま */ }
@@ -1699,7 +1699,7 @@
 
             function applyLogo(el, logo) {
                 el.style.background = '#fff';
-                el.innerHTML = '<img src="' + logo + '" alt="" style="width:100%;height:100%;object-fit:contain;padding:2px;box-sizing:border-box;border-radius:6px;">';
+                el.innerHTML = '<img src="' + esc(logo) + '" alt="" style="width:100%;height:100%;object-fit:contain;padding:2px;box-sizing:border-box;border-radius:6px;">';
             }
 
             for (const [clubId, els] of byId) {
@@ -1813,7 +1813,7 @@
                     const g = avatarColor(p.name);
                     const playerPhoto = p.photoUrl || p.profileImage;
                     const avatar = playerPhoto
-                        ? '<img src="' + playerPhoto + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
+                        ? '<img src="' + esc(playerPhoto) + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
                         : esc(getInitials(p.name));
                     const avatarStyleAttr = playerPhoto ? '' : ('background: ' + g[0] + '; color:#fff;');
                     let badge = '';
@@ -1874,7 +1874,7 @@
                 wrap.innerHTML = top5.map(r => {
                     const g = avatarColor(r.name);
                     const avatar = r.profileImage
-                        ? '<img src="' + r.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
+                        ? '<img src="' + esc(r.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
                         : esc(getInitials(r.name));
                     const avatarStyleAttr = r.profileImage ? '' : ('background: ' + g[0] + '; color:#fff;');
                     const score = Math.round((r.computedAverage / 5) * 100);
@@ -2003,7 +2003,7 @@
                     if (logo) {
                         root.querySelectorAll('.media-logo-badge[data-media-name="' + CSS.escape(name) + '"]').forEach(el => {
                             el.style.background = 'none';
-                            el.innerHTML = '<img src="' + logo + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                            el.innerHTML = '<img src="' + esc(logo) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
                         });
                     }
                 } catch (e) { /* ロゴが無ければ頭文字バッジのまま */ }

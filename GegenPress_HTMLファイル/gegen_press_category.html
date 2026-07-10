@@ -990,9 +990,9 @@
 
         function thumbHtml(article) {
             if (article.image) {
-                const pos = (article.imagePosition && typeof article.imagePosition.x === 'number')
+                const pos = (article.imagePosition && typeof article.imagePosition.x === 'number' && typeof article.imagePosition.y === 'number')
                     ? (article.imagePosition.x + '% ' + article.imagePosition.y + '%') : '50% 50%';
-                return '<img src="' + article.image + '" alt="" style="object-position:' + pos + ';">';
+                return '<img src="' + esc(article.image) + '" alt="" style="object-position:' + pos + ';">';
             }
             return esc(article.category || 'Gegen Press!');
         }
@@ -1027,7 +1027,7 @@
                     if (img) {
                         root.querySelectorAll('.author-avatar-badge[data-author-id="' + CSS.escape(id) + '"]').forEach(el => {
                             el.style.background = 'none';
-                            el.innerHTML = '<img src="' + img + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                            el.innerHTML = '<img src="' + esc(img) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
                         });
                     }
                 } catch (e) { /* 取得できなければ頭文字バッジのまま */ }

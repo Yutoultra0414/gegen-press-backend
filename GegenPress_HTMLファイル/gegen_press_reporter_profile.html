@@ -1499,7 +1499,7 @@
             if (!el) return;
             var img = r.profileImage || r.avatarUrl;
             if (img) {
-                el.innerHTML = '<img src="' + img + '" alt="' + escapeHtml(r.name || '') + '">';
+                el.innerHTML = '<img src="' + escapeHtml(img) + '" alt="' + escapeHtml(r.name || '') + '">';
                 el.style.background = 'none';
                 return;
             }
@@ -1927,7 +1927,7 @@
                     const r = x.r;
                     const g = avatarColor(r.name);
                     const avatar = r.profileImage
-                        ? '<img src="' + r.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
+                        ? '<img src="' + esc(r.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
                         : escapeHtml(getInitials(r.name));
                     const avatarBg = r.profileImage ? '' : ('background: ' + g[0] + ';');
                     return (

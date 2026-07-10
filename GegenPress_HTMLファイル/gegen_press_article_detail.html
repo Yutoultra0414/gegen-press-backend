@@ -1684,7 +1684,7 @@
                         if (rres && rres.success && rres.reporter && rres.reporter.profileImage) {
                             const avatarEl = document.getElementById('authorAvatar');
                             avatarEl.style.background = 'none';
-                            avatarEl.innerHTML = '<img src="' + rres.reporter.profileImage + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                            avatarEl.innerHTML = '<img src="' + esc(rres.reporter.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
                         }
                     }).catch(function () {});
                 }
@@ -1718,10 +1718,10 @@
                 // 本文（サムネイル＋改行を段落として表示）
                 const bodyEl = document.getElementById('articleContent');
                 const text = a.content || a.description || '';
-                const pos = (a.imagePosition && typeof a.imagePosition.x === 'number')
+                const pos = (a.imagePosition && typeof a.imagePosition.x === 'number' && typeof a.imagePosition.y === 'number')
                     ? (a.imagePosition.x + '% ' + a.imagePosition.y + '%') : '50% 50%';
                 const thumbHtml = a.image
-                    ? '<img src="' + a.image + '" alt="" style="width:100%; max-height:340px; object-fit:cover; object-position:' + pos + '; border-radius:8px; margin-bottom:16px; display:block;">'
+                    ? '<img src="' + esc(a.image) + '" alt="" style="width:100%; max-height:340px; object-fit:cover; object-position:' + pos + '; border-radius:8px; margin-bottom:16px; display:block;">'
                     : '';
                 if (text || thumbHtml) {
                     bodyEl.innerHTML = thumbHtml + text.split(/\n+/).filter(Boolean).map(p => '<p>' + esc(p) + '</p>').join('');

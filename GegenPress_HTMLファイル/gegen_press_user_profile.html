@@ -416,7 +416,7 @@
         function renderMyAvatar(profileImage, name) {
             const el = document.getElementById('myAvatar');
             if (profileImage) {
-                el.innerHTML = '<img src="' + profileImage + '" alt="">';
+                el.innerHTML = '<img src="' + esc(profileImage) + '" alt="">';
                 el.style.background = 'none';
             } else {
                 el.textContent = getInitials(name);

@@ -402,6 +402,7 @@
 
     <script src="api-client.js" onerror="console.warn('api-client.js 未読込')"></script>
     <script>
+        console.log('[GegenPress] player_profile build: 2026-07-10a（編集リンク診断入り）');
         function esc(s) {
             return String(s == null ? '' : s)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -434,7 +435,7 @@
                 return '<a href="' + href + '" title="' + esc(label) + '" ' +
                     'style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:6px; ' +
                     'overflow:hidden; margin-right:4px; background:#fff; border:1px solid rgba(255,255,255,0.5);">' +
-                    '<img src="' + logoUrl + '" alt="" style="width:100%; height:100%; object-fit:contain; padding:2px; box-sizing:border-box;"></a>';
+                    '<img src="' + esc(logoUrl) + '" alt="" style="width:100%; height:100%; object-fit:contain; padding:2px; box-sizing:border-box;"></a>';
             }
             const g = colorFor(label);
             return '<a href="' + href + '" title="' + esc(label) + '" ' +
@@ -466,10 +467,10 @@
             const el = document.getElementById('profileAvatar');
             // 表示優先順位: Wikimedia Commons由来の写真(photoUrl) > ユーザーがアップロードしたアイコン(profileImage) > 色付きイニシャル
             if (p.photoUrl) {
-                el.innerHTML = '<img src="' + p.photoUrl + '" alt="">';
+                el.innerHTML = '<img src="' + esc(p.photoUrl) + '" alt="">';
                 el.style.background = 'none';
             } else if (p.profileImage) {
-                el.innerHTML = '<img src="' + p.profileImage + '" alt="">';
+                el.innerHTML = '<img src="' + esc(p.profileImage) + '" alt="">';
                 el.style.background = 'none';
             } else {
                 el.textContent = getInitials(p.name);
