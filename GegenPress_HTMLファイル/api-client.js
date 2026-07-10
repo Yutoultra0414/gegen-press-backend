@@ -9,6 +9,7 @@
  * 使い方: <script src="api-client.js"></script>
  */
 (function () {
+  console.log('[GegenPress] api-client.js build: 2026-07-10a（ADMIN_UIDS診断入り）');
   // ==== Firebase 設定（Web公開前提の値。秘密鍵ではありません） ====
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyDyisueW3srtm60_Y1oiE4mf5Rcy6_gB6Y",
