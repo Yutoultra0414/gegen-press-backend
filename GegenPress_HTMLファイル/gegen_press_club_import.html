@@ -97,7 +97,7 @@
             <div class="card">
                 <div class="dropzone" id="dropzone">
                     <strong>ここにロゴ画像をドラッグ&ドロップ</strong>
-                    SVGまたはPNG・複数選択可・クリックしてファイルを選ぶこともできます
+                    SVGまたはPNG・複数選択可・football-logos.ccのファイル名（例: germany_bayern-munchen...）もそのまま使えます
                     <input type="file" id="fileInput" accept=".svg,.png,image/svg+xml,image/png" multiple style="display:none;">
                 </div>
             </div>
@@ -137,8 +137,50 @@
                 .replace(/^-+|-+$/g, '')
                 .replace(/-{2,}/g, '-');
         }
+
+        // football-logos.cc からダウンロードした画像は、ファイル名が
+        // "germany_bayern-munchen.football-logos.cc" のような形式になっていることがある。
+        // これをそのまま渡しても使えるよう、国名部分とチーム名部分を分けて読み取る。
+        const COUNTRY_EN_JA = {
+            england: 'イングランド', scotland: 'スコットランド', wales: 'ウェールズ', ireland: 'アイルランド',
+            spain: 'スペイン', portugal: 'ポルトガル', germany: 'ドイツ', italy: 'イタリア', france: 'フランス',
+            netherlands: 'オランダ', belgium: 'ベルギー', croatia: 'クロアチア', serbia: 'セルビア',
+            poland: 'ポーランド', ukraine: 'ウクライナ', switzerland: 'スイス', austria: 'オーストリア',
+            denmark: 'デンマーク', sweden: 'スウェーデン', norway: 'ノルウェー', turkey: 'トルコ', greece: 'ギリシャ',
+            brazil: 'ブラジル', argentina: 'アルゼンチン', uruguay: 'ウルグアイ', colombia: 'コロンビア',
+            chile: 'チリ', paraguay: 'パラグアイ', peru: 'ペルー', ecuador: 'エクアドル',
+            usa: 'アメリカ', 'united-states': 'アメリカ', canada: 'カナダ', mexico: 'メキシコ',
+            morocco: 'モロッコ', algeria: 'アルジェリア', tunisia: 'チュニジア', egypt: 'エジプト',
+            senegal: 'セネガル', nigeria: 'ナイジェリア', cameroon: 'カメルーン', ghana: 'ガーナ',
+            'south-africa': '南アフリカ', japan: '日本', 'south-korea': '韓国', china: '中国',
+            'saudi-arabia': 'サウジアラビア', iran: 'イラン', qatar: 'カタール', uae: 'アラブ首長国連邦',
+            australia: 'オーストラリア'
+        };
+        function parseLogoFilename(filename) {
+            let base = filename;
+            let ext = null;
+            const extMatch = base.match(/\.(svg|png|jpe?g|webp)$/i);
+            if (extMatch) { ext = extMatch[1].toLowerCase(); base = base.slice(0, -extMatch[0].length); }
+            // "xxx.football-logos.cc" のようなサイト名部分を除去（拡張子の前後どちらにあっても対応）
+            base = base.replace(/\.football-logos\.cc$/i, '');
+            if (!ext) {
+                const extMatch2 = base.match(/\.(svg|png|jpe?g|webp)$/i);
+                if (extMatch2) { ext = extMatch2[1].toLowerCase(); base = base.slice(0, -extMatch2[0].length); }
+            }
+            const underscoreIdx = base.indexOf('_');
+            let countryRaw = null, teamRaw = base;
+            if (underscoreIdx > 0) {
+                countryRaw = base.slice(0, underscoreIdx).toLowerCase();
+                teamRaw = base.slice(underscoreIdx + 1);
+            }
+            return {
+                clubId: slugify(teamRaw),
+                countryJa: countryRaw ? (COUNTRY_EN_JA[countryRaw] || null) : null,
+                ext: ext // 拡張子が読み取れなければ null（file.typeで判定にフォールバック）
+            };
+        }
         function clubIdFromFilename(filename) {
-            return slugify(filename.replace(/\.[a-zA-Z0-9]+$/, ''));
+            return parseLogoFilename(filename).clubId;
         }
 
         // ==== 簡易ファジーマッチ（Levenshtein） ====
@@ -419,12 +461,18 @@
 
         async function processFile(file) {
             const seq = cardSeq++;
-            const clubId = clubIdFromFilename(file.name);
-            const ext = file.name.toLowerCase().endsWith('.svg') ? 'svg' : 'raster';
+            const parsed = parseLogoFilename(file.name);
+            const clubId = parsed.clubId;
+            // 拡張子がファイル名から読み取れない場合（football-logos.cc特有の命名など）は、
+            // ブラウザが判定したMIMEタイプ（file.type）にフォールバックする。
+            const isSvg = parsed.ext ? parsed.ext === 'svg' : (file.type === 'image/svg+xml');
+            const ext = isSvg ? 'svg' : 'raster';
 
             const c = {
                 clubId, file, ext, status: 'searching',
-                displayNameJa: '', displayNameEn: '', shortName: '', country: '', leagueId: '',
+                displayNameJa: '', displayNameEn: '', shortName: '',
+                country: parsed.countryJa || '', // ファイル名の国名ヒントを初期値に。Wikidataで一致すれば上書きされる
+                leagueId: '',
                 stadium: '', founded: '', website: '', aliases: [], primaryColor: '#e63946', secondaryColor: '#1d3557',
                 logoDataUrl: null, wikidataQid: null, candidates: []
             };
@@ -512,8 +560,10 @@
         });
         function handleFiles(fileList) {
             Array.from(fileList).forEach(file => {
-                if (!/\.(svg|png)$/i.test(file.name)) {
-                    logMsg('✗ ' + file.name + ': SVGまたはPNGのみ対応しています', true);
+                const looksImageByName = /\.(svg|png|jpe?g|webp)$/i.test(file.name) || /\.football-logos\.cc$/i.test(file.name);
+                const looksImageByType = /^image\/(svg\+xml|png|jpeg|webp)$/.test(file.type || '');
+                if (!looksImageByName && !looksImageByType) {
+                    logMsg('✗ ' + file.name + ': 画像ファイル（SVG/PNG等）として認識できませんでした', true);
                     return;
                 }
                 processFile(file);
