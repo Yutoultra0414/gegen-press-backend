@@ -384,10 +384,15 @@
                         '<a href="' + esc(clubMasterData.website) + '" target="_blank" rel="noopener" style="color:#fff; text-decoration:underline;">公式サイト</a>';
                 }
 
-                // ログイン中（管理者）ならロゴ設定ボタンを表示。保存先は clubs.saveFull（clubId方式）
+                // ログイン中（管理者）ならロゴ設定ボタンとクラブ情報の編集リンクを表示。保存先は clubs.saveFull（clubId方式）
                 let user = null;
                 try { user = await GegenPressAPI._currentUser(); } catch (e) {}
-                if (user && GegenPressAPI.isAdminUid(user.uid)) document.getElementById('setClubLogoBtn').style.display = 'inline-block';
+                if (user && GegenPressAPI.isAdminUid(user.uid)) {
+                    document.getElementById('setClubLogoBtn').style.display = 'inline-block';
+                    const badgesEl = document.getElementById('clubBadges');
+                    badgesEl.innerHTML += '<a href="gegen_press_club_import.html?edit=' + encodeURIComponent(clubIdParam) + '" ' +
+                        'style="background:rgba(255,255,255,0.9); color:#1d3557; border-radius:2px; padding:3px 10px; font-size:11px; font-weight:bold; text-decoration:none;">クラブ情報を編集</a>';
+                }
                 return;
             }
 

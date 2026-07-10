@@ -613,6 +613,58 @@
             if (okCount > 0) loadExisting();
         });
 
+        // ==== 既存クラブの編集（登録済み一覧の「編集」ボタンから） ====
+        async function editExistingClub(clubId) {
+            // すでに同じクラブの編集カードが開いていれば、そこへスクロールするだけ
+            for (const [seq, c] of cards.entries()) {
+                if (c.clubId === clubId) {
+                    const el = document.getElementById('card-' + seq);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+            }
+            let club = null;
+            try {
+                const res = await GegenPressAPI.clubs.getById(clubId);
+                if (res && res.success) club = res.club;
+            } catch (e) {}
+            if (!club) {
+                logMsg('✗ ' + clubId + ' の読み込みに失敗しました', true);
+                return;
+            }
+            const seq = cardSeq++;
+            const c = {
+                clubId: clubId,
+                file: null,
+                ext: null,
+                status: 'manual', // 編集は手動確定扱い（Wikidata再検索はしない。必要ならファイルを再ドロップ）
+                displayNameJa: club.displayNameJa || '',
+                displayNameEn: club.displayNameEn || '',
+                shortName: club.shortName || '',
+                country: club.country || '',
+                leagueId: club.leagueId || '',
+                stadium: club.stadium || '',
+                founded: club.founded || '',
+                website: club.website || '',
+                aliases: club.aliases || [],
+                primaryColor: club.primaryColor || '#e63946',
+                secondaryColor: club.secondaryColor || '#1d3557',
+                logoDataUrl: club.logo || null, // 既存ロゴをそのまま保持（変更したい場合は同名ファイルを再ドロップ）
+                wikidataQid: club.wikidataQid || null,
+                candidates: []
+            };
+            cards.set(seq, c);
+            const wrap = document.getElementById('clubCardsWrap');
+            const cardEl = document.createElement('div');
+            cardEl.className = 'club-card';
+            cardEl.id = 'card-' + seq;
+            wrap.appendChild(cardEl);
+            renderCard(seq);
+            updateSaveBarVisibility();
+            cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            logMsg('「' + (c.displayNameJa || clubId) + '」を編集モードで開きました。内容を修正して「すべてFirestoreに保存」を押してください。');
+        }
+
         // ==== 登録済みクラブ一覧（削除も可能） ====
         async function loadExisting() {
             const wrap = document.getElementById('existingWrap');
@@ -624,7 +676,7 @@
                     return;
                 }
                 wrap.innerHTML = '<table class="existing"><thead><tr>' +
-                    '<th>ドキュメントID</th><th>表示名</th><th>リーグ</th><th>形式</th><th></th>' +
+                    '<th>ドキュメントID</th><th>表示名</th><th>リーグ</th><th>形式</th><th></th><th></th>' +
                     '</tr></thead><tbody>' +
                     list.map(c => {
                         const looksLegacy = !/^[a-z0-9-]+$/.test(c.id); // clubIdは半角英数+ハイフンのみのはず
@@ -633,10 +685,17 @@
                             '<td>' + esc(c.displayNameJa || c.displayNameEn || c.name || '（旧形式データ）') + '</td>' +
                             '<td>' + esc(c.leagueId || '-') + '</td>' +
                             '<td>' + (looksLegacy ? '<span style="color:#c5303c;">旧形式（クラブ名がID）</span>' : '新clubId形式') + '</td>' +
+                            '<td>' + (looksLegacy ? '' : '<span class="edit-btn" data-edit="' + esc(c.id) + '" style="color:#1d3557; cursor:pointer; font-size:11.5px; font-weight:bold;">編集</span>') + '</td>' +
                             '<td><span class="del-btn" data-del="' + esc(c.id) + '">削除</span></td>' +
                         '</tr>';
                     }).join('') + '</tbody></table>' +
                     '<p style="font-size:11px; color:#999; margin-top:8px;">「旧形式（クラブ名がID）」は、このツール導入前にクラブページから個別登録された古いロゴデータです。新しいクラブマスタとは別物として残っています。不要であれば削除して問題ありません。</p>';
+
+                wrap.querySelectorAll('[data-edit]').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        editExistingClub(this.getAttribute('data-edit'));
+                    });
+                });
 
                 wrap.querySelectorAll('[data-del]').forEach(btn => {
                     btn.addEventListener('click', async function () {
@@ -668,6 +727,9 @@
             document.getElementById('loadingBox').style.display = 'none';
             document.getElementById('mainArea').style.display = 'block';
             loadExisting();
+            // クラブページの「編集」リンクなどから ?edit=clubId で直接編集モードを開く
+            const editParam = new URLSearchParams(window.location.search).get('edit');
+            if (editParam) editExistingClub(editParam);
         }
         init();
     </script>
