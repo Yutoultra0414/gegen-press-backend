@@ -1132,6 +1132,37 @@
         })();
     </script>
 
+    <!-- 初めての方向け: ガイドページへの案内ポップアップ（タブごとに初回のみ、イントロ演出の直後に表示） -->
+    <div id="guidePopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(20,33,61,0.72); z-index:9998; align-items:center; justify-content:center; padding:20px;">
+        <div style="position:relative; max-width:360px; width:100%;">
+            <button id="guidePopupClose" aria-label="閉じる" style="position:absolute; top:-14px; right:-14px; width:32px; height:32px; border-radius:50%; background:#fff; border:none; box-shadow:0 2px 8px rgba(0,0,0,0.25); font-size:16px; font-weight:900; color:#333; cursor:pointer; line-height:1;">×</button>
+            <a href="gegen_press_guide.html" style="display:block;">
+                <img src="guide-popup.png" alt="初心者必見！Gegen Press!の楽しみ方。ルール説明はこちら" style="width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.35); display:block;">
+            </a>
+        </div>
+    </div>
+    <script>
+        (function () {
+            var overlay = document.getElementById('guidePopupOverlay');
+            if (!overlay) return;
+            var shown = false;
+            try { shown = !!sessionStorage.getItem('gpGuidePopupShown'); } catch (e) {}
+            if (shown) return;
+            try { sessionStorage.setItem('gpGuidePopupShown', '1'); } catch (e) {}
+            // イントロ演出（約1.3秒）が終わってから表示する
+            setTimeout(function () {
+                overlay.style.display = 'flex';
+            }, 1500);
+            document.getElementById('guidePopupClose').addEventListener('click', function (e) {
+                e.preventDefault();
+                overlay.style.display = 'none';
+            });
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) overlay.style.display = 'none';
+            });
+        })();
+    </script>
+
     <!-- ヘッダー -->
     <header class="gp-header">
         <a href="gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
@@ -1368,6 +1399,7 @@
             </div>
             <div class="gp-footer-col">
                 <h4>Contents</h4>
+                <a href="gegen_press_guide.html">初めての方へ</a>
                 <a href="gegen_press_category.html">ニュース一覧</a>
                 <a href="gegen_press_ranking.html">記者ランキング</a>
                 <a href="gegen_press_players.html">選手一覧</a>
