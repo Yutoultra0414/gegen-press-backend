@@ -9,7 +9,7 @@
  * 使い方: <script src="api-client.js"></script>
  */
 (function () {
-  console.log('[GegenPress] api-client.js build: 2026-07-10a（ADMIN_UIDS診断入り）');
+  console.log('[GegenPress] api-client.js build: 2026-07-12a（初期表示の高速化）');
   // ==== Firebase 設定（Web公開前提の値。秘密鍵ではありません） ====
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyDyisueW3srtm60_Y1oiE4mf5Rcy6_gB6Y",
@@ -55,9 +55,16 @@
     return { db: firebase.firestore(), auth: firebase.auth() };
   }
 
-  var _ready = ensureFirebase().then(async function (fb) {
-    // Googleログインが signInWithRedirect にフォールバックした場合、
-    // リダイレクトで戻ってきた直後にその結果を回収して users コレクションに反映する
+  var _ready = ensureFirebase().catch(function (e) {
+    console.error('Firebase 初期化に失敗しました:', e);
+    throw e;
+  });
+
+  // Googleログインが signInWithRedirect にフォールバックした場合の結果回収。
+  // 以前はこれを _ready の直列処理に入れていたが、getRedirectResult() は認証系の
+  // 完全な初期化を待つため回線状況によっては長く待たされ、全ページの初期表示が
+  // 固まる原因になっていた。ページ表示をブロックしないよう、裏で並行実行する。
+  _ready.then(async function (fb) {
     try {
       var redirectResult = await fb.auth.getRedirectResult();
       if (redirectResult && redirectResult.user) {
@@ -70,11 +77,7 @@
     } catch (e) {
       console.warn('リダイレクトログインの結果取得に失敗しました:', e);
     }
-    return fb;
-  }).catch(function (e) {
-    console.error('Firebase 初期化に失敗しました:', e);
-    throw e;
-  });
+  }).catch(function () { /* 初期化失敗時は上のcatchで通知済み */ });
 
   // ログイン状態が確定するのを一度だけ待つ
   function currentUser() {

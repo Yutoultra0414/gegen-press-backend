@@ -7,17 +7,25 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Meiryo', 'Segoe UI', sans-serif; background: #f5f5f5; color: #333;
-            font-size: 13px; line-height: 1.8;
+        :root {
+            --red: #e63946;
+            --navy: #14213d;
+            --ink: #1a1a1a;
+            --rule: #d9d9d9;
+            --paper: #fffdfa;
+        }
+        body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Meiryo', 'Segoe UI', sans-serif; background: #efeeec; color: var(--ink);
+            font-size: 13px; line-height: 1.9;
         }
 
         /* ===== 共通ヘッダー（他ページと同一） ===== */
         html, body { max-width: 100%; overflow-x: hidden; }
         header.gp-header {
-            background: #fff !important; border-bottom: 3px solid #e63946 !important;
+            background: #fff !important; border-bottom: 3px solid var(--red) !important;
             padding: 6px 24px !important; display: flex !important; align-items: center !important;
             justify-content: flex-start !important; flex-direction: row !important; flex-wrap: nowrap !important;
             gap: 26px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
@@ -25,105 +33,222 @@
         }
         .gp-logo { display: block; flex-shrink: 0; }
         .gp-logo img { height: 34px !important; width: auto; display: block; }
-        .gp-nav { display: flex; align-items: stretch; gap: 22px; flex: 1; min-width: 0; overflow-x: visible; scrollbar-width: none; }
-        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav { display: flex; align-items: stretch; gap: 22px; flex: 1; min-width: 0; }
         .gp-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; line-height: 1.15; padding: 6px 2px; white-space: nowrap; }
         .gp-en { font-size: 14px; font-weight: 900; letter-spacing: 0.5px; color: #111; text-transform: uppercase; }
         .gp-jp { font-size: 10px; color: #888; font-weight: 600; margin-top: 1px; }
-        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item:hover .gp-en { color: var(--red); }
         .gp-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-shrink: 0; }
-        .gp-mypage { display: flex; flex-direction: column; align-items: center; background: #e63946; color: #fff; text-decoration: none; padding: 5px 14px; border-radius: 5px; line-height: 1.15; white-space: nowrap; }
+        .gp-mypage { display: flex; flex-direction: column; align-items: center; background: var(--red); color: #fff; text-decoration: none; padding: 5px 14px; border-radius: 5px; line-height: 1.15; white-space: nowrap; }
         .gp-mypage .gp-en { color: #fff; font-size: 12px; }
         .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
         .gp-mypage:hover { background: #c5303c; }
-        .gp-dropdown-wrap { position: relative; }
-        .gp-dropdown-panel { display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #ddd; box-shadow: 0 8px 20px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; flex-direction: column; }
-        .gp-dropdown-wrap.open .gp-dropdown-panel, .gp-dropdown-wrap:hover .gp-dropdown-panel { display: flex; }
-        .gp-dropdown-option { display: flex; flex-direction: column; padding: 10px 14px; text-decoration: none; color: #333; border-bottom: 1px solid #eee; }
-        .gp-dropdown-option:last-child { border-bottom: none; }
-        .gp-dropdown-option strong { font-size: 12.5px; }
-        .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
-        .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
-        .gp-submenu-wrap { position: relative; }
-        .gp-submenu-trigger { cursor: pointer; justify-content: space-between; display: flex; }
-        .gp-submenu-panel { display: none; position: absolute; top: 0; left: 100%; background: #fff; border: 1px solid #ddd; box-shadow: 0 8px 20px rgba(0,0,0,0.12); min-width: 170px; max-height: 320px; overflow-y: auto; z-index: 210; flex-direction: column; }
-        .gp-submenu-wrap.open .gp-submenu-panel { display: flex; }
-        .gp-submenu-option { font-size: 12px; padding: 8px 12px; }
         @media (max-width: 768px) {
             header.gp-header { flex-wrap: wrap !important; padding: 8px 14px !important; gap: 0 !important; row-gap: 6px !important; }
             .gp-logo { order: 1; } .gp-logo img { height: 26px !important; }
             .gp-actions { order: 2; margin-left: auto; } .gp-mypage { padding: 4px 10px; } .gp-mypage .gp-en { font-size: 10.5px; }
-            .gp-nav { order: 3; flex: 1 1 100%; width: 100%; max-width: 100%; overflow-x: visible; flex-wrap: wrap; justify-content: space-between; gap: 6px 4px; }
-            .gp-nav-item { white-space: nowrap; padding: 4px 2px; } .gp-en { font-size: 11.5px; } .gp-jp { font-size: 9px; }
-            .gp-submenu-panel { position: static; box-shadow: none; border: none; border-top: 1px solid #eee; min-width: 0; }
+            .gp-nav { order: 3; flex: 1 1 100%; width: 100%; flex-wrap: wrap; justify-content: space-between; gap: 6px 4px; }
+            .gp-nav-item { padding: 4px 2px; } .gp-en { font-size: 11.5px; } .gp-jp { font-size: 9px; }
         }
 
-        /* ===== ページ本体 ===== */
-        .guide-hero {
-            background: linear-gradient(180deg, #14213d 0%, #1d3557 100%);
-            padding: 36px 20px 30px; text-align: center; color: #fff;
+        /* ===== 紙面 ===== */
+        .sheet {
+            max-width: 720px;
+            margin: 28px auto 60px;
+            background: var(--paper);
+            border: 1px solid #e2e0dc;
+            padding: 0 0 56px;
         }
-        .guide-hero h1 { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
-        .guide-hero p { font-size: 13px; color: rgba(255,255,255,0.8); max-width: 560px; margin: 0 auto 20px; line-height: 1.9; }
-        .guide-hero img { max-width: 100%; width: 480px; border-radius: 8px; }
+        @media (max-width: 768px) { .sheet { margin: 0 0 0; border: none; } }
 
-        .container { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
-
-        .intro-box {
-            background: #fff; border-radius: 8px; padding: 20px 22px; margin-bottom: 28px;
-            border-left: 4px solid #e63946; font-size: 13.5px; line-height: 1.9; color: #444;
+        /* --- 見出しまわり（新聞のダブルルール） --- */
+        .masthead {
+            padding: 44px 56px 0;
+        }
+        .masthead .kicker {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 11px; font-weight: 900; letter-spacing: 3px;
+            color: var(--red); text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .kicker .bars {
+            display: inline-block; width: 26px; height: 10px;
+            background:
+                linear-gradient(115deg, transparent 0 8%, var(--red) 8% 30%, transparent 30% 42%, var(--red) 42% 60%, transparent 60% 72%, var(--red) 72% 86%, transparent 86%);
+        }
+        .masthead h1 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 33px; font-weight: 700; line-height: 1.45;
+            letter-spacing: 0.04em;
+            margin-bottom: 18px;
+        }
+        .masthead .lede {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 14px; line-height: 2.2; color: #3a3a3a;
+            padding-bottom: 26px;
+        }
+        .double-rule {
+            border-top: 3px solid var(--ink);
+            border-bottom: 1px solid var(--ink);
+            height: 6px;
+            margin: 0 56px;
         }
 
-        .step-card {
-            background: #fff; border-radius: 8px; padding: 20px 22px; margin-bottom: 16px;
-            display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        /* --- 導入（ドロップキャップ） --- */
+        .opening {
+            padding: 30px 56px 8px;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 13.5px; line-height: 2.3; color: #2b2b2b;
         }
-        .step-num {
-            flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: #e63946; color: #fff;
-            display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px;
+        .opening p::first-letter {
+            font-size: 42px; font-weight: 700; color: var(--red);
+            float: left; line-height: 1; padding: 4px 8px 0 0;
         }
-        .step-body h2 { font-size: 15px; color: #1d3557; margin-bottom: 6px; font-weight: 900; }
-        .step-body p { font-size: 13px; color: #555; line-height: 1.85; }
-        .step-body a.step-link { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: bold; color: #e63946; text-decoration: none; }
-        .step-body a.step-link:hover { text-decoration: underline; }
 
-        .section-heading {
-            font-size: 17px; font-weight: 900; color: #1d3557; margin: 40px 0 16px;
-            border-bottom: 2px solid #e8e8e8; padding-bottom: 8px; position: relative;
+        /* --- 図版 --- */
+        figure.inset {
+            margin: 26px 56px 8px;
+            border: 1px solid var(--rule);
+            padding: 8px;
+            background: #fff;
         }
-        .section-heading::after { content: ''; position: absolute; left: 0; bottom: -2px; width: 48px; height: 2px; background: #e63946; }
-
-        .community-box {
-            background: #fff5f5; border: 1px solid #ffd7da; border-radius: 8px; padding: 22px;
-            font-size: 13.5px; line-height: 1.9; color: #555; margin-bottom: 8px;
+        figure.inset img { width: 100%; display: block; }
+        figure.inset figcaption {
+            font-size: 10.5px; color: #888; padding: 8px 4px 2px;
+            border-top: 1px dotted var(--rule); margin-top: 8px;
         }
-        .community-box strong { color: #c5303c; }
 
-        .philosophy-box {
-            background: #14213d; color: rgba(255,255,255,0.9); border-radius: 10px;
-            padding: 28px 26px; margin-top: 12px; line-height: 2;
+        /* --- 章見出し --- */
+        .chapter {
+            margin: 44px 56px 4px;
+            display: flex; align-items: baseline; gap: 14px;
+            border-bottom: 1px solid var(--ink);
+            padding-bottom: 10px;
         }
-        .philosophy-box h2 { color: #fff; font-size: 16px; margin-bottom: 14px; font-weight: 900; }
-        .philosophy-box p { font-size: 13px; margin-bottom: 10px; color: rgba(255,255,255,0.85); }
-        .philosophy-box strong { color: #ffd166; }
-
-        .cta-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 32px; }
-        .cta-row a {
-            text-decoration: none; font-weight: bold; font-size: 13px; padding: 12px 22px; border-radius: 6px;
+        .chapter .no {
+            font-size: 11px; font-weight: 900; letter-spacing: 2.5px;
+            color: var(--red); text-transform: uppercase; white-space: nowrap;
         }
-        .cta-primary { background: #e63946; color: #fff; }
-        .cta-primary:hover { background: #c5303c; }
-        .cta-secondary { background: #fff; color: #1d3557; border: 1px solid #ccc; }
-        .cta-secondary:hover { border-color: #1d3557; }
+        .chapter h2 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 20px; font-weight: 700; letter-spacing: 0.06em;
+        }
 
-        @media (max-width: 640px) {
-            .guide-hero h1 { font-size: 19px; }
-            .step-card { flex-direction: column; }
-            .container { padding: 24px 16px 60px; }
+        /* --- ステップ（番号付き編集リスト） --- */
+        .steps { margin: 0 56px; }
+        .step {
+            display: grid; grid-template-columns: 64px 1fr; gap: 0 18px;
+            padding: 24px 0 22px;
+            border-bottom: 1px dotted #c9c7c2;
+        }
+        .step:last-child { border-bottom: none; }
+        .step .num {
+            font-size: 30px; font-weight: 900; line-height: 1;
+            color: var(--red);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -1px;
+            padding-top: 2px;
+        }
+        .step .num small { display: block; font-size: 9px; font-weight: 700; letter-spacing: 2px; color: #b5b3ae; margin-top: 6px; }
+        .step h3 {
+            font-size: 15.5px; font-weight: 900; letter-spacing: 0.03em;
+            margin-bottom: 7px;
+        }
+        .step p { font-size: 13px; color: #454545; line-height: 2.0; }
+        .step p .note { color: #999; font-size: 11.5px; }
+        .step .go {
+            display: inline-block; margin-top: 9px;
+            font-size: 12px; font-weight: 700; color: var(--red); text-decoration: none;
+            border-bottom: 1px solid rgba(230,57,70,0.35);
+            padding-bottom: 1px;
+        }
+        .step .go:hover { border-bottom-color: var(--red); }
+
+        /* --- コミュニティ（引用組み） --- */
+        .pullquote {
+            margin: 46px 56px 0;
+            padding: 6px 0 6px 26px;
+            border-left: 3px solid var(--red);
+        }
+        .pullquote p {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 15px; line-height: 2.3; color: #222;
+        }
+        .pullquote p strong { color: var(--red); font-weight: 700; }
+        .pullquote .sub {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 12px; color: #666; margin-top: 12px; line-height: 2;
+        }
+
+        /* --- 理念（コラム欄） --- */
+        .column-box {
+            margin: 52px 40px 0;
+            background: var(--navy);
+            color: rgba(255,255,255,0.88);
+            padding: 40px 44px 36px;
+            position: relative;
+        }
+        .column-box::before {
+            content: 'WHY WE BUILT THIS';
+            position: absolute; top: -9px; left: 32px;
+            background: var(--red); color: #fff;
+            font-size: 10px; font-weight: 900; letter-spacing: 2.5px;
+            padding: 3px 12px;
+        }
+        .column-box h2 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 19px; font-weight: 700; color: #fff;
+            letter-spacing: 0.06em; margin-bottom: 20px;
+        }
+        .column-box p {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 13px; line-height: 2.4; margin-bottom: 14px;
+            color: rgba(255,255,255,0.85);
+        }
+        .column-box p strong { color: #ffd166; font-weight: 700; }
+        .column-box .sign {
+            text-align: right; font-family: 'Noto Sans JP', sans-serif;
+            font-size: 11px; letter-spacing: 1.5px; color: rgba(255,255,255,0.55);
+            margin-top: 22px;
+        }
+
+        /* --- 結び --- */
+        .closing {
+            margin: 44px 56px 0;
+            text-align: center;
+        }
+        .closing .bars-divider {
+            width: 54px; height: 12px; margin: 0 auto 22px;
+            background:
+                linear-gradient(115deg, transparent 0 8%, var(--red) 8% 26%, transparent 26% 38%, var(--red) 38% 54%, transparent 54% 66%, var(--red) 66% 80%, transparent 80%);
+        }
+        .closing p { font-size: 13px; color: #555; margin-bottom: 22px; }
+        .closing .cta {
+            display: inline-block; background: var(--red); color: #fff;
+            font-size: 13.5px; font-weight: 900; letter-spacing: 1px;
+            text-decoration: none; padding: 13px 44px;
+        }
+        .closing .cta:hover { background: #c5303c; }
+        .closing .sub-link { display: block; margin-top: 14px; font-size: 11.5px; color: #888; text-decoration: none; }
+        .closing .sub-link:hover { color: var(--red); }
+
+        @media (max-width: 768px) {
+            .masthead { padding: 30px 20px 0; }
+            .masthead h1 { font-size: 24px; }
+            .double-rule { margin: 0 20px; }
+            .opening { padding: 24px 20px 4px; }
+            figure.inset { margin: 20px 20px 4px; }
+            .chapter { margin: 36px 20px 2px; }
+            .steps { margin: 0 20px; }
+            .step { grid-template-columns: 46px 1fr; gap: 0 12px; }
+            .step .num { font-size: 24px; }
+            .pullquote { margin: 36px 20px 0; padding-left: 18px; }
+            .column-box { margin: 44px 12px 0; padding: 32px 22px 28px; }
+            .closing { margin: 38px 20px 0; }
         }
 
         /* ===== フッター（他ページと同一） ===== */
-        .gp-footer { background: #14213d; color: rgba(255,255,255,0.75); margin-top: 0; }
+        .gp-footer { background: var(--navy); color: rgba(255,255,255,0.75); margin-top: 0; }
         .gp-footer-inner { max-width: 1040px; margin: 0 auto; padding: 36px 24px 28px; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px; }
         .gp-footer-logo { height: 30px; width: auto; filter: brightness(0) invert(1); opacity: 0.95; margin-bottom: 12px; }
         .gp-footer-brand p { font-size: 12px; line-height: 1.7; color: rgba(255,255,255,0.6); }
@@ -152,94 +277,106 @@
         </div>
     </header>
 
-    <div class="guide-hero">
-        <h1>初めてサイトを訪れた方へ</h1>
-        <p>Gegen Press!は、海外サッカーの移籍情報やニュースを、記者・ジャーナリストの信頼度とあわせて届ける、<strong>ファン参加型</strong>のメディアです。ここでは、サイトの楽しみ方を順番にご紹介します。</p>
-        <img src="guide-hero-banner.png" alt="Gegen Press!の楽しみ方: 最新ニュースがすぐわかる、人気記事ランキング、記事を投稿してみんなとシェア、好きなリーグやチームをフォロー">
-    </div>
+    <article class="sheet">
+        <div class="masthead">
+            <div class="kicker"><span class="bars"></span>BEGINNER'S GUIDE<span class="bars"></span></div>
+            <h1>初めてサイトを訪れた方へ。</h1>
+            <p class="lede">Gegen Press!は、海外サッカーの移籍情報やニュースを「誰が報じたか」という視点とともに届ける、ファン参加型のメディアです。この記事では、サイトの歩き方を順を追ってご案内します。</p>
+        </div>
+        <div class="double-rule"></div>
 
-    <div class="container">
-        <div class="intro-box">
-            Gegen Press!は、運営だけがニュースを発信するサイトではありません。読者のみなさん一人ひとりが記事を書き、選手やクラブの情報を育てていく——そんな「みんなで作るサッカーメディア」を目指しています。まずは下から、サイトの使い方を見ていきましょう。
+        <div class="opening">
+            <p>このサイトには、編集部だけがいるわけではありません。記事を書くのも、選手の情報を登録するのも、記者を評価するのも、読者であるあなた自身。全員がひとつの編集部として、他のどこにもないサッカーの情報基地を一緒に作っていく——それがGegen Press!です。</p>
         </div>
 
-        <div class="section-heading">サイトの見方</div>
+        <figure class="inset">
+            <img src="guide-hero-banner.png" alt="Gegen Press!の楽しみ方: 最新ニュースがすぐわかる、人気記事ランキング、記事を投稿してみんなとシェア、好きなリーグやチームをフォロー">
+            <figcaption>Gegen Press! でできる4つのこと。読むだけでも、参加しても楽しめます。</figcaption>
+        </figure>
 
-        <div class="step-card">
-            <div class="step-num">1</div>
-            <div class="step-body">
-                <h2>ホーム画面でニュースをチェック</h2>
-                <p>トップページを開くと、最新の移籍情報や注目ニュースが並びます。「BREAKING NEWS」には特に重要なニュースが、その下には人気記事・インタビュー記事、話題の選手・記者・メディアが一覧できます。気になるニュースがあれば、タップして詳しく読んでみてください。</p>
-                <a class="step-link" href="gegen_press_top.html">ホーム画面を見る →</a>
+        <div class="chapter">
+            <span class="no">CHAPTER 1</span>
+            <h2>まずは、読んでみる</h2>
+        </div>
+        <div class="steps">
+            <div class="step">
+                <div class="num">01<small>HOME</small></div>
+                <div>
+                    <h3>ホーム画面でニュースをチェックする</h3>
+                    <p>トップページには、いま動いている移籍情報と注目ニュースが集まります。最上段の「BREAKING NEWS」は特に重要な速報。その下に人気記事、インタビュー、話題の選手・記者・メディアと続きます。まずは気になる見出しをひとつ、開いてみてください。</p>
+                    <a class="go" href="gegen_press_top.html">ホーム画面へ →</a>
+                </div>
+            </div>
+            <div class="step">
+                <div class="num">02<small>RANKING</small></div>
+                <div>
+                    <h3>記者ランキングで「信頼できる書き手」を知る</h3>
+                    <p>Gegen Press!の心臓部です。記者本人を直接採点するのではなく、その記者の記事に読者がつけた★評価の平均が、そのままスコアになります。「どのメディアか」の一歩先、「誰が書いたか」で情報を見る習慣が、ここで身につきます。</p>
+                    <a class="go" href="gegen_press_ranking.html">記者ランキングへ →</a>
+                </div>
+            </div>
+            <div class="step">
+                <div class="num">03<small>PLAYERS</small></div>
+                <div>
+                    <h3>選手ページを眺めてみる</h3>
+                    <p>選手一覧には、登録済みの選手プロフィールが並びます。所属クラブ、ポジション、移籍の噂まで一覧できます。「あの選手がいない」と気づいたら——それは、あなたの出番です（CHAPTER 2へ）。</p>
+                    <a class="go" href="gegen_press_players.html">選手一覧へ →</a>
+                </div>
             </div>
         </div>
 
-        <div class="step-card">
-            <div class="step-num">2</div>
-            <div class="step-body">
-                <h2>選手ページで、データをみんなで育てる</h2>
-                <p>選手一覧では、登録済みの選手プロフィールを見ることができます。まだ登録されていない選手や、情報が古い選手を見つけたら、ぜひあなたの手で追加・編集してください。基本情報は公開データと連携して自動入力される部分もありますが、抜けている情報はみんなで補っていく仕組みです。</p>
-                <a class="step-link" href="gegen_press_players.html">選手一覧を見る →</a>
+        <div class="chapter">
+            <span class="no">CHAPTER 2</span>
+            <h2>次に、参加してみる</h2>
+        </div>
+        <div class="steps">
+            <div class="step">
+                <div class="num">04<small>SIGN UP</small></div>
+                <div>
+                    <h3>無料の会員登録をする</h3>
+                    <p>記事の投稿、評価、コメントには会員登録が必要です。メールアドレスかGoogleアカウントがあれば、1分で完了します。</p>
+                    <a class="go" href="gegen_press_login.html">ログイン / 新規登録へ →</a>
+                </div>
+            </div>
+            <div class="step">
+                <div class="num">05<small>POST</small></div>
+                <div>
+                    <h3>記事を投稿してみる</h3>
+                    <p>海外メディアの報道を参考に、自分の言葉でニュースを書いて共有できます。情報の確度や引用元URLも記録できるので、丁寧に書くほど読者の信頼と記者ランキングの精度につながります。<br><span class="note">※ 画像の著作権にはご注意ください。詳しくは利用規約をどうぞ。</span></p>
+                    <a class="go" href="gegen_press_write_article.html">記事を投稿する →</a>
+                </div>
+            </div>
+            <div class="step">
+                <div class="num">06<small>ADD</small></div>
+                <div>
+                    <h3>記者・メディア・選手を追加する</h3>
+                    <p>紹介したい記者やメディア、載っていない選手は、あなた自身の手で追加できます。名前さえ分かれば大丈夫。あなたが追加した情報は、他の読者みんなの財産になります。</p>
+                    <a class="go" href="gegen_press_add_reporter.html">記者・メディアを追加する →</a>
+                </div>
             </div>
         </div>
 
-        <div class="step-card">
-            <div class="step-num">3</div>
-            <div class="step-body">
-                <h2>記者ランキングで「信頼できる記者」を見つける</h2>
-                <p>Gegen Press!最大の特徴が記者ランキングです。記者本人を直接評価するのではなく、その記者が書いた記事についた★評価の平均が、そのままスコアになります。「どのメディアが報じたか」だけでなく「誰が報じたか」に注目することで、信頼できる情報源を見つけやすくなります。</p>
-                <a class="step-link" href="gegen_press_ranking.html">記者ランキングを見る →</a>
-            </div>
+        <div class="pullquote">
+            <p>ここは、<strong>みんなで作る</strong>サイトです。</p>
+            <p class="sub">記事も、選手データも、記者の評価も、すべて読者の手で育っていきます。一人で完璧な情報を揃えることはできなくても、みんなで少しずつ持ち寄れば、他では見られない厚みのあるデータベースと、良いコミュニティができていくはずです。肩の力を抜いて、できるところから参加してみてください。</p>
         </div>
 
-        <div class="section-heading">参加してみよう</div>
-
-        <div class="step-card">
-            <div class="step-num">4</div>
-            <div class="step-body">
-                <h2>会員登録して参加しよう</h2>
-                <p>記事を投稿したり、評価やコメントを残したりするには、会員登録(無料)が必要です。メールアドレスまたはGoogleアカウントで、1分ほどで登録できます。</p>
-                <a class="step-link" href="gegen_press_login.html">ログイン / 新規登録はこちら →</a>
-            </div>
-        </div>
-
-        <div class="step-card">
-            <div class="step-num">5</div>
-            <div class="step-body">
-                <h2>記事を投稿してみよう</h2>
-                <p>登録が済んだら、さっそく記事を投稿してみましょう。海外メディアの報道を参考にしながら、自分の言葉でニュースを書いて共有できます。ニュースの種類や情報の確度、引用元URLなども入力できるので、できるだけ詳しく書くと読者にも記者ランキングにも良い影響があります。<br>
-                <span style="color:#999; font-size:12px;">※ 画像の著作権にはご注意ください。詳しくは利用規約をご確認ください。</span></p>
-                <a class="step-link" href="gegen_press_write_article.html">記事を投稿する →</a>
-            </div>
-        </div>
-
-        <div class="step-card">
-            <div class="step-num">6</div>
-            <div class="step-body">
-                <h2>記者・メディアも自分で追加できる</h2>
-                <p>記事内で紹介したい記者やメディアがまだ登録されていない場合、あなた自身で追加できます。名前さえ分かれば追加できるので、気になる記者を見つけたらぜひ登録してみてください。追加した記者・メディアは、他のユーザーとも共有されます。</p>
-                <a class="step-link" href="gegen_press_add_reporter.html">記者・メディアを追加する →</a>
-            </div>
-        </div>
-
-        <div class="section-heading">みんなで作るコミュニティ</div>
-        <div class="community-box">
-            Gegen Press!は、運営が一方的に情報を発信するサイトではありません。記事も、選手データも、記者・メディアの情報も、すべて<strong>読者のみなさんの手</strong>で育っていきます。一人で完璧な情報を用意することはできませんが、みんなで少しずつ持ち寄れば、他では見られない厚みのあるデータベース、そして良いコミュニティになっていくはずです。ぜひ気軽に、投稿や編集に参加してみてください。
-        </div>
-
-        <div class="philosophy-box">
+        <div class="column-box">
             <h2>このサイトを作る理由</h2>
             <p>現在は「どのメディアが報じたか」は意識されても、「<strong>誰が報じたか</strong>」まで見られる機会は多くありません。</p>
-            <p>しかし実際には、同じメディアでも記者やジャーナリストによって得意分野や情報の精度は大きく異なります。質の高い番記者の記事は、移籍情報だけでなく、そのクラブへの理解を深める貴重な情報源でもあります。移籍情報だけでなく、クラブ運営のビジョンなどに関して報道してくれる記者も多くいます。</p>
+            <p>しかし実際には、同じメディアでも記者やジャーナリストによって得意分野や情報の精度は大きく異なります。質の高い番記者の記事は移籍情報だけでなく、そのクラブへの理解を深める貴重な情報源でもあります。移籍情報だけでなく、クラブ運営のビジョン等に関して報道してくれる記者も多く居ます。</p>
             <p>そのため、「フォロワー数」や「拡散力」ではなく、<strong>記者個人の信用度</strong>に焦点を当てたサイトを目指しています。</p>
             <p>信頼性が分かることで、移籍の噂をもとにした選手・クラブへの誹謗中傷につながったりすることも減らせるのではないかと考えています。</p>
+            <div class="sign">— Gegen Press! 運営</div>
         </div>
 
-        <div class="cta-row">
-            <a href="gegen_press_login.html" class="cta-primary">会員登録する</a>
-            <a href="gegen_press_top.html" class="cta-secondary">ホームに戻る</a>
+        <div class="closing">
+            <div class="bars-divider"></div>
+            <p>それでは、良いフットボールライフを。</p>
+            <a class="cta" href="gegen_press_login.html">会員登録して参加する</a>
+            <a class="sub-link" href="gegen_press_top.html">まずはホームでニュースを見る</a>
         </div>
-    </div>
+    </article>
 
     <footer class="gp-footer">
         <div class="gp-footer-inner">
@@ -271,17 +408,5 @@
         </div>
         <div class="gp-footer-bottom">&copy; 2026 Gegen Press! All Rights Reserved.</div>
     </footer>
-
-    <script>
-        (function () {
-            document.querySelectorAll('.gp-submenu-trigger').forEach(function (trigger) {
-                trigger.addEventListener('click', function (e) {
-                    e.preventDefault(); e.stopPropagation();
-                    var wrap = trigger.closest('.gp-submenu-wrap');
-                    if (wrap) wrap.classList.toggle('open');
-                });
-            });
-        })();
-    </script>
 </body>
 </html>
