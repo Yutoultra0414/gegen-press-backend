@@ -555,6 +555,46 @@
         }
     
     </style>
+    <style>
+        /* ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== */
+        .gp-hamburger {
+            display: flex; flex-direction: column; justify-content: center; gap: 4px;
+            width: 34px; height: 34px; background: none; border: none; cursor: pointer;
+            padding: 6px; flex-shrink: 0; margin-left: 10px;
+        }
+        .gp-hamburger span { display: block; width: 100%; height: 2px; background: #1a1a1a; border-radius: 1px; }
+        .gp-sidebar-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(20,33,61,0.55); z-index: 997;
+        }
+        .gp-sidebar-overlay.open { display: block; }
+        .gp-sidebar {
+            position: fixed; top: 0; right: 0; height: 100%; width: 300px; max-width: 86vw;
+            background: #fff; z-index: 998; box-shadow: -8px 0 24px rgba(0,0,0,0.15);
+            transform: translateX(100%); transition: transform 0.25s ease; overflow-y: auto;
+            display: flex; flex-direction: column;
+        }
+        .gp-sidebar.open { transform: translateX(0); }
+        .gp-sidebar-head {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 18px; border-bottom: 1px solid #eee;
+            font-weight: 900; font-size: 12px; letter-spacing: 2px; color: #999;
+        }
+        .gp-sidebar-head button { background: none; border: none; font-size: 22px; cursor: pointer; color: #333; line-height: 1; }
+        .gp-sidebar-search-wrap { padding: 16px 18px; border-bottom: 1px solid #eee; position: relative; }
+        .gp-sidebar-search { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
+        .gp-sidebar-section { padding: 14px 18px; border-bottom: 1px solid #eee; }
+        .gp-sidebar-section h4 { font-size: 10.5px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 8px; }
+        .gp-sidebar-section a { display: block; padding: 6px 0; font-size: 13px; color: #333; text-decoration: none; }
+        .gp-sidebar-section a:hover { color: #e63946; }
+        .gp-search-suggest {
+            display: none; position: absolute; left: 18px; right: 18px; top: 100%; margin-top: -1px;
+            background: #fff; border: 1px solid #ccc; border-top: none; z-index: 5;
+            max-height: 240px; overflow-y: auto; box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        }
+        .gp-search-suggest .item { padding: 8px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f0f0f0; color: #333; }
+        .gp-search-suggest .item:last-child { border-bottom: none; }
+        .gp-search-suggest .item:hover { background: #fdf1f2; color: #e63946; }
+    </style>
 </head>
 <body>
     <!-- ヘッダー -->
@@ -605,9 +645,46 @@
             <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
         </nav>
         <div class="gp-actions">
+            <button id="gpSidebarToggle" class="gp-hamburger" aria-label="メニューを開く" type="button">
+                <span></span><span></span><span></span>
+            </button>
             <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
         </div>
     </header>
+
+    <!-- ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== -->
+    <div id="gpSidebarOverlay" class="gp-sidebar-overlay"></div>
+    <aside id="gpSidebar" class="gp-sidebar">
+        <div class="gp-sidebar-head">
+            <span>MENU</span>
+            <button id="gpSidebarClose" aria-label="閉じる" type="button">&times;</button>
+        </div>
+        <div class="gp-sidebar-search-wrap">
+            <input type="text" id="gpSidebarSearch" class="gp-sidebar-search" placeholder="チーム名・選手名・#ハッシュタグで検索" autocomplete="off">
+            <div id="gpSidebarSuggest" class="gp-search-suggest"></div>
+        </div>
+        <nav class="gp-sidebar-section">
+            <h4>Contents</h4>
+            <a href="gegen_press_guide.html">初めての方へ</a>
+            <a href="gegen_press_category.html">ニュース一覧</a>
+            <a href="gegen_press_ranking.html">記者ランキング</a>
+            <a href="gegen_press_players.html">選手一覧</a>
+            <a href="gegen_press_write_article.html">ニュースを投稿</a>
+        </nav>
+        <nav class="gp-sidebar-section">
+            <h4>Join</h4>
+            <a href="gegen_press_add_reporter.html">記者を追加</a>
+            <a href="gegen_press_add_media.html">メディアを追加</a>
+            <a href="gegen_press_add_player.html">選手を追加</a>
+            <a href="gegen_press_login.html">ログイン / 新規登録</a>
+        </nav>
+        <nav class="gp-sidebar-section">
+            <h4>About</h4>
+            <a href="gegen_press_terms.html">利用規約</a>
+            <a href="gegen_press_privacy.html">プライバシーポリシー</a>
+            <a href="mailto:gegenpressmanagement@gmail.com">お問い合わせ</a>
+        </nav>
+    </aside>
 
     <script>
         (function () {
@@ -966,6 +1043,67 @@
                 }
             });
         });
+    </script>
+    <script>
+        // ===== サイドバー（ハンバーガーメニュー。全ページ共通） =====
+        (function () {
+            var toggle = document.getElementById('gpSidebarToggle');
+            var closeBtn = document.getElementById('gpSidebarClose');
+            var sidebar = document.getElementById('gpSidebar');
+            var overlay = document.getElementById('gpSidebarOverlay');
+            if (!toggle || !sidebar) return;
+            function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('open'); }
+            function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+            toggle.addEventListener('click', openSidebar);
+            closeBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // 検索サジェスト（「もしかして」：よく使われるハッシュタグを頻度順で候補表示）
+            var input = document.getElementById('gpSidebarSearch');
+            var suggestBox = document.getElementById('gpSidebarSuggest');
+            var popularTags = null, tagsPromise = null;
+            function normalize(s) { return (s || '').trim().toLowerCase().replace(/^#+/, ''); }
+            function ensureTags() {
+                if (popularTags) return Promise.resolve(popularTags);
+                if (!tagsPromise) {
+                    tagsPromise = (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.articles && GegenPressAPI.articles.getPopularTags)
+                        ? GegenPressAPI.articles.getPopularTags().then(function (res) { popularTags = (res && res.success) ? res.tags : []; return popularTags; })
+                        : Promise.resolve([]);
+                }
+                return tagsPromise;
+            }
+            function goSearch(q) { window.location.href = 'gegen_press_search.html?q=' + encodeURIComponent(q); }
+            function renderSuggestions(matches) {
+                if (!matches.length) { suggestBox.style.display = 'none'; suggestBox.innerHTML = ''; return; }
+                suggestBox.innerHTML = matches.map(function (m) {
+                    var safe = String(m.tag).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    return '<div class="item" data-tag="' + safe + '">#' + safe + '</div>';
+                }).join('');
+                suggestBox.style.display = 'block';
+                Array.prototype.forEach.call(suggestBox.querySelectorAll('.item'), function (el) {
+                    el.addEventListener('mousedown', function (e) {
+                        e.preventDefault();
+                        goSearch(this.getAttribute('data-tag'));
+                    });
+                });
+            }
+            if (input) {
+                input.addEventListener('input', function () {
+                    var raw = normalize(this.value);
+                    if (!raw) { suggestBox.style.display = 'none'; return; }
+                    ensureTags().then(function (tags) {
+                        renderSuggestions(tags.filter(function (t) { return normalize(t.tag).indexOf(raw) >= 0; }).slice(0, 6));
+                    });
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        var q = this.value.trim();
+                        if (q) goSearch(q);
+                    }
+                });
+                input.addEventListener('blur', function () { setTimeout(function () { suggestBox.style.display = 'none'; }, 150); });
+            }
+        })();
     </script>
 </body>
 </html>

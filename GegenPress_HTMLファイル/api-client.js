@@ -502,6 +502,26 @@
           });
           return { success: true, articles: list };
         } catch (e) { return { success: false, message: String(e), articles: [] }; }
+      },
+      // 検索欄のサジェスト（「もしかして」）用に、記事についているハッシュタグを頻度順で集計する。
+      // 全記事を読む必要があるため、呼び出し側で結果をキャッシュして使い回すことを推奨。
+      async getPopularTags() {
+        try {
+          var fb = await _ready;
+          var snap = await fb.db.collection('articles').get();
+          var counts = {};
+          docList(snap).forEach(function (a) {
+            (a.tags || []).forEach(function (t) {
+              var tag = (t || '').trim();
+              if (!tag) return;
+              counts[tag] = (counts[tag] || 0) + 1;
+            });
+          });
+          var list = Object.keys(counts).map(function (tag) {
+            return { tag: tag, count: counts[tag] };
+          }).sort(function (a, b) { return b.count - a.count; });
+          return { success: true, tags: list };
+        } catch (e) { return { success: false, message: String(e), tags: [] }; }
       }
     },
 
