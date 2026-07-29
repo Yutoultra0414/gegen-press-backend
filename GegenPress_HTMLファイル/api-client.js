@@ -497,7 +497,7 @@
           var kw = (keyword || '').trim().toLowerCase().replace(/^#+/, '');
           var list = docList(snap).filter(function (a) {
             var tagsStr = Array.isArray(a.tags) ? a.tags.join(' ') : '';
-            return ((a.title || '') + ' ' + (a.description || '') + ' ' + (a.content || '') + ' ' + tagsStr)
+            return ((a.title || '') + ' ' + (a.description || '') + ' ' + (a.content || '') + ' ' + tagsStr + ' ' + (a.authorName || ''))
               .toLowerCase().indexOf(kw) >= 0;
           });
           return { success: true, articles: list };

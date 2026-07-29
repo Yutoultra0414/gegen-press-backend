@@ -148,12 +148,10 @@
 
         /* コンテナ */
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 60px 40px;
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 40px;
+            padding: 40px 40px 60px;
+            display: block;
         }
 
         /* サイドバー */
@@ -246,120 +244,169 @@
             border-color: #e63946;
         }
 
-        /* 検索結果 */
+        /* 検索結果（コンパクト表示） */
         .results-list {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 6px;
             margin-bottom: 40px;
         }
 
         .result-item {
             background: #fff;
-            border: 2px solid #ddd;
-            border-left: 4px solid #e63946;
-            border-radius: 6px;
-            padding: 25px;
-            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             cursor: pointer;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .result-item:hover {
             border-color: #e63946;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
+        .result-thumb {
+            width: 56px;
+            height: 56px;
+            border-radius: 3px;
+            flex-shrink: 0;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .result-thumb-placeholder {
+            width: 56px;
+            height: 56px;
+            border-radius: 3px;
+            flex-shrink: 0;
+            background: #14213d;
+        }
+
+        .result-body {
+            flex: 1;
+            min-width: 0;
         }
 
         .result-title {
-            font-size: 18px;
+            font-size: 13.5px;
             font-weight: bold;
-            color: #000;
-            margin-bottom: 8px;
+            color: #1a1a1a;
+            line-height: 1.4;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
 
-        .result-meta {
+        .result-meta-row {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-
-        .result-author {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #333;
+            gap: 6px;
+            font-size: 11.5px;
+            color: #888;
         }
 
         .author-avatar {
-            width: 32px;
-            height: 32px;
-            background: #e63946;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 9.5px;
             color: #fff;
+            flex-shrink: 0;
+            overflow: hidden;
         }
-
-        .result-time {
-            font-size: 12px;
-            color: #999;
-        }
+        .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
         .result-score {
-            background-color: #e63946;
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-weight: bold;
+            flex-shrink: 0;
             font-size: 12px;
-            text-align: center;
-        }
-
-        .result-description {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 12px;
-        }
-
-        .result-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-
-        .result-tag {
-            background-color: rgba(230, 57, 70, 0.1);
+            font-weight: 900;
             color: #e63946;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            border: 1px solid #e63946;
-            cursor: pointer;
+            white-space: nowrap;
+        }
+        .result-score .max { color: #ccc; font-weight: 400; font-size: 10.5px; }
+
+        /* チームハブ（クラブ名で検索した時） */
+        .team-hub-header {
+            display: flex; align-items: center; gap: 14px;
+            background: #14213d; border-radius: 8px; padding: 18px 20px; margin-bottom: 24px;
+            text-decoration: none; color: #fff;
+        }
+        .team-hub-header .badge {
+            width: 52px; height: 52px; border-radius: 8px; background: #fff;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;
+        }
+        .team-hub-header .badge img { width: 100%; height: 100%; object-fit: contain; padding: 4px; box-sizing: border-box; }
+        .team-hub-header h2 { font-size: 17px; font-weight: 900; }
+        .team-hub-header p { font-size: 11.5px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+
+        .hub-section-title {
+            font-size: 13px; font-weight: 900; color: #1d3557;
+            margin: 26px 0 10px; padding-bottom: 6px; border-bottom: 2px solid #eee;
         }
 
-        .result-footer {
-            display: flex;
-            gap: 20px;
-            font-size: 12px;
-            color: #999;
-            border-top: 1px solid #ddd;
-            padding-top: 12px;
+        .beat-reporters {
+            display: flex; overflow-x: auto; gap: 12px; padding-bottom: 6px;
+            -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity;
         }
+        .beat-reporter-card {
+            flex: 0 0 88px; text-align: center; text-decoration: none; color: #333;
+            scroll-snap-align: start;
+        }
+        .beat-reporter-card .avatar {
+            width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: #fff; font-size: 16px; overflow: hidden;
+        }
+        .beat-reporter-card .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .beat-reporter-card .name { font-size: 11px; line-height: 1.35; }
+        .beat-reporter-card .count { font-size: 10px; color: #999; }
+
+        .more-articles-btn {
+            display: block; text-align: center; margin-top: 10px;
+            padding: 10px; border: 1px solid #ddd; border-radius: 4px;
+            font-size: 12.5px; font-weight: bold; color: #333; text-decoration: none;
+        }
+        .more-articles-btn:hover { border-color: #e63946; color: #e63946; }
+
+        .team-players-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;
+        }
+        .team-player-card {
+            display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+            border: 1px solid #eee; border-radius: 4px; text-decoration: none; color: #333;
+        }
+        .team-player-card:hover { border-color: #e63946; }
+        .team-player-card .avatar {
+            width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: bold;
+        }
+        .team-player-card .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .team-player-card .name { font-size: 12px; font-weight: bold; }
+        .team-player-card .pos { font-size: 10.5px; color: #999; }
+
+        .reporter-match-card {
+            display: flex; align-items: center; gap: 12px;
+            background: #fff5f5; border: 1px solid #ffd7da; border-radius: 6px;
+            padding: 14px 16px; margin-bottom: 20px; text-decoration: none; color: #333;
+        }
+        .reporter-match-card .avatar {
+            width: 44px; height: 44px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;
+        }
+        .reporter-match-card .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .reporter-match-card .name { font-size: 13.5px; font-weight: 900; color: #1d3557; }
+        .reporter-match-card .sub { font-size: 11.5px; color: #888; }
 
         /* ページネーション */
         .pagination {
@@ -724,10 +771,10 @@
             <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
         </nav>
         <div class="gp-actions">
+            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
             <button id="gpSidebarToggle" class="gp-hamburger" aria-label="メニューを開く" type="button">
                 <span></span><span></span><span></span>
             </button>
-            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
         </div>
     </header>
 
@@ -841,106 +888,16 @@
 
     <!-- メインコンテンツ -->
     <div class="container">
-        <!-- サイドバー -->
-        <aside class="sidebar">
-            <!-- 記者フィルター（絞り込み機能は準備中） -->
-            <div class="filter-box">
-                <h3>記者で絞る <span style="font-size:11px; color:#999; font-weight:normal;">(準備中)</span></h3>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" checked>
-                        Fabrizio Romano
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox">
-                        Sky Sports
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox">
-                        Marca Sports
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox">
-                        Goal.com
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox">
-                        その他
-                    </label>
-                </div>
-            </div>
-
-            <!-- 信頼度フィルター（絞り込み機能は準備中） -->
-            <div class="filter-box">
-                <h3>信頼度で絞る <span style="font-size:11px; color:#999; font-weight:normal;">(準備中)</span></h3>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" checked>
-                        90点以上
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox">
-                        80点以上
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox">
-                        70点以上
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox">
-                        すべて
-                    </label>
-                </div>
-            </div>
-
-            <!-- 期間フィルター（絞り込み機能は準備中） -->
-            <div class="filter-box">
-                <h3>期間で絞る <span style="font-size:11px; color:#999; font-weight:normal;">(準備中)</span></h3>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" checked>
-                        24時間以内
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox">
-                        7日以内
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox">
-                        30日以内
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox">
-                        すべて
-                    </label>
-                </div>
-            </div>
-        </aside>
-
         <!-- メインコンテンツ -->
         <main class="main-content">
+            <!-- チーム名で検索した場合はここにクラブ情報がまとめて表示される -->
+            <div id="teamHub"></div>
+
+            <!-- 記者名にヒットした場合、ここにその記者のカードが表示される -->
+            <div id="reporterMatchSlot"></div>
+
             <!-- ソート -->
-            <div class="sort-section">
+            <div class="sort-section" id="sortSection">
                 <span class="sort-label">並び替え:</span>
                 <select class="sort-select" id="sortSelect">
                     <option>最新順</option>
@@ -955,8 +912,8 @@
                 <p style="color:#999; padding:20px 0;">読み込み中...</p>
             </div>
 
-            <!-- ページネーション -->
-            <div class="pagination">
+            <!-- ページネーション（実データ表示時は常に非表示） -->
+            <div class="pagination" style="display:none;">
                 <button class="pagination-btn" disabled>前へ</button>
                 <button class="pagination-btn active">1</button>
                 <button class="pagination-btn">2</button>
@@ -1005,16 +962,14 @@
             } catch (e) { return ''; }
         }
 
-        // フィルターのチェックボックスは今回未配線（見た目のみ・準備中）
-        document.querySelectorAll('.filter-option input').forEach(checkbox => {
-            checkbox.disabled = true;
-        });
-
         // 検索欄・ソート
         const searchInput = document.getElementById('searchInput');
         const sortSelect = document.getElementById('sortSelect');
+        const sortSection = document.getElementById('sortSection');
         const resultsList = document.getElementById('resultsList');
         const resultCount = document.getElementById('resultCount');
+        const teamHub = document.getElementById('teamHub');
+        const reporterMatchSlot = document.getElementById('reporterMatchSlot');
 
         searchInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
@@ -1075,10 +1030,111 @@
 
         let currentResults = [];
 
+        // ==== キャッシュ（同じ検索セッション内で使い回す） ====
+        let reportersCache = null;
+        let clubsCache = null;
+        const ratingCache = {};
+
+        async function ensureReporters() {
+            if (reportersCache) return reportersCache;
+            const res = (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.reporters) ? await GegenPressAPI.reporters.getAll() : null;
+            const map = new Map();
+            ((res && res.success && res.reporters) || []).forEach(r => map.set(r.id, r));
+            reportersCache = map;
+            return map;
+        }
+        async function ensureClubs() {
+            if (clubsCache) return clubsCache;
+            const res = (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.clubs) ? await GegenPressAPI.clubs.getAll() : null;
+            clubsCache = ((res && res.success && res.clubs) || []).filter(c => c.displayNameJa || c.displayNameEn);
+            return clubsCache;
+        }
+        // 記事の評価平均を取得（1件ずつratingsコレクションを読むため、多数の記事を一度に
+        // 表示する規模になった場合は事前集計フィールドを持たせる設計に見直す必要がある）
+        async function getArticleRatingAvg(articleId) {
+            if (articleId in ratingCache) return ratingCache[articleId];
+            try {
+                const res = await GegenPressAPI.ratings.getByArticle(articleId);
+                const list = (res && res.success) ? res.ratings : [];
+                const avg = list.length ? list.reduce((s, r) => s + (r.rating || 0), 0) / list.length : null;
+                ratingCache[articleId] = avg;
+                return avg;
+            } catch (e) { ratingCache[articleId] = null; return null; }
+        }
+
+        function normalizeName(s) { return (s || '').trim().toLowerCase().replace(/[・\s]/g, ''); }
+
+        // クラブ名・表記ゆれ（aliases）にマッチするクラブを1つ探す
+        function matchClub(query, clubs) {
+            const nq = normalizeName(query);
+            if (!nq) return null;
+            let best = null, bestScore = 0;
+            clubs.forEach(c => {
+                const names = [c.displayNameJa, c.displayNameEn].concat(c.aliases || []).filter(Boolean);
+                names.forEach(n => {
+                    const nn = normalizeName(n);
+                    if (!nn) return;
+                    if (nn === nq && bestScore < 100) { best = c; bestScore = 100; }
+                    else if ((nn.indexOf(nq) >= 0 || nq.indexOf(nn) >= 0) && nq.length >= 2 && bestScore < 50) { best = c; bestScore = 50; }
+                });
+            });
+            return best;
+        }
+        // 記者名（本名・ローマ字）にマッチする記者を探す
+        function matchReporters(query, reportersMap) {
+            const nq = normalizeName(query);
+            if (!nq || nq.length < 2) return [];
+            const out = [];
+            reportersMap.forEach(r => {
+                const n = normalizeName(r.name);
+                const nr = normalizeName(r.nameRomaji || '');
+                if ((n && n.indexOf(nq) >= 0) || (nr && nr.indexOf(nq) >= 0)) out.push(r);
+            });
+            return out;
+        }
+
+        function authorAvatarHtml(authorId, authorName, reportersMap, size) {
+            size = size || 20;
+            const rep = authorId ? reportersMap.get(authorId) : null;
+            if (rep && rep.profileImage) {
+                return '<span class="author-avatar" style="width:' + size + 'px;height:' + size + 'px;"><img src="' + esc(rep.profileImage) + '"></span>';
+            }
+            return '<span class="author-avatar" style="width:' + size + 'px;height:' + size + 'px;' + avatarStyle(authorName) + '">' + esc(getInitials(authorName || '')) + '</span>';
+        }
+
+        // ==== コンパクトな記事カード（サムネ・タイトル・評価・記者名+アイコンのみ） ====
+        async function compactCardHtml(a, reportersMap) {
+            const ratingAvg = await getArticleRatingAvg(a.id);
+            const ratingHtml = (ratingAvg == null)
+                ? '<span style="color:#ccc;">評価なし</span>'
+                : '★' + ratingAvg.toFixed(1) + '<span class="max">/5.0</span>';
+            const thumbHtml = a.image
+                ? '<img class="result-thumb" src="' + esc(a.image) + '" alt="">'
+                : '<div class="result-thumb-placeholder"></div>';
+            return (
+                '<div class="result-item" data-id="' + esc(a.id) + '">' +
+                    thumbHtml +
+                    '<div class="result-body">' +
+                        '<div class="result-title">' + esc(a.title) + '</div>' +
+                        '<div class="result-meta-row">' +
+                            authorAvatarHtml(a.authorId, a.authorName, reportersMap) +
+                            '<span>' + esc(a.authorName || '') + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="result-score">' + ratingHtml + '</div>' +
+                '</div>'
+            );
+        }
+        function bindCardClicks(container) {
+            container.querySelectorAll('.result-item[data-id]').forEach(el => {
+                el.addEventListener('click', () => goArticle(el.getAttribute('data-id')));
+            });
+        }
+
         function sortResults(list, mode) {
             const arr = list.slice();
             if (mode === '信頼度が高い順') {
-                arr.sort((a, b) => (b.trustScore || 0) - (a.trustScore || 0));
+                arr.sort((a, b) => (ratingCache[b.id] || 0) - (ratingCache[a.id] || 0));
             } else if (mode === '人気順') {
                 arr.sort((a, b) => (b.views || 0) - (a.views || 0));
             } else { // 最新順・関連度順（データ上は投稿日時順で代用）
@@ -1091,48 +1147,107 @@
             return arr;
         }
 
-        function renderResults(list, sortMode) {
+        async function renderResults(list, sortMode) {
+            const reportersMap = await ensureReporters();
+            // 「信頼度が高い順」を正しく並べるため、先に評価を全件取得しておく
+            await Promise.all(list.map(a => getArticleRatingAvg(a.id)));
             const sorted = sortResults(list, sortMode || sortSelect.value);
             resultCount.textContent = sorted.length + '件';
-            const pg = document.querySelector('.pagination');
-            if (pg) pg.style.display = 'none'; // 見せかけのページ送りは実データ表示時には隠す
 
             if (sorted.length === 0) {
                 resultsList.innerHTML = '<p style="color:#999; padding:20px 0;">該当するニュースが見つかりませんでした。</p>';
                 return;
             }
-            resultsList.innerHTML = sorted.map(a => {
-                const rating = (typeof a.averageRating === 'number') ? a.averageRating.toFixed(1) : '-';
-                const tags = (a.tags || []).slice(0, 4).map(t =>
-                    '<span class="result-tag" onclick="event.stopPropagation(); window.location.href=\'gegen_press_hashtag.html?tag=' + encodeURIComponent(t) + '\';">#' + esc(t) + '</span>'
-                ).join('');
+            const htmlParts = await Promise.all(sorted.map(a => compactCardHtml(a, reportersMap)));
+            resultsList.innerHTML = htmlParts.join('');
+            bindCardClicks(resultsList);
+        }
+
+        // ==== 記者名がヒットした場合のカード ====
+        function renderReporterMatch(reporters) {
+            if (!reporters.length) { reporterMatchSlot.innerHTML = ''; return; }
+            reporterMatchSlot.innerHTML = reporters.slice(0, 3).map(r => {
+                const avatar = r.profileImage
+                    ? '<div class="avatar"><img src="' + esc(r.profileImage) + '"></div>'
+                    : '<div class="avatar" style="' + avatarStyle(r.name) + '">' + esc(getInitials(r.name)) + '</div>';
                 return (
-                    '<div class="result-item" style="cursor:pointer;" data-id="' + esc(a.id) + '">' +
-                        '<div class="result-header">' +
-                            '<div>' +
-                                '<div class="result-title">' + esc(a.title) + '</div>' +
-                                '<div class="result-meta">' +
-                                    '<div class="result-author">' +
-                                        '<div class="author-avatar" style="' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</div>' +
-                                        '<span>' + esc(a.authorName || '') + '</span>' +
-                                    '</div>' +
-                                    '<span class="result-time">' + esc(fmtDate(a.createdAt)) + '</span>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="result-score">' + (a.trustScore || 0) + '/100</div>' +
-                        '</div>' +
-                        '<div class="result-description">' + esc(a.description || '') + '</div>' +
-                        '<div class="result-tags">' + tags + '</div>' +
-                        '<div class="result-footer">' +
-                            '<span>閲覧数: ' + (a.views || 0).toLocaleString() + '</span>' +
-                            '<span>評価: ' + rating + '/5.0</span>' +
-                        '</div>' +
-                    '</div>'
+                    '<a class="reporter-match-card" href="gegen_press_reporter_profile.html?id=' + encodeURIComponent(r.id) + '">' +
+                        avatar +
+                        '<div><div class="name">' + esc(r.name) + '</div><div class="sub">' + esc(r.mediaOutlet || '所属メディア未設定') + ' ・ 信頼スコア ' + (r.trustScore || 0) + '/100</div></div>' +
+                    '</a>'
                 );
             }).join('');
-            resultsList.querySelectorAll('.result-item').forEach(el => {
-                el.addEventListener('click', () => goArticle(el.getAttribute('data-id')));
+        }
+
+        // ==== チーム名がヒットした場合のハブ表示 ====
+        async function renderTeamHub(club, allArticles, reportersMap) {
+            const label = club.displayNameJa || club.displayNameEn;
+            const clubArticles = allArticles.filter(a => (a.tags || []).some(t => normalizeName(t) === normalizeName(label) || normalizeName(t).indexOf(normalizeName(label)) >= 0));
+
+            // 番記者: このクラブに関する記事を書いている記者を、記事数の多い順に
+            const authorCounts = new Map();
+            clubArticles.forEach(a => {
+                if (!a.authorId) return;
+                const cur = authorCounts.get(a.authorId) || { authorId: a.authorId, authorName: a.authorName, count: 0 };
+                cur.count++;
+                authorCounts.set(a.authorId, cur);
             });
+            const beatReporters = Array.from(authorCounts.values()).sort((a, b) => b.count - a.count).slice(0, 10);
+
+            const beatHtml = beatReporters.length === 0
+                ? '<p style="color:#999; font-size:12.5px;">この番記者はまだ登録されていません。</p>'
+                : '<div class="beat-reporters">' + beatReporters.map(br => {
+                    const rep = reportersMap.get(br.authorId);
+                    const avatar = (rep && rep.profileImage)
+                        ? '<div class="avatar"><img src="' + esc(rep.profileImage) + '"></div>'
+                        : '<div class="avatar" style="' + avatarStyle(br.authorName) + '">' + esc(getInitials(br.authorName)) + '</div>';
+                    return (
+                        '<a class="beat-reporter-card" href="gegen_press_reporter_profile.html?id=' + encodeURIComponent(br.authorId) + '">' +
+                            avatar +
+                            '<div class="name">' + esc(br.authorName || '') + '</div>' +
+                            '<div class="count">記事' + br.count + '件</div>' +
+                        '</a>'
+                    );
+                }).join('') + '</div>';
+
+            const sortedArticles = sortResults(clubArticles, '最新順').slice(0, 10);
+            await Promise.all(sortedArticles.map(a => getArticleRatingAvg(a.id)));
+            const articleCards = await Promise.all(sortedArticles.map(a => compactCardHtml(a, reportersMap)));
+            const articlesHtml = sortedArticles.length === 0
+                ? '<p style="color:#999; font-size:12.5px;">まだ' + esc(label) + 'に関する記事がありません。</p>'
+                : '<div class="results-list">' + articleCards.join('') + '</div>' +
+                    '<a class="more-articles-btn" href="gegen_press_hashtag.html?tag=' + encodeURIComponent(label) + '">もっと見る →</a>';
+
+            // 選手（5人）
+            let playersHtml = '<p style="color:#999; font-size:12.5px;">まだ選手が登録されていません。</p>';
+            try {
+                const pRes = (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.players) ? await GegenPressAPI.players.getAll() : null;
+                const players = ((pRes && pRes.success && pRes.players) || []).filter(p => p.currentClubId === club.id).slice(0, 5);
+                if (players.length > 0) {
+                    playersHtml = '<div class="team-players-grid">' + players.map(p => {
+                        const photo = p.photoUrl || p.profileImage;
+                        const avatar = photo
+                            ? '<div class="avatar"><img src="' + esc(photo) + '"></div>'
+                            : '<div class="avatar" style="' + avatarStyle(p.name) + '">' + esc(getInitials(p.name)) + '</div>';
+                        return (
+                            '<a class="team-player-card" href="gegen_press_player_profile.html?id=' + encodeURIComponent(p.id) + '">' +
+                                avatar +
+                                '<div><div class="name">' + esc(p.name) + '</div><div class="pos">' + esc(p.position || '') + '</div></div>' +
+                            '</a>'
+                        );
+                    }).join('') + '</div>';
+                }
+            } catch (e) { /* 選手情報が取れなくてもチーム情報自体は表示する */ }
+
+            teamHub.innerHTML =
+                '<a class="team-hub-header" href="gegen_press_club_profile.html?id=' + encodeURIComponent(club.id) + '">' +
+                    '<div class="badge">' + (club.logo ? '<img src="' + esc(club.logo) + '">' : '⚽') + '</div>' +
+                    '<div><h2>' + esc(label) + '</h2><p>' + esc(club.country || '') + (club.leagueId ? ' ・ ' + esc(club.leagueId) : '') + '</p></div>' +
+                '</a>' +
+                '<div class="hub-section-title">番記者</div>' + beatHtml +
+                '<div class="hub-section-title">関連ニュース</div>' + articlesHtml +
+                '<div class="hub-section-title">所属選手</div>' + playersHtml;
+            bindCardClicks(teamHub);
         }
 
         async function runSearch() {
@@ -1143,17 +1258,35 @@
             const params = new URLSearchParams(window.location.search);
             const q = params.get('q') || '';
             searchInput.value = q;
+            teamHub.innerHTML = '';
+            reporterMatchSlot.innerHTML = '';
 
             try {
-                const res = q
-                    ? await GegenPressAPI.articles.search(q)
-                    : await GegenPressAPI.articles.getAll();
-                if (!res || !res.success) {
+                const [searchRes, clubs, reportersMap] = await Promise.all([
+                    q ? GegenPressAPI.articles.search(q) : GegenPressAPI.articles.getAll(),
+                    ensureClubs(),
+                    ensureReporters()
+                ]);
+                if (!searchRes || !searchRes.success) {
                     resultsList.innerHTML = '<p style="color:#999; padding:20px 0;">検索に失敗しました。</p>';
                     return;
                 }
-                currentResults = res.articles || [];
-                renderResults(currentResults);
+                currentResults = searchRes.articles || [];
+
+                const club = q ? matchClub(q, clubs) : null;
+                if (club) {
+                    sortSection.style.display = 'none';
+                    resultsList.style.display = 'none';
+                    await renderTeamHub(club, currentResults, reportersMap);
+                    resultCount.textContent = '「' + esc(club.displayNameJa || club.displayNameEn) + '」の特集ページを表示中';
+                    return;
+                }
+
+                sortSection.style.display = '';
+                resultsList.style.display = '';
+                const matchedReporters = q ? matchReporters(q, reportersMap) : [];
+                renderReporterMatch(matchedReporters);
+                await renderResults(currentResults);
             } catch (e) {
                 resultsList.innerHTML = '<p style="color:#999; padding:20px 0;">検索中にエラーが発生しました。</p>';
             }

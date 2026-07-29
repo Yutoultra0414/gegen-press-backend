@@ -1252,11 +1252,10 @@
             <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
         </nav>
         <div class="gp-actions">
+            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
             <button id="gpSidebarToggle" class="gp-hamburger" aria-label="メニューを開く" type="button">
                 <span></span><span></span><span></span>
             </button>
-            <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
-            <input type="text" class="search-bar" id="homeSearch" placeholder="検索..." autocomplete="off">
         </div>
     </header>
 
@@ -1502,20 +1501,6 @@
 
     <script src="api-client.js" onerror="console.warn('api-client.js 未読込: 見本データを表示します')"></script>
     <script>
-        // 検索バー: Enterで検索ページへ
-        const homeSearch = document.getElementById('homeSearch');
-        if (homeSearch) {
-            homeSearch.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    const q = this.value.trim();
-                    const url = q
-                        ? 'gegen_press_search.html?q=' + encodeURIComponent(q)
-                        : 'gegen_press_search.html';
-                    window.location.href = url;
-                }
-            });
-        }
-
         function goReporter(id) {
             window.location.href = id
                 ? 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(id)
