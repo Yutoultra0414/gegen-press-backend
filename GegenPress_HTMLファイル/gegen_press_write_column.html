@@ -577,6 +577,12 @@
 
         <div class="form-card" id="formCard">
             <form id="articleForm">
+                <!-- タイトル -->
+                <div class="form-group">
+                    <label class="form-label">見出し <span class="required-badge">必須</span></label>
+                    <input type="text" class="form-input" id="articleTitle" placeholder="例: なぜあのクラブは中盤の補強を優先するのか" maxlength="80">
+                </div>
+
                 <!-- サムネイル（必須） -->
                 <div class="form-group">
                     <label class="form-label">サムネイル画像 <span class="required-badge">必須</span></label>
@@ -589,10 +595,16 @@
                     <p class="focal-hint" id="focalHint" style="display:none;">画像をクリック（またはドラッグ）すると、一覧などで表示される際に中心にしたい部分を指定できます。</p>
                 </div>
 
-                <!-- タイトル -->
+                <!-- 概要 -->
                 <div class="form-group">
-                    <label class="form-label">見出し <span class="required-badge">必須</span></label>
-                    <input type="text" class="form-input" id="articleTitle" placeholder="例: なぜあのクラブは中盤の補強を優先するのか" maxlength="80">
+                    <label class="form-label">概要（一覧に表示される要約） <span class="required-badge">必須</span></label>
+                    <textarea class="form-textarea" id="articleDesc" style="min-height:70px;" placeholder="1〜2文で内容を要約してください" maxlength="140"></textarea>
+                </div>
+
+                <!-- 本文 -->
+                <div class="form-group">
+                    <label class="form-label">本文 <span class="required-badge">必須</span></label>
+                    <textarea class="form-textarea" id="articleContent" style="min-height:480px; max-height:75vh; overflow-y:auto; line-height:1.8;" placeholder="コラムの本文を入力してください"></textarea>
                 </div>
 
                 <!-- サブカテゴリ -->
@@ -619,18 +631,6 @@
                     <p class="form-hint">Enterまたはカンマで確定します。自由に作成できます（例: 移籍市場、〇〇選手 など）。</p>
                     <div id="hashtagChips" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;"></div>
                     <input type="text" class="form-input" id="hashtagInput" placeholder="#タグを入力してEnter">
-                </div>
-
-                <!-- 概要 -->
-                <div class="form-group">
-                    <label class="form-label">概要（一覧に表示される要約） <span class="required-badge">必須</span></label>
-                    <textarea class="form-textarea" id="articleDesc" style="min-height:70px;" placeholder="1〜2文で内容を要約してください" maxlength="140"></textarea>
-                </div>
-
-                <!-- 本文 -->
-                <div class="form-group">
-                    <label class="form-label">本文 <span class="required-badge">必須</span></label>
-                    <textarea class="form-textarea" id="articleContent" placeholder="コラムの本文を入力してください"></textarea>
                 </div>
 
                 <div class="form-actions">
