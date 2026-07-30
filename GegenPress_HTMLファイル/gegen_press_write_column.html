@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ニュースを投稿 | Gegen Press!</title>
+    <title>コラムを投稿 | Gegen Press!</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -563,19 +563,23 @@
 
 
 
-    <div class="gp-page-strip"><h1>ニュースを投稿</h1></div>
+    <div class="gp-page-strip"><h1>コラムを投稿</h1></div>
 
     <div class="container">
         <div class="login-notice" id="loginNotice">
-            ニュースの投稿にはログインが必要です。<a href="gegen_press_login.html">ログイン / 新規登録はこちら</a>
+            コラムの投稿にはログインが必要です。<a href="gegen_press_login.html">ログイン / 新規登録はこちら</a>
         </div>
+        <p style="max-width:720px; margin:0 auto 16px; font-size:12.5px; color:#888; line-height:1.8;">
+            コラムは、記者の一次情報とは違い、<strong>あなた自身の感想・考察・分析</strong>を自由に書けるコーナーです。
+            誰でも投稿でき、投稿者の情報は「ライター」として表示されます。
+        </p>
 
         <div class="form-card" id="formCard">
             <form id="articleForm">
                 <!-- サムネイル（必須） -->
                 <div class="form-group">
                     <label class="form-label">サムネイル画像 <span class="required-badge">必須</span></label>
-                    <p class="form-hint">ニュース一覧・速報カードに表示される画像です。横長の画像がきれいに収まります。</p>
+                    <p class="form-hint">コラム一覧・カードに表示される画像です。横長の画像がきれいに収まります。</p>
                     <div class="thumb-drop" id="thumbDrop">
                         <div class="thumb-drop-label" id="thumbDropLabel">クリックして画像を選択</div>
                     </div>
@@ -587,72 +591,22 @@
                 <!-- タイトル -->
                 <div class="form-group">
                     <label class="form-label">見出し <span class="required-badge">必須</span></label>
-                    <input type="text" class="form-input" id="articleTitle" placeholder="例: マンチェスター・シティが超大型補強を発表" maxlength="80">
+                    <input type="text" class="form-input" id="articleTitle" placeholder="例: なぜあのクラブは中盤の補強を優先するのか" maxlength="80">
                 </div>
 
-                <!-- 報道日時 -->
+                <!-- サブカテゴリ -->
                 <div class="form-group">
-                    <label class="form-label">報道日 <span class="required-badge">必須</span></label>
-                    <p class="form-hint">実際にこのニュースが報じられた日付です。「どこが一番早く報じたか」の比較に使われます。時刻がわからない場合は日付のみでかまいません。</p>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <input type="date" class="form-input" id="reportedDate" style="max-width:200px;">
-                        <input type="time" class="form-input" id="reportedTime" style="max-width:160px;" placeholder="時刻（任意）">
-                    </div>
-                </div>
-
-                <!-- 引用元 -->
-                <div class="form-group">
-                    <label class="form-label">引用元URL <span class="optional-badge">任意</span></label>
-                    <p class="form-hint">引用元の記事やツイートなどのリンクを入力してください。</p>
-                    <input type="text" class="form-input" id="sourceUrl" placeholder="https://...">
-                </div>
-
-                <!-- 投稿記者 -->
-                <div class="form-group">
-                    <label class="form-label">投稿する記者名義 <span class="required-badge">必須</span></label>
-                    <p class="form-hint">あなたが追加した記者、または担当している記者を選んでください</p>
-                    <select class="form-select" id="authorSelect">
-                        <option value="">読み込み中...</option>
-                    </select>
-                </div>
-
-                <!-- 記事の種類（複数選択可） -->
-                <div class="form-group">
-                    <label class="form-label">記事の種類 <span class="required-badge">必須</span></label>
-                    <p class="form-hint">複数選択できます。ニュース一覧上部の「NEWS」メニューの絞り込みに使われます。</p>
-                    <div class="tag-group" id="articleTypeTags">
-                        <span class="tag-option" data-value="移籍記事">移籍記事</span>
-                        <span class="tag-option" data-value="インタビュー記事">インタビュー記事</span>
-                        <span class="tag-option" data-value="一般記事">一般記事</span>
-                    </div>
-                </div>
-
-                <!-- 情報の確度（「移籍記事」を選んだ場合のみ表示・必須） -->
-                <div class="form-group" id="newsTypeGroup" style="display:none;">
-                    <label class="form-label">情報の確度 <span class="required-badge">必須</span></label>
-                    <p class="form-hint">「移籍記事」にはこの情報が必要です。ニュース一覧で「確定情報」「移籍の噂」に分けて表示されます。</p>
-                    <div class="tag-group" id="newsTypeTags">
-                        <span class="tag-option" data-value="confirmed">確定情報</span>
-                        <span class="tag-option" data-value="rumor">移籍の噂</span>
-                    </div>
-                </div>
-
-                <!-- サブカテゴリ（リーグ等） -->
-                <div class="form-group">
-                    <label class="form-label">サブカテゴリ（リーグ等） <span class="required-badge">必須</span></label>
+                    <label class="form-label">サブカテゴリ <span class="required-badge">必須</span></label>
+                    <p class="form-hint">1つ選んでください。コラム一覧の絞り込みに使われます。</p>
                     <div class="tag-group" id="categoryTags">
-                        <span class="tag-option" data-value="移籍情報">移籍情報</span>
-                        <span class="tag-option" data-value="プレミアリーグ">プレミアリーグ</span>
-                        <span class="tag-option" data-value="ラリーガ">ラリーガ</span>
-                        <span class="tag-option" data-value="セリエA">セリエA</span>
-                        <span class="tag-option" data-value="ブンデスリーガ">ブンデスリーガ</span>
-                        <span class="tag-option" data-value="リーグアン">リーグアン</span>
-                        <span class="tag-option" data-value="エールディヴィジ">エールディヴィジ</span>
-                        <span class="tag-option" data-value="プリメイラ・リーガ">プリメイラ・リーガ</span>
-                        <span class="tag-option" data-value="MLS">MLS</span>
-                        <span class="tag-option" data-value="日本サッカー">日本サッカー</span>
-                        <span class="tag-option" data-value="代表チーム">代表チーム</span>
-                        <span class="tag-option" data-value="その他リーグ">その他リーグ</span>
+                        <span class="tag-option" data-value="移籍分析">移籍分析</span>
+                        <span class="tag-option" data-value="戦術分析">戦術分析</span>
+                        <span class="tag-option" data-value="選手考察">選手考察</span>
+                        <span class="tag-option" data-value="監督・クラブ経営">監督・クラブ経営</span>
+                        <span class="tag-option" data-value="育成・下部組織">育成・下部組織</span>
+                        <span class="tag-option" data-value="海外の反応">海外の反応</span>
+                        <span class="tag-option" data-value="コラム全般">コラム全般</span>
+                        <span class="tag-option" data-value="その他">その他</span>
                     </div>
                 </div>
 
@@ -673,21 +627,21 @@
                 <!-- 本文 -->
                 <div class="form-group">
                     <label class="form-label">本文 <span class="required-badge">必須</span></label>
-                    <textarea class="form-textarea" id="articleContent" placeholder="ニュースの本文を入力してください"></textarea>
+                    <textarea class="form-textarea" id="articleContent" placeholder="コラムの本文を入力してください"></textarea>
                 </div>
 
                 <div class="form-actions">
                     <button type="button" class="cancel-btn" onclick="window.location.href='gegen_press_category.html'">キャンセル</button>
-                    <button type="submit" class="submit-btn" id="submitBtn">ニュースを投稿する</button>
+                    <button type="submit" class="submit-btn" id="submitBtn">コラムを投稿する</button>
                 </div>
             </form>
         </div>
 
         <div class="success-message" id="successMessage">
-            <h2>ニュースを投稿しました</h2>
-            <p>ニュースが公開されました。トップページやニュース一覧に表示されます。</p>
+            <h2>コラムを投稿しました</h2>
+            <p>コラムが公開されました。コラム一覧などに表示されます。</p>
             <div class="success-actions">
-                <button class="btn-view" id="viewArticleBtn">ニュースを見る</button>
+                <button class="btn-view" id="viewArticleBtn">コラムを見る</button>
                 <button class="btn-another" id="addAnotherBtn">続けて投稿する</button>
             </div>
         </div>
@@ -697,18 +651,13 @@
     <script>
         const loginNotice = document.getElementById('loginNotice');
         const formCard = document.getElementById('formCard');
-        const authorSelect = document.getElementById('authorSelect');
         let currentUserObj = null;
-        let myReporters = []; // 自分が追加した記者 or 全記者（後述の方針）
+        let writerName = '匿名ユーザー';
 
         async function init() {
-            // 報道日はデフォルトで今日の日付にしておく（編集モードでは後で上書きされます）
-            const todayStr = new Date().toISOString().slice(0, 10);
-            document.getElementById('reportedDate').value = todayStr;
-
             if (typeof GegenPressAPI === 'undefined') {
                 loginNotice.style.display = 'block';
-                loginNotice.innerHTML = 'ニュース投稿機能を読み込めませんでした。';
+                loginNotice.innerHTML = 'コラム投稿機能を読み込めませんでした。';
                 formCard.style.display = 'none';
                 return;
             }
@@ -721,26 +670,17 @@
             }
             currentUserObj = user;
 
-            // 記者選択肢を読み込む（全記者から選べるようにする。詳細はチャット内で説明）
+            // ライター名（投稿者本人の表示名）を取得
             try {
-                const res = await GegenPressAPI.reporters.getAll();
-                myReporters = (res && res.success) ? (res.reporters || []) : [];
-            } catch (e) { myReporters = []; }
-
-            authorSelect.innerHTML = '<option value="">選択してください</option>' +
-                myReporters.map(r => '<option value="' + r.id + '">' + escapeHtml(r.name) + '</option>').join('');
-
-            // 記者ページの「この記者のニュースを投稿する」から来た場合、記者名義を事前に選択しておく
-            const preselectAuthorId = new URLSearchParams(window.location.search).get('authorId');
-            if (preselectAuthorId && myReporters.some(r => r.id === preselectAuthorId)) {
-                authorSelect.value = preselectAuthorId;
-            }
+                const ures = await GegenPressAPI.users.get(user.uid);
+                writerName = (ures && ures.success && ures.user && ures.user.username) || user.displayName || '匿名ユーザー';
+            } catch (e) { writerName = user.displayName || '匿名ユーザー'; }
 
             await loadArticleForEdit();
         }
 
         // =========================================================
-        // 編集モード（?id=... がある場合、既存ニュースを読み込んでフォームに反映し、
+        // 編集モード（?id=... がある場合、既存コラムを読み込んでフォームに反映し、
         // 送信時は create ではなく update を呼ぶ）
         // =========================================================
         const editArticleId = new URLSearchParams(window.location.search).get('id');
@@ -748,14 +688,14 @@
 
         async function loadArticleForEdit() {
             if (!editArticleId) return;
-            document.querySelector('.gp-page-strip h1').textContent = 'ニュースを編集';
-            document.title = 'ニュースを編集 | Gegen Press!';
+            document.querySelector('.gp-page-strip h1').textContent = 'コラムを編集';
+            document.title = 'コラムを編集 | Gegen Press!';
             document.getElementById('submitBtn').textContent = '変更を保存する';
 
             const res = await GegenPressAPI.articles.getById(editArticleId);
             if (!res || !res.success || !res.article) {
                 loginNotice.style.display = 'block';
-                loginNotice.textContent = '編集対象のニュースが見つかりませんでした。';
+                loginNotice.textContent = '編集対象のコラムが見つかりませんでした。';
                 formCard.style.display = 'none';
                 return;
             }
@@ -763,7 +703,7 @@
 
             if (editingArticle.createdBy && editingArticle.createdBy !== currentUserObj.uid && !GegenPressAPI.isAdminUid(currentUserObj.uid)) {
                 loginNotice.style.display = 'block';
-                loginNotice.textContent = 'このニュースを編集する権限がありません（投稿した本人のみ編集できます）。';
+                loginNotice.textContent = 'このコラムを編集する権限がありません（投稿した本人のみ編集できます）。';
                 formCard.style.display = 'none';
                 return;
             }
@@ -771,36 +711,13 @@
             document.getElementById('articleTitle').value = editingArticle.title || '';
             document.getElementById('articleDesc').value = editingArticle.description || '';
             document.getElementById('articleContent').value = editingArticle.content || '';
-            document.getElementById('sourceUrl').value = editingArticle.sourceUrl || '';
-            if (editingArticle.authorId) authorSelect.value = editingArticle.authorId;
 
-            if (editingArticle.reportedAt) {
-                const rd = editingArticle.reportedAt.toDate ? editingArticle.reportedAt.toDate() : new Date(editingArticle.reportedAt);
-                if (!isNaN(rd)) {
-                    document.getElementById('reportedDate').value = rd.toISOString().slice(0, 10);
-                    if (!editingArticle.reportedTimeUnknown) {
-                        document.getElementById('reportedTime').value = String(rd.getHours()).padStart(2, '0') + ':' + String(rd.getMinutes()).padStart(2, '0');
-                    }
-                }
-            }
-
-            // サブカテゴリ（複数）。旧データ（category が1件のみ）にも対応
+            // サブカテゴリ（単一選択）
             const cats = editingArticle.categories || (editingArticle.category ? [editingArticle.category] : []);
             cats.forEach(v => {
                 const catTag = document.querySelector('#categoryTags .tag-option[data-value="' + CSS.escape(v) + '"]');
                 if (catTag) { catTag.classList.add('selected'); selectedCategories.add(v); }
             });
-            (editingArticle.articleTypes || []).forEach(v => {
-                const tag = document.querySelector('#articleTypeTags .tag-option[data-value="' + CSS.escape(v) + '"]');
-                if (tag) { tag.classList.add('selected'); selectedArticleTypes.add(v); }
-            });
-            if (selectedArticleTypes.has('移籍記事')) {
-                document.getElementById('newsTypeGroup').style.display = 'block';
-                if (editingArticle.newsType) {
-                    const nt = document.querySelector('#newsTypeTags .tag-option[data-value="' + CSS.escape(editingArticle.newsType) + '"]');
-                    if (nt) { nt.classList.add('selected'); selectedNewsType = editingArticle.newsType; }
-                }
-            }
             hashtags = (editingArticle.tags || []).slice();
             renderHashtagChips();
 
@@ -854,7 +771,7 @@
         });
         hashtagInput.addEventListener('blur', addHashtagFromInput);
 
-        // サブカテゴリ（複数選択可）
+        // サブカテゴリ（単一選択。もう一度押すと選択解除）
         const selectedCategories = new Set();
         document.querySelectorAll('#categoryTags .tag-option').forEach(tag => {
             tag.addEventListener('click', function () {
@@ -862,47 +779,12 @@
                 if (selectedCategories.has(v)) {
                     selectedCategories.delete(v);
                     this.classList.remove('selected');
-                } else {
-                    selectedCategories.add(v);
-                    this.classList.add('selected');
-                }
-            });
-        });
-
-        // 記事の種類（複数選択）。「移籍記事」を含む場合のみ「情報の確度」を表示・必須にする
-        const selectedArticleTypes = new Set();
-        document.querySelectorAll('#articleTypeTags .tag-option').forEach(tag => {
-            tag.addEventListener('click', function () {
-                const v = this.getAttribute('data-value');
-                if (selectedArticleTypes.has(v)) {
-                    selectedArticleTypes.delete(v);
-                    this.classList.remove('selected');
-                } else {
-                    selectedArticleTypes.add(v);
-                    this.classList.add('selected');
-                }
-                const showNewsType = selectedArticleTypes.has('移籍記事');
-                document.getElementById('newsTypeGroup').style.display = showNewsType ? 'block' : 'none';
-                if (!showNewsType) {
-                    selectedNewsType = null;
-                    document.querySelectorAll('#newsTypeTags .tag-option').forEach(t => t.classList.remove('selected'));
-                }
-            });
-        });
-
-        // 情報の確度（「移籍記事」選択時のみ必須・単一選択。もう一度押すと選択解除）
-        let selectedNewsType = null;
-        document.querySelectorAll('#newsTypeTags .tag-option').forEach(tag => {
-            tag.addEventListener('click', function () {
-                const v = this.getAttribute('data-value');
-                if (selectedNewsType === v) {
-                    selectedNewsType = null;
-                    this.classList.remove('selected');
                     return;
                 }
-                document.querySelectorAll('#newsTypeTags .tag-option').forEach(t => t.classList.remove('selected'));
+                selectedCategories.clear();
+                document.querySelectorAll('#categoryTags .tag-option').forEach(t => t.classList.remove('selected'));
+                selectedCategories.add(v);
                 this.classList.add('selected');
-                selectedNewsType = v;
             });
         });
 
@@ -1010,10 +892,6 @@
             const title = document.getElementById('articleTitle').value.trim();
             const desc = document.getElementById('articleDesc').value.trim();
             const content = document.getElementById('articleContent').value.trim();
-            const authorId = authorSelect.value;
-            const reportedDate = document.getElementById('reportedDate').value;
-            const reportedTime = document.getElementById('reportedTime').value;
-            const sourceUrl = document.getElementById('sourceUrl').value.trim();
 
             if (!thumbDataUrl) {
                 document.getElementById('thumbRequiredNote').style.display = 'block';
@@ -1021,19 +899,11 @@
                 return;
             }
             if (!title) { alert('見出しを入力してください'); return; }
-            if (!reportedDate) { alert('報道日を入力してください'); return; }
-            if (!authorId) { alert('投稿する記者名義を選択してください'); return; }
-            if (selectedArticleTypes.size === 0) { alert('記事の種類を1つ以上選択してください'); return; }
-            if (selectedArticleTypes.has('移籍記事') && !selectedNewsType) { alert('「移籍記事」を選んだ場合は、情報の確度（確定情報／移籍の噂）を選択してください'); return; }
-            if (selectedCategories.size === 0) { alert('サブカテゴリを1つ以上選択してください'); return; }
+            if (selectedCategories.size === 0) { alert('サブカテゴリを選択してください'); return; }
             if (!desc) { alert('概要を入力してください'); return; }
             if (!content) { alert('本文を入力してください'); return; }
 
-            // 報道日時（時刻が未入力の場合は00:00扱い。「日にちだけ」の比較用途では十分です）
-            const reportedAtDate = new Date(reportedDate + 'T' + (reportedTime || '00:00') + ':00');
-            const categoriesArray = Array.from(selectedCategories);
-
-            const rep = myReporters.find(r => r.id === authorId);
+            const subcategory = Array.from(selectedCategories)[0];
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
 
@@ -1043,16 +913,10 @@
                     title: title,
                     description: desc,
                     content: content,
-                    category: categoriesArray[0], // 既存のリーグ別グルーピングとの互換用（先頭のサブカテゴリ）
-                    categories: categoriesArray,
-                    reportedAt: reportedAtDate,
-                    reportedTimeUnknown: !reportedTime,
-                    sourceUrl: sourceUrl || null,
-                    articleTypes: Array.from(selectedArticleTypes),
-                    newsType: selectedNewsType,
+                    category: subcategory, // 既存のカテゴリ表示ロジックとの互換用
+                    categories: [subcategory],
+                    subcategory: subcategory,
                     tags: hashtags,
-                    authorId: authorId,
-                    authorName: rep ? rep.name : '',
                     image: thumbDataUrl,
                     imagePosition: thumbFocal,
                     edited: true
@@ -1070,28 +934,23 @@
             submitBtn.textContent = '投稿中...';
 
             const res = await GegenPressAPI.articles.create({
+                contentType: 'column', // 通常のニュース記事と区別するためのフラグ
                 title: title,
                 description: desc,
                 content: content,
-                category: categoriesArray[0], // 既存のリーグ別グルーピングとの互換用（先頭のサブカテゴリ）
-                categories: categoriesArray,
-                reportedAt: reportedAtDate,
-                reportedTimeUnknown: !reportedTime,
-                sourceUrl: sourceUrl || null,
-                articleTypes: Array.from(selectedArticleTypes),
-                newsType: selectedNewsType,
+                category: subcategory,
+                categories: [subcategory],
+                subcategory: subcategory,
                 tags: hashtags,
-                authorId: authorId,
-                authorName: rep ? rep.name : '',
-                authorScore: rep ? (rep.trustScore || 0) : 0,
+                // コラムは「記者」ではなく、投稿した本人が「ライター」として表示される
+                writerUid: currentUserObj.uid,
+                writerName: writerName,
                 image: thumbDataUrl,
-                imagePosition: thumbFocal,
-                averageRating: 0,
-                trustScore: rep ? (rep.trustScore || 0) : 0
+                imagePosition: thumbFocal
             });
 
             submitBtn.disabled = false;
-            submitBtn.textContent = 'ニュースを投稿する';
+            submitBtn.textContent = 'コラムを投稿する';
 
             if (res && res.success) {
                 lastCreatedId = res.article && res.article.id;

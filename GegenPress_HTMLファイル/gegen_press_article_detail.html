@@ -929,7 +929,13 @@
                     <a href="gegen_press_add_reporter.html" class="gp-dropdown-option"><strong>記者を追加</strong><span>Add Reporter</span></a>
                 </div>
             </div>
-            <a class="gp-nav-item" href="gegen_press_write_article.html"><span class="gp-en">POST</span><span class="gp-jp">ニュースを投稿</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="postDropdownWrap">
+                <a class="gp-nav-item" href="#" id="postDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">POST</span><span class="gp-jp">投稿する</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_write_article.html" class="gp-dropdown-option"><strong>ニュースを投稿</strong><span>Post News</span></a>
+                    <a href="gegen_press_write_column.html" class="gp-dropdown-option"><strong>コラムを投稿</strong><span>Post Column</span></a>
+                </div>
+            </div>
         </nav>
         <div class="gp-actions">
             <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
@@ -977,6 +983,21 @@
         (function () {
             var wrap = document.getElementById('addMediaDropdownWrap');
             var trigger = document.getElementById('addMediaDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('postDropdownWrap');
+            var trigger = document.getElementById('postDropdownTrigger');
             if (!wrap || !trigger) return;
             trigger.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -1198,18 +1219,18 @@
                 </div>
             </div>
 
-            <!-- 記者情報 -->
+            <!-- 記者情報（コラムの場合は「ライター」表示に切り替わる） -->
             <div class="sidebar-box">
-                <h3>記者</h3>
+                <h3 id="sideAuthorBoxTitle">記者</h3>
                 <div class="info-item">
                     <div class="info-label">名前</div>
                     <div class="info-value" id="sideAuthorName">Fabrizio Romano</div>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="sideAuthorOutletRow">
                     <div class="info-label">専門</div>
                     <div class="info-value" id="sideAuthorOutlet">移籍情報</div>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="sideAuthorScoreRow">
                     <div class="info-label">信ぴょう性</div>
                     <div class="info-value" id="sideAuthorScore">96/100</div>
                 </div>
@@ -1342,7 +1363,10 @@
                 ratingSubmitBtn.disabled = false;
                 ratingSubmitBtn.textContent = '評価を投稿';
                 if (res && res.success) {
-                    alert('ご投稿ありがとうございます！\n\n選択された評価: ' + selectedRating + '★\n\nあなたの評価はこの記者のスコアに反映されます。');
+                    const msg = (currentArticle && currentArticle.contentType === 'column')
+                        ? 'ご投稿ありがとうございます！\n\n選択された評価: ' + selectedRating + '★'
+                        : 'ご投稿ありがとうございます！\n\n選択された評価: ' + selectedRating + '★\n\nあなたの評価はこの記者のスコアに反映されます。';
+                    alert(msg);
                     ratingSubmitBtn.textContent = '評価を更新（' + selectedRating + '★ 投稿済み）';
                     loadRatings(); // 一覧と平均を更新
                 } else {
@@ -1458,7 +1482,9 @@
             const deleteBtn = document.getElementById('deleteArticleBtn');
             if (currentArticle && (currentArticle.createdBy === user.uid || currentArticle.authorId === user.uid || GegenPressAPI.isAdminUid(user.uid))) {
                 const editLink = document.getElementById('editArticleLink');
-                editLink.href = 'gegen_press_write_article.html?id=' + encodeURIComponent(articleId);
+                const editTarget = (currentArticle.contentType === 'column') ? 'gegen_press_write_column.html' : 'gegen_press_write_article.html';
+                editLink.href = editTarget + '?id=' + encodeURIComponent(articleId);
+                editLink.textContent = (currentArticle.contentType === 'column') ? 'このコラムを編集' : 'このニュースを編集';
                 editLink.style.display = 'inline-block';
 
                 deleteBtn.style.display = 'inline-block';
@@ -1751,25 +1777,64 @@
 
                 document.getElementById('authorAvatar').textContent = getInitials(a.authorName);
                 document.getElementById('authorAvatar').setAttribute('style', avatarStyle(a.authorName));
-                document.getElementById('authorName').textContent = a.authorName || '';
                 document.getElementById('authorHandle').textContent = '';
-                document.getElementById('authorSection').onclick = function () {
-                    window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
-                };
-                // 記者の実際のアイコン画像が設定されていれば、それを表示する（無ければ略称バッジのまま）
-                if (a.authorId && typeof GegenPressAPI !== 'undefined') {
-                    GegenPressAPI.reporters.getById(a.authorId).then(function (rres) {
-                        if (rres && rres.success && rres.reporter && rres.reporter.profileImage) {
-                            const avatarEl = document.getElementById('authorAvatar');
-                            avatarEl.style.background = 'none';
-                            avatarEl.innerHTML = '<img src="' + esc(rres.reporter.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
-                        }
-                    }).catch(function () {});
+
+                const isColumn = a.contentType === 'column';
+                if (isColumn) {
+                    // ==== コラム: 「記者」ではなく「ライター」（投稿した本人）の情報を表示 ====
+                    const writerName = a.writerName || '匿名ユーザー';
+                    document.getElementById('authorName').textContent = writerName;
+                    document.getElementById('authorAvatar').textContent = getInitials(writerName);
+                    document.getElementById('authorAvatar').setAttribute('style', avatarStyle(writerName));
+                    document.getElementById('authorSection').onclick = function () {
+                        if (a.writerUid) window.location.href = 'gegen_press_user_profile.html?id=' + encodeURIComponent(a.writerUid);
+                    };
+                    // ユーザーのアイコン画像が設定されていれば、それを表示する（無ければ略称バッジのまま）
+                    if (a.writerUid && typeof GegenPressAPI !== 'undefined') {
+                        GegenPressAPI.users.get(a.writerUid).then(function (ures) {
+                            if (ures && ures.success && ures.user && ures.user.profileImage) {
+                                const avatarEl = document.getElementById('authorAvatar');
+                                avatarEl.style.background = 'none';
+                                avatarEl.innerHTML = '<img src="' + esc(ures.user.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                            }
+                        }).catch(function () {});
+                    }
+                    document.getElementById('sideAuthorBoxTitle').textContent = 'ライター';
+                    document.getElementById('sideAuthorName').textContent = writerName;
+                    document.getElementById('sideAuthorOutletRow').style.display = 'none';
+                    document.getElementById('sideAuthorScoreRow').style.display = 'none';
+                    const sideLink = document.getElementById('sideAuthorLink');
+                    if (a.writerUid) {
+                        sideLink.href = 'gegen_press_user_profile.html?id=' + encodeURIComponent(a.writerUid);
+                        sideLink.style.display = '';
+                    } else {
+                        sideLink.style.display = 'none';
+                    }
+                } else {
+                    // ==== 通常のニュース記事: 従来通り「記者」情報を表示 ====
+                    document.getElementById('authorName').textContent = a.authorName || '';
+                    document.getElementById('authorSection').onclick = function () {
+                        window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
+                    };
+                    // 記者の実際のアイコン画像が設定されていれば、それを表示する（無ければ略称バッジのまま）
+                    if (a.authorId && typeof GegenPressAPI !== 'undefined') {
+                        GegenPressAPI.reporters.getById(a.authorId).then(function (rres) {
+                            if (rres && rres.success && rres.reporter && rres.reporter.profileImage) {
+                                const avatarEl = document.getElementById('authorAvatar');
+                                avatarEl.style.background = 'none';
+                                avatarEl.innerHTML = '<img src="' + esc(rres.reporter.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                            }
+                        }).catch(function () {});
+                    }
+                    document.getElementById('sideAuthorBoxTitle').textContent = '記者';
+                    document.getElementById('sideAuthorLink').href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
+                    document.getElementById('sideAuthorLink').style.display = '';
+                    document.getElementById('sideAuthorName').textContent = a.authorName || '';
+                    document.getElementById('sideAuthorOutletRow').style.display = '';
+                    document.getElementById('sideAuthorScoreRow').style.display = '';
+                    document.getElementById('sideAuthorOutlet').textContent = '';
+                    document.getElementById('sideAuthorScore').textContent = (a.authorScore || 0) + '/100';
                 }
-                document.getElementById('sideAuthorLink').href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
-                document.getElementById('sideAuthorName').textContent = a.authorName || '';
-                document.getElementById('sideAuthorOutlet').textContent = '';
-                document.getElementById('sideAuthorScore').textContent = (a.authorScore || 0) + '/100';
 
                 // 投稿したユーザー（記者とは別。ログインユーザー本人）を小さく表示
                 if (a.createdBy) {
@@ -1823,14 +1888,20 @@
             }
         }
 
-        // ==== 関連ニュース（同じ記者の他のニュース、最大4件） ====
+        // ==== 関連ニュース（同じ記者=ニュース、同じライター=コラムの他の投稿。最大4件） ====
         async function loadRelated(article) {
             const wrap = document.getElementById('relatedArticles');
             if (typeof GegenPressAPI === 'undefined') { wrap.innerHTML = ''; return; }
             try {
-                const res = await GegenPressAPI.reporters.getArticles(article.authorId);
-                if (!res || !res.success) { wrap.innerHTML = ''; return; }
-                const others = (res.articles || []).filter(a => a.id !== articleId).slice(0, 4);
+                let list = [];
+                if (article.contentType === 'column') {
+                    const res = await GegenPressAPI.articles.getAll();
+                    list = (res && res.success) ? (res.articles || []).filter(a => a.contentType === 'column' && a.writerUid === article.writerUid) : [];
+                } else {
+                    const res = await GegenPressAPI.reporters.getArticles(article.authorId);
+                    list = (res && res.success) ? (res.articles || []) : [];
+                }
+                const others = list.filter(a => a.id !== articleId).slice(0, 4);
                 if (others.length === 0) {
                     wrap.innerHTML = '<p style="color:#999; font-size:13px;">関連ニュースはありません。</p>';
                     return;
