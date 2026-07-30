@@ -611,10 +611,17 @@
                 <!-- 投稿記者 -->
                 <div class="form-group">
                     <label class="form-label">投稿する記者名義 <span class="required-badge">必須</span></label>
-                    <p class="form-hint">あなたが追加した記者、または担当している記者を選んでください</p>
-                    <select class="form-select" id="authorSelect">
-                        <option value="">読み込み中...</option>
-                    </select>
+                    <p class="form-hint">名前を入力すると候補が出ます（日本語・英語どちらでも検索できます）。一覧にない記者は「記者を追加」から先に登録してください。</p>
+                    <div style="position:relative;">
+                        <input type="text" class="form-input" id="authorSearchInput" placeholder="記者名を入力（例: ファ / Fa）" autocomplete="off">
+                        <div id="authorSuggest" class="gp-search-suggest" style="display:none; left:0; right:0;"></div>
+                    </div>
+                    <div id="authorSelectedChip" style="display:none; margin-top:8px; align-items:center; gap:8px; background:#f5f5f5; border-radius:6px; padding:8px 12px;">
+                        <span id="authorSelectedAvatar" style="width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:900; color:#fff; overflow:hidden; flex-shrink:0;"></span>
+                        <span id="authorSelectedName" style="font-size:13px; font-weight:bold; color:#1d3557; flex:1;"></span>
+                        <span id="authorSelectedClear" style="font-size:12px; color:#999; cursor:pointer; text-decoration:underline;">変更する</span>
+                    </div>
+                    <input type="hidden" id="authorSelect" value="">
                 </div>
 
                 <!-- 記事の種類（複数選択可） -->
@@ -698,9 +705,95 @@
     <script>
         const loginNotice = document.getElementById('loginNotice');
         const formCard = document.getElementById('formCard');
-        const authorSelect = document.getElementById('authorSelect');
+        const authorSelect = document.getElementById('authorSelect'); // 選択中のreporterId（hidden）
+        const authorSearchInput = document.getElementById('authorSearchInput');
+        const authorSuggest = document.getElementById('authorSuggest');
+        const authorSelectedChip = document.getElementById('authorSelectedChip');
         let currentUserObj = null;
         let myReporters = []; // 自分が追加した記者 or 全記者（後述の方針）
+
+        // 日本語・英語（ローマ字）どちらでも検索できるよう正規化する（カナ半角化はしていないので、
+        // 全角カナ/漢字表記と、ローマ字/英語表記のどちらかが部分一致すればヒットする作りです）
+        function normalizeSearchText(s) {
+            return String(s || '').trim().toLowerCase().replace(/[\s・,、]/g, '');
+        }
+        function searchReporters(query) {
+            const nq = normalizeSearchText(query);
+            if (!nq) return [];
+            return myReporters.filter(r => {
+                const n1 = normalizeSearchText(r.name);
+                const n2 = normalizeSearchText(r.nameRomaji || '');
+                return (n1 && n1.indexOf(nq) >= 0) || (n2 && n2.indexOf(nq) >= 0);
+            }).slice(0, 8);
+        }
+        function reporterAvatarHtml(r, size) {
+            size = size || 26;
+            if (r.profileImage) {
+                return '<span style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;display:inline-flex;overflow:hidden;flex-shrink:0;"><img src="' + escapeHtml(r.profileImage) + '" style="width:100%;height:100%;object-fit:cover;"></span>';
+            }
+            const g = avatarColor(r.name);
+            return '<span style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:' + Math.round(size * 0.4) + 'px;font-weight:900;color:#fff;flex-shrink:0;background:' + g[0] + ';">' + escapeHtml(getInitialsLocal(r.name)) + '</span>';
+        }
+        function getInitialsLocal(name) {
+            if (!name) return '?';
+            const parts = String(name).trim().split(/\s+/).filter(p => /[A-Za-z0-9\u00C0-\u024F]/.test(p.charAt(0)));
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            const one = parts[0] || String(name).trim();
+            return one.substring(0, 2).toUpperCase();
+        }
+        const AUTHOR_PALETTE = [
+            ['#e63946', '#a4161a'], ['#1d3557', '#14213d'], ['#2a9d8f', '#1f7a6f'],
+            ['#e76f51', '#c44a30'], ['#6a4c93', '#4e3470'], ['#457b9d', '#2f5a73']
+        ];
+        function avatarColor(name) {
+            let h = 0; const s = name || '';
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return AUTHOR_PALETTE[h % AUTHOR_PALETTE.length];
+        }
+
+        function renderAuthorSuggest(list) {
+            if (list.length === 0) { authorSuggest.style.display = 'none'; authorSuggest.innerHTML = ''; return; }
+            authorSuggest.innerHTML = list.map(r =>
+                '<div class="item" data-id="' + r.id + '" style="display:flex; align-items:center; gap:8px;">' +
+                    reporterAvatarHtml(r, 22) +
+                    '<span>' + escapeHtml(r.name) + (r.nameRomaji ? ' <span style="color:#999;">(' + escapeHtml(r.nameRomaji) + ')</span>' : '') + (r.mediaOutlet ? ' <span style="color:#bbb;">・' + escapeHtml(r.mediaOutlet) + '</span>' : '') + '</span>' +
+                '</div>'
+            ).join('');
+            authorSuggest.style.display = 'block';
+            authorSuggest.querySelectorAll('[data-id]').forEach(el => {
+                el.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    selectAuthor(this.getAttribute('data-id'));
+                });
+            });
+        }
+        function selectAuthor(id) {
+            const r = myReporters.find(x => x.id === id);
+            if (!r) return;
+            authorSelect.value = id;
+            authorSuggest.style.display = 'none';
+            authorSearchInput.style.display = 'none';
+            authorSelectedChip.style.display = 'flex';
+            document.getElementById('authorSelectedAvatar').outerHTML = reporterAvatarHtml(r, 26).replace('<span', '<span id="authorSelectedAvatar"');
+            document.getElementById('authorSelectedName').textContent = r.name + (r.mediaOutlet ? '（' + r.mediaOutlet + '）' : '');
+        }
+        function clearAuthorSelection() {
+            authorSelect.value = '';
+            authorSelectedChip.style.display = 'none';
+            authorSearchInput.style.display = 'block';
+            authorSearchInput.value = '';
+            authorSearchInput.focus();
+        }
+        authorSearchInput.addEventListener('input', function () {
+            renderAuthorSuggest(searchReporters(this.value));
+        });
+        authorSearchInput.addEventListener('focus', function () {
+            if (this.value.trim()) renderAuthorSuggest(searchReporters(this.value));
+        });
+        authorSearchInput.addEventListener('blur', function () {
+            setTimeout(() => { authorSuggest.style.display = 'none'; }, 150);
+        });
+        document.getElementById('authorSelectedClear').addEventListener('click', clearAuthorSelection);
 
         async function init() {
             // 報道日はデフォルトで今日の日付にしておく（編集モードでは後で上書きされます）
@@ -722,19 +815,19 @@
             }
             currentUserObj = user;
 
-            // 記者選択肢を読み込む（全記者から選べるようにする。詳細はチャット内で説明）
+            // 記者候補を読み込む（全記者から検索して選べるようにする）
             try {
                 const res = await GegenPressAPI.reporters.getAll();
                 myReporters = (res && res.success) ? (res.reporters || []) : [];
             } catch (e) { myReporters = []; }
-
-            authorSelect.innerHTML = '<option value="">選択してください</option>' +
-                myReporters.map(r => '<option value="' + r.id + '">' + escapeHtml(r.name) + '</option>').join('');
+            authorSearchInput.placeholder = myReporters.length === 0
+                ? '記者が登録されていません。先に「記者を追加」してください'
+                : '記者名を入力（例: ファ / Fa）';
 
             // 記者ページの「この記者のニュースを投稿する」から来た場合、記者名義を事前に選択しておく
             const preselectAuthorId = new URLSearchParams(window.location.search).get('authorId');
             if (preselectAuthorId && myReporters.some(r => r.id === preselectAuthorId)) {
-                authorSelect.value = preselectAuthorId;
+                selectAuthor(preselectAuthorId);
             }
 
             await loadArticleForEdit();
@@ -773,7 +866,7 @@
             document.getElementById('articleDesc').value = editingArticle.description || '';
             document.getElementById('articleContent').value = editingArticle.content || '';
             document.getElementById('sourceUrl').value = editingArticle.sourceUrl || '';
-            if (editingArticle.authorId) authorSelect.value = editingArticle.authorId;
+            if (editingArticle.authorId) selectAuthor(editingArticle.authorId);
 
             if (editingArticle.reportedAt) {
                 const rd = editingArticle.reportedAt.toDate ? editingArticle.reportedAt.toDate() : new Date(editingArticle.reportedAt);
