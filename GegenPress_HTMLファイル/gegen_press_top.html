@@ -1233,6 +1233,7 @@
                     </div>
                     <a href="gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>インタビュー記事</strong><span>Interviews</span></a>
                     <a href="gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>一般記事</strong><span>General</span></a>
+                    <a href="gegen_press_category.html?contentType=column" class="gp-dropdown-option"><strong>コラム</strong><span>Columns</span></a>
                 </div>
             </div>
             <div class="gp-nav-item gp-dropdown-wrap" id="rankingDropdownWrap">
@@ -1422,6 +1423,16 @@
         <div class="container">
             <h2 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>話題のインタビュー記事</h2>
             <div id="interviewArticles">
+                <div class="hero-duo"><div><div class="skeleton sk-thumb"></div><div class="skeleton sk-line" style="width:82%;"></div><div class="skeleton sk-line" style="width:46%;"></div></div><div class="sk-second"><div class="skeleton sk-thumb"></div><div class="skeleton sk-line" style="width:70%;"></div><div class="skeleton sk-line" style="width:38%;"></div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 話題のコラム -->
+    <section class="pickup-section">
+        <div class="container">
+            <h2 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>話題のコラム</h2>
+            <div id="columnArticles">
                 <div class="hero-duo"><div><div class="skeleton sk-thumb"></div><div class="skeleton sk-line" style="width:82%;"></div><div class="skeleton sk-line" style="width:46%;"></div></div><div class="sk-second"><div class="skeleton sk-thumb"></div><div class="skeleton sk-line" style="width:70%;"></div><div class="skeleton sk-line" style="width:38%;"></div></div></div>
             </div>
         </div>
@@ -1630,12 +1641,16 @@
                     const rowA = list.slice(2, 10); // 横スクロール分：最大8件
 
                     function heroCardHtml(a, extraClass) {
+                        const byName = a.authorName || a.writerName || '';
+                        const idAttr = a.contentType === 'column'
+                            ? ' data-writer-id="' + esc(a.writerUid || '') + '"'
+                            : ' data-author-id="' + esc(a.authorId || '') + '"';
                         return (
                             '<a class="hero-card' + (extraClass ? ' ' + extraClass : '') + '" data-article-id="' + esc(a.id) + '">' +
                                 '<div class="hero-thumb"><span class="cat-tag">' + esc(a.category || '速報') + '</span>' + thumbHtmlFor(a) + '</div>' +
                                 '<div class="hero-body">' +
                                     '<div class="hero-title">' + esc(a.title) + '</div>' +
-                                    '<div class="card-meta"><span class="author-avatar-badge" data-author-id="' + esc(a.authorId || '') + '" style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;overflow:hidden;' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</span>' + esc(a.authorName || '') + '</div>' +
+                                    '<div class="card-meta"><span class="author-avatar-badge"' + idAttr + ' style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;overflow:hidden;' + avatarStyle(byName) + '">' + esc(getInitials(byName)) + '</span>' + esc(byName) + '</div>' +
                                 '</div>' +
                             '</a>'
                         );
@@ -1671,8 +1686,9 @@
                     upgradeAuthorAvatars(wrap);
                 }
 
-                // 記者の実際のアイコン画像があれば、頭文字バッジを画像に差し替える
+                // 記者（または、コラムの場合はライター本人）の実際のアイコン画像があれば、頭文字バッジを画像に差し替える
                 const _authorAvatarCache = {};
+                const _writerAvatarCache = {};
                 async function upgradeAuthorAvatars(root) {
                     if (typeof GegenPressAPI === 'undefined') return;
                     const ids = new Set();
@@ -1689,6 +1705,28 @@
                             const img = _authorAvatarCache[id];
                             if (img) {
                                 root.querySelectorAll('.author-avatar-badge[data-author-id="' + CSS.escape(id) + '"]').forEach(el => {
+                                    el.style.background = 'none';
+                                    el.innerHTML = '<img src="' + esc(img) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                                });
+                            }
+                        } catch (e) { /* 取得できなければ頭文字バッジのまま */ }
+                    }
+
+                    // コラムのライター（投稿した本人）のアイコン
+                    const writerIds = new Set();
+                    root.querySelectorAll('.author-avatar-badge[data-writer-id]').forEach(el => {
+                        const id = el.getAttribute('data-writer-id');
+                        if (id) writerIds.add(id);
+                    });
+                    for (const id of writerIds) {
+                        try {
+                            if (!(id in _writerAvatarCache)) {
+                                const ures = await GegenPressAPI.users.get(id);
+                                _writerAvatarCache[id] = (ures && ures.success && ures.user && ures.user.profileImage) || null;
+                            }
+                            const img = _writerAvatarCache[id];
+                            if (img) {
+                                root.querySelectorAll('.author-avatar-badge[data-writer-id="' + CSS.escape(id) + '"]').forEach(el => {
                                     el.style.background = 'none';
                                     el.innerHTML = '<img src="' + esc(img) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
                                 });
@@ -1738,12 +1776,17 @@
                     const generalList = recent
                         .filter(a => Array.isArray(a.articleTypes) && a.articleTypes.includes('一般記事'))
                         .sort((a, b) => trendScore(b) - trendScore(a));
+                    const columnList = recent
+                        .filter(a => a.contentType === 'column')
+                        .sort((a, b) => trendScore(b) - trendScore(a));
                     renderHeroScroll('interviewArticles', interviewList.slice(0, 9));
+                    renderHeroScroll('columnArticles', columnList.slice(0, 9));
                     renderHeroScroll('generalArticles', generalList.slice(0, 9));
                 } catch (e) {
                     console.warn('話題のインタビュー記事／一般記事の読み込みに失敗:', e);
                     document.getElementById('interviewArticles').innerHTML = '<p style="color:#999; font-size:13px;">読み込みに失敗しました。</p>';
                     document.getElementById('generalArticles').innerHTML = '<p style="color:#999; font-size:13px;">読み込みに失敗しました。</p>';
+                    document.getElementById('columnArticles').innerHTML = '<p style="color:#999; font-size:13px;">読み込みに失敗しました。</p>';
                 }
 
                 // サイドバー：注目のハッシュタグ（記事に付いたタグの出現頻度上位）
@@ -1842,6 +1885,17 @@
             }
         }
 
+        // 移籍ステータスの小さな右上パッチ（「移籍決定」等の冗長な表記の代わり）
+        function transferPatchHtml(status) {
+            if (status === 'rumor') {
+                return '<span style="position:absolute; top:6px; right:8px; font-size:8.5px; font-weight:900; padding:2px 6px; border-radius:3px; background:#fff3cd; color:#856404; line-height:1.4; letter-spacing:0.5px;">噂</span>';
+            }
+            if (status === 'completed') {
+                return '<span style="position:absolute; top:6px; right:8px; font-size:8.5px; font-weight:900; padding:2px 6px; border-radius:3px; background:#d4edda; color:#155724; line-height:1.4; letter-spacing:0.5px;">決定</span>';
+            }
+            return '';
+        }
+
         // ==== 直近の移籍（fromClub → toClub が設定されている選手を新しい順に） ====
         async function loadTransfersSection() {
             const wrap = document.getElementById('transfersSection');
@@ -1863,23 +1917,26 @@
                     return tb - ta;
                 });
                 wrap.innerHTML = list.slice(0, 5).map(p => {
-                    const badge = p.transferStatus === 'rumor'
-                        ? '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#fff3cd;color:#856404;flex-shrink:0;">移籍の噂</span>'
-                        : '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#d4edda;color:#155724;flex-shrink:0;">移籍決定</span>';
                     return (
-                        '<div style="display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid #eee;">' +
-                            clubBadgeHtml(p.fromClub, 34, p.fromClubId) +
-                            '<span style="color:#ccc; font-size:13px; flex-shrink:0;">→</span>' +
-                            clubBadgeHtml(p.toClub, 34, p.toClubId) +
-                            '<div style="flex:1; min-width:0; margin-left:4px;">' +
-                                '<a href="gegen_press_player_profile.html?id=' + encodeURIComponent(p.id) + '" style="font-size:13px; font-weight:bold; color:#1d3557; text-decoration:none;">' + esc(p.name) + '</a>' +
-                                '<div style="font-size:11px; color:#888;">' + esc(p.fromClub || '不明') + ' → ' + esc(p.toClub || '不明') +
-                                    (p.transferFee ? ' ・ ' + esc(p.transferFee) : '') + '</div>' +
+                        '<div style="position:relative; display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid #eee; cursor:pointer;" data-id="' + esc(p.id) + '">' +
+                            '<div style="display:flex; align-items:center; gap:3px; flex-shrink:0;">' +
+                                clubBadgeHtml(p.fromClub, 30, p.fromClubId) +
+                                '<span style="color:#ccc; font-size:12px;">→</span>' +
+                                clubBadgeHtml(p.toClub, 30, p.toClubId) +
                             '</div>' +
-                            badge +
+                            '<div style="flex:1; min-width:0;">' +
+                                '<div style="font-size:13px; font-weight:bold; color:#1d3557; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + esc(p.name) + '</div>' +
+                                (p.transferFee ? '<div style="font-size:11px; color:#888;">' + esc(p.transferFee) + '</div>' : '') +
+                            '</div>' +
+                            transferPatchHtml(p.transferStatus) +
                         '</div>'
                     );
                 }).join('');
+                wrap.querySelectorAll('[data-id]').forEach(el => {
+                    el.addEventListener('click', () => {
+                        window.location.href = 'gegen_press_player_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                    });
+                });
                 bindClubBadges(wrap);
             } catch (e) {
                 wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">読み込み中にエラーが発生しました。</div>';
@@ -1932,23 +1989,18 @@
                         ? '<img src="' + esc(playerPhoto) + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
                         : esc(getInitials(p.name));
                     const avatarStyleAttr = playerPhoto ? '' : ('background: ' + g[0] + '; color:#fff;');
-                    let badge = '';
-                    if (p.transferStatus === 'rumor') badge = '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#fff3cd;color:#856404;">移籍の噂</span>';
-                    else if (p.transferStatus === 'completed') badge = '<span style="font-size:10px;font-weight:bold;padding:3px 8px;border-radius:2px;background:#d4edda;color:#155724;">移籍決定</span>';
                     const viewsHtml = anyViews
-                        ? '<span style="font-size:10.5px; color:#999;">👁 ' + formatViews(p._recentViews) + '</span>'
+                        ? '<div style="font-size:11px; color:#888;">👁 ' + formatViews(p._recentViews) + '</div>'
                         : '';
                     return (
-                        '<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid #eee; cursor:pointer;" data-id="' + esc(p.id) + '">' +
-                            '<div style="width:42px;height:42px;border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;overflow:hidden;' + avatarStyleAttr + '">' + avatar + '</div>' +
+                        '<div style="position:relative; display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid #eee; cursor:pointer;" data-id="' + esc(p.id) + '">' +
+                            '<div style="width:38px;height:38px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;overflow:hidden;' + avatarStyleAttr + '">' + avatar + '</div>' +
                             '<div style="flex:1; min-width:0;">' +
-                                '<div style="font-size:13px; font-weight:bold; color:#1d3557;">' + esc(p.name) + (p.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(p.nameRomaji) + '</span>' : '') + '</div>' +
-                                '<div style="font-size:11px; color:#888;">' + esc(p.currentClub || '') + '</div>' +
-                            '</div>' +
-                            '<div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0;">' +
-                                '<div style="display:flex; align-items:center; gap:8px;">' + clubBadgeHtml(p.currentClub, 28, p.currentClubId) + badge + '</div>' +
+                                '<div style="font-size:13px; font-weight:bold; color:#1d3557; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + esc(p.name) + (p.nameRomaji ? ' <span style="font-weight:400;color:#999;font-size:11px;">' + esc(p.nameRomaji) + '</span>' : '') + '</div>' +
                                 viewsHtml +
                             '</div>' +
+                            clubBadgeHtml(p.currentClub, 38, p.currentClubId) +
+                            transferPatchHtml(p.transferStatus) +
                         '</div>'
                     );
                 }).join('');

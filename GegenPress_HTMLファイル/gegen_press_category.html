@@ -858,6 +858,7 @@
                     </div>
                     <a href="gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>インタビュー記事</strong><span>Interviews</span></a>
                     <a href="gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>一般記事</strong><span>General</span></a>
+                    <a href="gegen_press_category.html?contentType=column" class="gp-dropdown-option"><strong>コラム</strong><span>Columns</span></a>
                 </div>
             </div>
             <div class="gp-nav-item gp-dropdown-wrap" id="rankingDropdownWrap">
@@ -1097,18 +1098,23 @@
         }
 
         function metaHtml(a) {
+            const byName = a.authorName || a.writerName || '';
+            const idAttr = a.contentType === 'column'
+                ? ' data-writer-id="' + esc(a.writerUid || '') + '"'
+                : ' data-author-id="' + esc(a.authorId || '') + '"';
             return (
                 '<div class="card-meta">' +
-                    '<span class="author-dot author-avatar-badge" data-author-id="' + esc(a.authorId || '') + '" style="overflow:hidden;' + avatarStyle(a.authorName) + '">' + esc(getInitials(a.authorName)) + '</span>' +
-                    '<span>' + esc(a.authorName || '') + '</span>' +
+                    '<span class="author-dot author-avatar-badge"' + idAttr + ' style="overflow:hidden;' + avatarStyle(byName) + '">' + esc(getInitials(byName)) + '</span>' +
+                    '<span>' + esc(byName) + '</span>' +
                     '<span>・</span>' +
                     '<span>' + esc(fmtDate(a.createdAt)) + '</span>' +
                 '</div>'
             );
         }
 
-        // 記者の実際のアイコン画像があれば、頭文字バッジを画像に差し替える
+        // 記者（コラムの場合はライター本人）の実際のアイコン画像があれば、頭文字バッジを画像に差し替える
         const _authorAvatarCache = {};
+        const _writerAvatarCache = {};
         async function upgradeAuthorAvatars(root) {
             if (typeof GegenPressAPI === 'undefined') return;
             const ids = new Set();
@@ -1125,6 +1131,26 @@
                     const img = _authorAvatarCache[id];
                     if (img) {
                         root.querySelectorAll('.author-avatar-badge[data-author-id="' + CSS.escape(id) + '"]').forEach(el => {
+                            el.style.background = 'none';
+                            el.innerHTML = '<img src="' + esc(img) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                        });
+                    }
+                } catch (e) { /* 取得できなければ頭文字バッジのまま */ }
+            }
+            const writerIds = new Set();
+            root.querySelectorAll('.author-avatar-badge[data-writer-id]').forEach(el => {
+                const id = el.getAttribute('data-writer-id');
+                if (id) writerIds.add(id);
+            });
+            for (const id of writerIds) {
+                try {
+                    if (!(id in _writerAvatarCache)) {
+                        const ures = await GegenPressAPI.users.get(id);
+                        _writerAvatarCache[id] = (ures && ures.success && ures.user && ures.user.profileImage) || null;
+                    }
+                    const img = _writerAvatarCache[id];
+                    if (img) {
+                        root.querySelectorAll('.author-avatar-badge[data-writer-id="' + CSS.escape(id) + '"]').forEach(el => {
                             el.style.background = 'none';
                             el.innerHTML = '<img src="' + esc(img) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
                         });
@@ -1280,6 +1306,16 @@
                 }
                 let articles = res.articles || [];
                 const urlParams = new URLSearchParams(window.location.search);
+
+                // ?contentType=column：コラムだけを一覧表示する専用モード（NEWSメニューの「コラム」から遷移）
+                const contentTypeParam = urlParams.get('contentType');
+                if (contentTypeParam === 'column') {
+                    const columns = articles.filter(a => a.contentType === 'column');
+                    renderFullLeagueList('コラム', columns);
+                    upgradeAuthorAvatars(document.getElementById('mainContent'));
+                    return;
+                }
+                // ※「すべてのニュース」（フィルタ無しの通常表示）には、ご要望通りコラムも一緒に含めています。
 
                 // ?league=プレミアリーグ 等：そのリーグの全記事だけを一覧表示する専用モード
                 // （リーグ別セクションの「もっと見る」、または NEWS メニューの「移籍記事」→各リーグから遷移）
