@@ -1166,9 +1166,12 @@
                     <button class="submit-button" id="commentSubmitBtn" disabled style="opacity: 0.5; cursor: not-allowed;">コメントを投稿（ログイン必須）</button>
                 </div>
 
-                <!-- コメント一覧 -->
-                <div class="comments-list" id="commentsList" style="margin-top: 24px;">
+                <!-- コメント一覧（デフォルト折りたたみ。「コメントを見る」で10件ずつ表示） -->
+                <div class="comments-list" id="commentsList" style="margin-top: 24px; display:none;">
                     <p style="color:#999; font-size:14px;">読み込み中...</p>
+                </div>
+                <div id="commentsToggleWrap" style="text-align:center; margin-top:16px; display:none;">
+                    <button id="commentsToggleBtn" style="background:#fff; color:#333; border:1px solid #ccc; border-radius:6px; padding:10px 24px; font-size:13px; font-weight:bold; cursor:pointer;">コメントを見る</button>
                 </div>
             </section>
         </main>
@@ -1240,14 +1243,17 @@
                 </div>
             </div>
 
-            <!-- 関連ニュース -->
-            <div class="sidebar-box">
-                <h3>関連ニュース</h3>
-                <div id="relatedArticles">
-                    <p style="color:#999; font-size:13px;">読み込み中...</p>
-                </div>
-            </div>
         </aside>
+    </div>
+
+    <!-- 関連ニュース（開封率向上のため記事下部に移動。サムネ・タイトル・記者名・閲覧数のみ、横スクロール） -->
+    <div class="container" style="display:block;">
+        <section style="margin: 10px 0 40px;">
+            <h2 class="comments-title" style="font-size:18px; margin-bottom:14px;">関連ニュース</h2>
+            <div id="relatedArticles" style="display:flex; overflow-x:auto; gap:14px; padding-bottom:10px; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity;">
+                <p style="color:#999; font-size:13px;">読み込み中...</p>
+            </div>
+        </section>
     </div>
     </div><!-- /#pageContentWrap -->
 
@@ -1423,7 +1429,7 @@
                 commentSubmitBtn.textContent = 'コメントを投稿';
                 if (res && res.success) {
                     commentText.value = '';
-                    loadComments();
+                    loadComments(true);
                 } else {
                     alert((res && res.message) || 'コメントの投稿に失敗しました');
                 }
@@ -1624,7 +1630,12 @@
             );
         }
 
-        async function loadComments() {
+        let commentsTopLevel = [];
+        let commentsCurrentUid = null, commentsCurrentIsAdmin = false;
+        let commentsVisibleCount = 0;
+        const COMMENTS_PAGE_SIZE = 10;
+
+        async function loadComments(autoExpand) {
             if (typeof GegenPressAPI === 'undefined') return;
             try {
                 const res = await GegenPressAPI.comments.getByArticle(articleId);
@@ -1632,18 +1643,21 @@
                 const comments = res.comments || [];
                 document.getElementById('ratingCountTitle').textContent = 'コメント (' + comments.length + ')';
                 const listEl = document.getElementById('commentsList');
+                const toggleWrap = document.getElementById('commentsToggleWrap');
+                const toggleBtn = document.getElementById('commentsToggleBtn');
                 if (comments.length === 0) {
+                    listEl.style.display = 'block';
                     listEl.innerHTML = '<p style="color:#999; font-size:14px;">まだコメントがありません。最初のコメントを投稿してみましょう。</p>';
+                    toggleWrap.style.display = 'none';
                     return;
                 }
 
                 // 削除ボタンの表示可否判定に使うため、ログイン中のユーザー情報を先に取得しておく
-                let currentUid = null, currentIsAdmin = false;
                 try {
                     const cu = await GegenPressAPI._currentUser();
                     if (cu) {
-                        currentUid = cu.uid;
-                        currentIsAdmin = GegenPressAPI.isAdminUid(cu.uid);
+                        commentsCurrentUid = cu.uid;
+                        commentsCurrentIsAdmin = GegenPressAPI.isAdminUid(cu.uid);
                     }
                 } catch (e) { /* 未ログインなら削除ボタンは出さない */ }
 
@@ -1653,26 +1667,70 @@
                     return ta - tb;
                 };
                 // トップレベル（返信ではない）コメントは新しい順、返信は古い順（掲示板の会話順）で表示
-                const topLevel = comments.filter(c => !c.parentId).sort((a, b) => -sortAsc(a, b));
-                const repliesOf = (id) => comments.filter(c => c.parentId === id).sort(sortAsc);
+                commentsTopLevel = comments.filter(c => !c.parentId).sort((a, b) => -sortAsc(a, b));
+                window._commentsAll = comments; // renderChildren から参照するため
 
-                listEl.innerHTML = topLevel.map((c, i) => commentHtml(c, topLevel.length - i, currentUid, currentIsAdmin)).join('');
-
-                // 返信・さらにその返信…と、何階層でも再帰的に描画する
-                function renderChildren(parentId) {
-                    const kids = repliesOf(parentId);
-                    if (kids.length === 0) return;
-                    const wrap = document.getElementById('replies-' + parentId);
-                    if (wrap) {
-                        wrap.innerHTML = kids.map(k => commentHtml(k, '', currentUid, currentIsAdmin)).join('');
-                        kids.forEach(k => renderChildren(k.id));
+                if (autoExpand) {
+                    // 自分のコメント投稿・返信・削除の直後は、閉じ直さず今まで見えていた分（最低10件）を保って開いたままにする
+                    const keep = Math.max(commentsVisibleCount, COMMENTS_PAGE_SIZE);
+                    commentsVisibleCount = 0;
+                    toggleWrap.style.display = 'block';
+                    while (commentsVisibleCount < Math.min(keep, commentsTopLevel.length)) {
+                        expandComments();
                     }
+                    if (commentsTopLevel.length === 0) listEl.style.display = 'none';
+                    return;
                 }
-                topLevel.forEach(c => renderChildren(c.id));
 
-                bindCommentReplyHandlers(listEl);
+                // デフォルトは折りたたみ（0件表示）。「コメントを見る」を押すと最初の10件が開く。
+                listEl.style.display = 'none';
+                commentsVisibleCount = 0;
+                toggleWrap.style.display = 'block';
+                toggleBtn.textContent = 'コメントを見る（' + commentsTopLevel.length + '件）';
+                toggleBtn.onclick = expandComments;
             } catch (e) {
                 console.warn('コメントの読み込みに失敗:', e);
+            }
+        }
+
+        function repliesOf(comments, id) {
+            const sortAsc = (a, b) => {
+                const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                return ta - tb;
+            };
+            return comments.filter(c => c.parentId === id).sort(sortAsc);
+        }
+
+        // 「コメントを見る」／「もっと見る」：表示件数を10件ずつ増やして、毎回まとめて再描画する
+        function expandComments() {
+            const listEl = document.getElementById('commentsList');
+            const toggleBtn = document.getElementById('commentsToggleBtn');
+            const toggleWrap = document.getElementById('commentsToggleWrap');
+            const comments = window._commentsAll || [];
+
+            commentsVisibleCount = Math.min(commentsVisibleCount + COMMENTS_PAGE_SIZE, commentsTopLevel.length);
+            const visible = commentsTopLevel.slice(0, commentsVisibleCount);
+
+            listEl.style.display = 'block';
+            listEl.innerHTML = visible.map((c, i) => commentHtml(c, commentsTopLevel.length - i, commentsCurrentUid, commentsCurrentIsAdmin)).join('');
+
+            function renderChildren(parentId) {
+                const kids = repliesOf(comments, parentId);
+                if (kids.length === 0) return;
+                const wrap = document.getElementById('replies-' + parentId);
+                if (wrap) {
+                    wrap.innerHTML = kids.map(k => commentHtml(k, '', commentsCurrentUid, commentsCurrentIsAdmin)).join('');
+                    kids.forEach(k => renderChildren(k.id));
+                }
+            }
+            visible.forEach(c => renderChildren(c.id));
+            bindCommentReplyHandlers(listEl);
+
+            if (commentsVisibleCount >= commentsTopLevel.length) {
+                toggleWrap.style.display = 'none';
+            } else {
+                toggleBtn.textContent = 'もっと見る（残り' + (commentsTopLevel.length - commentsVisibleCount) + '件）';
             }
         }
 
@@ -1700,7 +1758,7 @@
                     this.disabled = false; this.textContent = '返信を投稿';
                     if (res && res.success) {
                         textEl.value = '';
-                        loadComments();
+                        loadComments(true);
                     } else {
                         alert((res && res.message) || '返信の投稿に失敗しました');
                     }
@@ -1718,7 +1776,7 @@
                     try {
                         const res = await GegenPressAPI.comments.delete(id);
                         if (res && res.success) {
-                            loadComments();
+                            loadComments(true);
                         } else {
                             alert((res && res.message && String(res.message).indexOf('permission') >= 0)
                                 ? 'このコメントを削除する権限がありません。'
@@ -1902,18 +1960,30 @@
                     const res = await GegenPressAPI.reporters.getArticles(article.authorId);
                     list = (res && res.success) ? (res.articles || []) : [];
                 }
-                const others = list.filter(a => a.id !== articleId).slice(0, 4);
+                const others = list.filter(a => a.id !== articleId).slice(0, 8);
                 if (others.length === 0) {
                     wrap.innerHTML = '<p style="color:#999; font-size:13px;">関連ニュースはありません。</p>';
                     return;
                 }
-                wrap.innerHTML = others.map(a =>
-                    '<div class="related-article" style="cursor:pointer;" data-id="' + esc(a.id) + '">' +
-                        '<div class="related-article-title">' + esc(a.title) + '</div>' +
-                        '<div class="related-article-author">' + esc(a.authorName || '') + '</div>' +
-                    '</div>'
-                ).join('');
-                wrap.querySelectorAll('.related-article').forEach(el => {
+                wrap.innerHTML = others.map(a => {
+                    const byName = a.authorName || a.writerName || '';
+                    const thumb = a.image
+                        ? '<img src="' + esc(a.image) + '" alt="" style="width:100%; height:100%; object-fit:cover;">'
+                        : '<div style="width:100%; height:100%; background:#14213d;"></div>';
+                    return (
+                        '<div style="flex:0 0 200px; scroll-snap-align:start; cursor:pointer; border:1px solid #eee; border-radius:6px; overflow:hidden;" data-id="' + esc(a.id) + '">' +
+                            '<div style="width:100%; height:112px; overflow:hidden;">' + thumb + '</div>' +
+                            '<div style="padding:10px 12px;">' +
+                                '<div style="font-size:12.5px; font-weight:bold; color:#1a1a1a; line-height:1.4; margin-bottom:8px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; min-height:2.8em;">' + esc(a.title) + '</div>' +
+                                '<div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#888;">' +
+                                    '<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">' + esc(byName) + '</span>' +
+                                    '<span>👁 ' + (a.views || 0).toLocaleString() + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>'
+                    );
+                }).join('');
+                wrap.querySelectorAll('[data-id]').forEach(el => {
                     el.addEventListener('click', () => {
                         window.location.href = 'gegen_press_article_detail.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
                     });
