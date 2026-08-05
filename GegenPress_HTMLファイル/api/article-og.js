@@ -12,12 +12,20 @@
 // 人間のユーザーがアクセスした場合も同じHTMLが返るだけなので、
 // これまで通りブラウザ側のJavaScriptがFirestoreを読みに行って表示を作ります(挙動は変わりません)。
 //
+// テンプレートHTMLの取得方法について(重要):
+// 以前は fs.readFileSync でこのファイルと同じリポジトリ内のHTMLを直接読んでいましたが、
+// Vercelのビルド時にそのファイルが関数の実行環境に同梱されないことがあり、
+// 何度直しても安定しなかったため、この方式はやめました。
+// 代わりに、同じサイト上で普通に公開されている gegen_press_article_detail.html を
+// HTTP経由でそのまま取得します。これなら「ビルド時に同梱されるか」という不安定な要素に
+// 依存せず、実際にブラウザからアクセスできているのと同じ内容が確実に取得できます。
+// ★ 注意: この関数は /gegen_press_article_detail.html を rewrite 先にしないでください。
+//   (静的ファイルが実在するため rewrite は発動しない仕様ですが、万一将来
+//    何らかの理由で発動するようになると、この関数からの取得が無限ループします)
+//
 // 認証情報は不要です: articles コレクションは firestore.rules で
 // `allow read: if true` になっており、Firebase設定(apiKey等)も
 // api-client.js内で「公開前提の値」と明記されている値をそのまま使っています。
-
-const fs = require('fs');
-const path = require('path');
 
 // api-client.js と同じ値(公開前提。秘密鍵ではありません)
 const FIREBASE_PROJECT_ID = 'gegen-press';
@@ -54,18 +62,15 @@ module.exports = async function handler(req, res) {
     const origin = proto + '://' + host;
     const pageUrl = origin + '/gegen_press_article_detail.html' + (id ? ('?id=' + encodeURIComponent(id)) : '');
 
-    // テンプレートHTMLを読み込む(このファイルと同じリポジトリにコミットされている前提)
-    // リネームはもう不要。/api/article-og という専用パスでアクセスするため、
-    // gegen_press_article_detail.html 自体は今まで通りの名前・場所のままでOK。
-    const templatePath = path.join(process.cwd(), 'gegen_press_article_detail.html');
+    // テンプレートHTMLを、ファイルシステムではなくHTTP経由で取得する
     let html;
     try {
-        html = fs.readFileSync(templatePath, 'utf8');
+        const templateRes = await fetch(origin + '/gegen_press_article_detail.html');
+        if (!templateRes.ok) throw new Error('テンプレート取得時にHTTP ' + templateRes.status);
+        html = await templateRes.text();
     } catch (e) {
-        // テンプレートが読めない場合でも、記事ページごとサイトを落とさない。
-        // (以前、テンプレートが見つからずエラー文だけを全ユーザーに返してしまう事故があったため、
-        //  必ずトップページへ302リダイレクトして、閲覧自体は継続できるようにする)
-        console.error('OGテンプレートの読み込みに失敗しました:', templatePath, e);
+        // テンプレートが取得できない場合でも、記事ページごとサイトを落とさない。
+        console.error('OGテンプレートの取得に失敗しました:', e);
         res.writeHead(302, { Location: '/gegen_press_top.html' });
         res.end();
         return;
