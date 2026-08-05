@@ -34,7 +34,7 @@ const FIREBASE_API_KEY = 'AIzaSyDyisueW3srtm60_Y1oiE4mf5Rcy6_gB6Y';
 const SITE_NAME = 'Gegen Press!';
 // TODO: 実際の本番ドメインが決まったら、ここをそのドメイン上のロゴ画像URLに書き換えてください。
 // (og:image は相対パスではなく絶対URLである必要があるため、実行時にホスト名から組み立てます)
-const DEFAULT_IMAGE_PATH = '/logo.png';
+const DEFAULT_IMAGE_PATH = '/og-image.png';
 const DEFAULT_DESCRIPTION = '海外サッカー記者の報道をまとめるニュース・コラムサイト';
 
 function esc(s) {
@@ -91,13 +91,14 @@ module.exports = async function handler(req, res) {
                 const fields = doc.fields || {};
                 const t = fsValue(fields, 'title');
                 const d = fsValue(fields, 'description') || fsValue(fields, 'content');
-                const img = fsValue(fields, 'image');
                 if (t) title = t;
                 if (d) description = String(d).slice(0, 120);
                 // Firestore側にBase64データURI(data:image/...)で保存されている画像は、
                 // og:imageとして使えない(SNSのクローラーはURLを別途取得しに行く仕様のため)。
                 // その場合はサイトロゴにフォールバックする。
-                if (img && !String(img).startsWith('data:')) image = img;
+                // 記事ごとの画像は使わず、常にサイト共通のOG画像(og-image.png)を使う。
+                // (以前は記事のimageフィールドを使おうとしていたが、Base64データURIだったりして
+                //  安定しなかったため、一律で共通画像にすることにした)
             }
             // 404などでも致命的エラーにはせず、デフォルトのメタ情報のままページ自体は返す
         } catch (e) {
