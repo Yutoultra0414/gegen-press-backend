@@ -71,6 +71,21 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // 記事作成のスクショ自動入力（Gemini連携）の1日あたりの利用回数カウンター。
+    // ドキュメントID は "{uid}_{YYYY-MM-DD}" 固定。サーバーレス関数(/api/analyze-screenshot)が
+    // 本人のIDトークンでこのドキュメントを+1しようとし、成功した場合だけ実際にAIを呼び出す。
+    // 1日10回を超える更新はここで拒否されるため、上限は関数側ではなくルール側で強制される。
+    match /aiUsage/{docId} {
+      allow read: if request.auth != null && docId.split('_')[0] == request.auth.uid;
+      allow create: if request.auth != null
+                    && docId.split('_')[0] == request.auth.uid
+                    && request.resource.data.count == 1;
+      allow update: if request.auth != null
+                    && docId.split('_')[0] == request.auth.uid
+                    && resource.data.count < 10
+                    && request.resource.data.count == resource.data.count + 1;
+    }
+
     // 記者へのレビュー（クチコミ）
     match /reviews/{reviewId} {
       allow read: if true;
