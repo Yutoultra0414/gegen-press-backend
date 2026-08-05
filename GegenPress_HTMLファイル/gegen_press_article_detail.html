@@ -1999,12 +1999,16 @@
             if (!btn) return;
             btn.addEventListener('click', function () {
                 // ツイート本文には記者（投稿者）のXユーザーネームのみを記載する。
-                // タイトルやサムネイルは、OGPカード側（別途対応が必要）に任せる想定。
+                // タイトルやサムネイルは、OGPカード側（/api/article-og が別途担当）に任せる想定。
                 const label = (currentArticle && currentArticle.contentType === 'column') ? '投稿者' : '記者';
                 const text = currentAuthorHandle ? (label + '：@' + currentAuthorHandle) : '';
+                // 通常のページURLではなく、OGPタグ付きで返す専用エンドポイントを共有する。
+                // (このURLは既存の静的ファイルと同名にならないため、Vercelの「静的ファイル優先」の
+                //  仕様と衝突せず、確実にog:tags付きのHTMLがXのクローラーに返る)
+                const ogShareUrl = window.location.origin + '/api/article-og?id=' + encodeURIComponent(articleId);
                 const shareUrl = 'https://twitter.com/intent/tweet?' + new URLSearchParams({
                     text: text,
-                    url: window.location.href
+                    url: ogShareUrl
                 }).toString();
                 window.open(shareUrl, '_blank', 'noopener,noreferrer,width=550,height=420');
             });
