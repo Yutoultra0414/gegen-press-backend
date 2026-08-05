@@ -56,7 +56,11 @@ module.exports = async function handler(req, res) {
 
     // テンプレートHTMLを読み込む(このファイルと同じリポジトリにコミットされている前提)
     // ルート直下に置いている想定です。実際の配置場所が違う場合はここのパスを調整してください。
-    const templatePath = path.join(process.cwd(), 'gegen_press_article_detail.html');
+    // ★重要: ここは "gegen_press_article_detail.html" ではなく、リネーム後の
+    // "_gegen_press_article_detail_template.html" を指す必要があります。
+    // (理由: Vercelは「rewriteのsourceと同名の静的ファイルが存在する場合、静的ファイルを優先し
+    //  rewriteを発動しない」仕様のため、実ファイルの名前を変えて衝突を避けています)
+    const templatePath = path.join(process.cwd(), '_gegen_press_article_detail_template.html');
     let html;
     try {
         html = fs.readFileSync(templatePath, 'utf8');
