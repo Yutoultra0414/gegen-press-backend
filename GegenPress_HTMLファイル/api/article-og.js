@@ -94,7 +94,10 @@ module.exports = async function handler(req, res) {
                 const img = fsValue(fields, 'image');
                 if (t) title = t;
                 if (d) description = String(d).slice(0, 120);
-                if (img) image = img; // Firestore側に絶対URLで保存されている前提
+                // Firestore側にBase64データURI(data:image/...)で保存されている画像は、
+                // og:imageとして使えない(SNSのクローラーはURLを別途取得しに行く仕様のため)。
+                // その場合はサイトロゴにフォールバックする。
+                if (img && !String(img).startsWith('data:')) image = img;
             }
             // 404などでも致命的エラーにはせず、デフォルトのメタ情報のままページ自体は返す
         } catch (e) {
