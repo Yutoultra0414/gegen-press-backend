@@ -252,6 +252,27 @@
             font-weight: 600;
         }
 
+        /* Xで共有ボタン */
+        .share-x-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .share-x-button:hover {
+            opacity: 0.85;
+        }
+
         /* コメントセクション */
         .comments-section {
             margin-top: 50px;
@@ -1122,6 +1143,14 @@
             <!-- ハッシュタグ -->
             <div id="articleTagsWrap" style="display:none; flex-wrap:wrap; gap:8px; margin:-8px 0 20px;"></div>
 
+            <!-- Xで共有 -->
+            <div style="margin: 0 0 30px;">
+                <button type="button" id="shareOnXBtn" class="share-x-button" style="display:none;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    <span>Xで共有</span>
+                </button>
+            </div>
+
             <!-- コメントセクション -->
             <section class="comments-section">
                 <h2 class="comments-title" id="ratingCountTitle">このニュースへの評価 (34)</h2>
@@ -1350,6 +1379,7 @@
         const articleId = params.get('id') || 'art_001'; // 指定が無ければ見本のまま
 
         let currentArticle = null; // Firestoreから読み込んだニュースデータ
+        let currentAuthorHandle = null; // Xで共有ボタン用（記者 or コラム投稿者のXハンドル。@なしで保持）
 
         // ==== 評価投稿（ログイン不要・Firestoreに保存） ====
         const ratingSubmitBtn = document.getElementById('ratingSubmit');
@@ -1848,13 +1878,17 @@
                     document.getElementById('authorSection').onclick = function () {
                         if (a.writerUid) window.location.href = 'gegen_press_user_profile.html?id=' + encodeURIComponent(a.writerUid);
                     };
-                    // ユーザーのアイコン画像が設定されていれば、それを表示する（無ければ略称バッジのまま）
+                    // ユーザーのアイコン画像・Xハンドルが設定されていれば取得する（無ければ略称バッジ・共有ボタン非表示のまま）
                     if (a.writerUid && typeof GegenPressAPI !== 'undefined') {
                         GegenPressAPI.users.get(a.writerUid).then(function (ures) {
-                            if (ures && ures.success && ures.user && ures.user.profileImage) {
-                                const avatarEl = document.getElementById('authorAvatar');
-                                avatarEl.style.background = 'none';
-                                avatarEl.innerHTML = '<img src="' + esc(ures.user.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                            if (ures && ures.success && ures.user) {
+                                if (ures.user.profileImage) {
+                                    const avatarEl = document.getElementById('authorAvatar');
+                                    avatarEl.style.background = 'none';
+                                    avatarEl.innerHTML = '<img src="' + esc(ures.user.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                                }
+                                currentAuthorHandle = ures.user.twitterHandle ? String(ures.user.twitterHandle).replace(/^@/, '').trim() : null;
+                                updateShareButtonVisibility();
                             }
                         }).catch(function () {});
                     }
@@ -1875,13 +1909,17 @@
                     document.getElementById('authorSection').onclick = function () {
                         window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
                     };
-                    // 記者の実際のアイコン画像が設定されていれば、それを表示する（無ければ略称バッジのまま）
+                    // 記者の実際のアイコン画像・Xハンドルが設定されていれば取得する（無ければ略称バッジ・共有ボタン非表示のまま）
                     if (a.authorId && typeof GegenPressAPI !== 'undefined') {
                         GegenPressAPI.reporters.getById(a.authorId).then(function (rres) {
-                            if (rres && rres.success && rres.reporter && rres.reporter.profileImage) {
-                                const avatarEl = document.getElementById('authorAvatar');
-                                avatarEl.style.background = 'none';
-                                avatarEl.innerHTML = '<img src="' + esc(rres.reporter.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                            if (rres && rres.success && rres.reporter) {
+                                if (rres.reporter.profileImage) {
+                                    const avatarEl = document.getElementById('authorAvatar');
+                                    avatarEl.style.background = 'none';
+                                    avatarEl.innerHTML = '<img src="' + esc(rres.reporter.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                                }
+                                currentAuthorHandle = rres.reporter.twitterHandle ? String(rres.reporter.twitterHandle).replace(/^@/, '').trim() : null;
+                                updateShareButtonVisibility();
                             }
                         }).catch(function () {});
                     }
@@ -1947,6 +1985,31 @@
             }
         }
 
+        // ==== Xで共有ボタン ====
+        // 記者（またはコラム投稿者）のXハンドルが取得できた場合のみボタンを表示する。
+        // ハンドルが無い場合は「誰の発言か分からないまま共有される」のを避けるため非表示のままにする。
+        function updateShareButtonVisibility() {
+            const btn = document.getElementById('shareOnXBtn');
+            if (!btn) return;
+            btn.style.display = currentAuthorHandle ? 'inline-flex' : 'none';
+        }
+
+        function initShareButton() {
+            const btn = document.getElementById('shareOnXBtn');
+            if (!btn) return;
+            btn.addEventListener('click', function () {
+                // ツイート本文には記者（投稿者）のXユーザーネームのみを記載する。
+                // タイトルやサムネイルは、OGPカード側（別途対応が必要）に任せる想定。
+                const label = (currentArticle && currentArticle.contentType === 'column') ? '投稿者' : '記者';
+                const text = currentAuthorHandle ? (label + '：@' + currentAuthorHandle) : '';
+                const shareUrl = 'https://twitter.com/intent/tweet?' + new URLSearchParams({
+                    text: text,
+                    url: window.location.href
+                }).toString();
+                window.open(shareUrl, '_blank', 'noopener,noreferrer,width=550,height=420');
+            });
+        }
+
         // ==== 関連ニュース（同じ記者=ニュース、同じライター=コラムの他の投稿。最大4件） ====
         async function loadRelated(article) {
             const wrap = document.getElementById('relatedArticles');
@@ -1999,6 +2062,7 @@
             if (loading) loading.style.display = 'none';
             if (wrap) wrap.style.opacity = '1';
         }
+        initShareButton();
         loadArticle().then(() => { initThumbButton(); initMyRating(); }).finally(revealPageContent);
     </script>
     <script>
