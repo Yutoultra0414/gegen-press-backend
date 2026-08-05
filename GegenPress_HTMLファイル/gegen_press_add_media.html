@@ -345,6 +345,12 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">X (Twitter) ハンドル <span class="optional-badge">任意</span></label>
+                    <p class="form-hint">所属記者本人にXアカウントが無い場合、記事共有時にこちらが代わりに使われます。@を含めて入力。例: @SkySportsNews</p>
+                    <input type="text" class="form-input" id="mediaTwitterHandle" placeholder="@username">
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">紹介文 <span class="optional-badge">任意</span></label>
                     <textarea class="form-textarea" id="mediaDescription" placeholder="どんなメディアか簡単に紹介してください"></textarea>
                 </div>
@@ -426,6 +432,7 @@
                 name: name,
                 description: document.getElementById('mediaDescription').value.trim(),
                 website: document.getElementById('mediaWebsite').value.trim() || null,
+                twitterHandle: document.getElementById('mediaTwitterHandle').value.trim().replace(/^@/, '') || null,
                 logo: logoDataUrl
             });
 

@@ -137,6 +137,41 @@
             .gp-submenu-panel { position: static; box-shadow: none; border: none; border-top: 1px solid #eee; min-width: 0; }
         }
     
+        .media-header { position: relative; }
+        .btn-edit-media {
+            position: absolute; top: 14px; right: 18px;
+            background-color: #fff; color: #1d3557;
+            border: 1.5px solid #fff; padding: 5px 14px; border-radius: 4px;
+            cursor: pointer; font-weight: bold; font-size: 10.5px;
+            letter-spacing: 0.3px; transition: all 0.3s ease;
+        }
+        .btn-edit-media:hover { background-color: transparent; color: #fff; }
+        #mediaTwitterLink { display: block; color: #fff; text-decoration: underline; font-size: 11.5px; margin-top: 4px; }
+
+        /* ===== 編集モーダル ===== */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6); z-index: 1000;
+            justify-content: center; align-items: flex-start; overflow-y: auto; padding: 40px 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal { background-color: #fff; border-radius: 10px; max-width: 480px; width: 100%; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { font-size: 18px; color: #e63946; font-weight: 900; }
+        .modal-close { background: none; border: none; font-size: 24px; color: #999; cursor: pointer; line-height: 1; }
+        .modal-close:hover { color: #e63946; }
+        .modal-group { margin-bottom: 16px; }
+        .modal-label { display: block; font-size: 11.5px; font-weight: bold; color: #333; margin-bottom: 5px; }
+        .modal-input, .modal-textarea {
+            width: 100%; padding: 10px 12px; border: 2px solid #ddd; border-radius: 6px;
+            font-size: 13px; font-family: inherit; color: #333;
+        }
+        .modal-input:focus, .modal-textarea:focus { outline: none; border-color: #e63946; box-shadow: 0 0 0 3px rgba(230,57,70,0.1); }
+        .modal-textarea { resize: vertical; min-height: 70px; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 22px; padding-top: 16px; border-top: 2px solid #eee; }
+        .modal-save { flex: 1; background: #e63946; color: #fff; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .modal-save:disabled { opacity: 0.5; cursor: not-allowed; }
+        .modal-cancel { background: transparent; border: 2px solid #ddd; color: #666; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; }
     </style>
     <style>
         /* ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== */
@@ -353,10 +388,12 @@
 
 
     <section class="media-header">
+        <button class="btn-edit-media" id="editMediaBtn" style="display:none;">編集</button>
         <div class="media-badge" id="mediaBadge">?</div>
         <div>
             <h1 id="mediaName">読み込み中...</h1>
             <p id="mediaSub"></p>
+            <a id="mediaTwitterLink" href="#" target="_blank" rel="noopener" style="display:none;"></a>
             <p id="mediaReporterCount" style="font-size:11.5px; color:rgba(255,255,255,0.8); margin-top:2px;"></p>
         </div>
     </section>
@@ -375,6 +412,33 @@
         <div class="card">
             <h2>所属記者</h2>
             <div id="mediaReporters"><p class="empty-note">読み込み中...</p></div>
+        </div>
+    </div>
+
+    <!-- 編集モーダル -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>メディア情報を編集</h2>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">紹介文</label>
+                <textarea class="modal-textarea" id="editDescription" placeholder="どんなメディアか簡単に紹介してください"></textarea>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">公式サイトURL</label>
+                <input type="text" class="modal-input" id="editWebsite" placeholder="https://...">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">X (Twitter) ハンドル</label>
+                <p class="empty-note" style="margin:-4px 0 6px;">所属記者本人にXアカウントが無い場合、記事共有時にこちらが代わりに使われます。</p>
+                <input type="text" class="modal-input" id="editMediaTwitter" placeholder="@username">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-cancel" id="modalCancelBtn">キャンセル</button>
+                <button class="modal-save" id="modalSaveBtn">変更を保存</button>
+            </div>
         </div>
     </div>
 
@@ -402,6 +466,17 @@
 
         const mediaName = new URLSearchParams(window.location.search).get('name');
 
+        function safeGetItem(key) {
+            try { return localStorage.getItem(key); } catch (e) { return null; }
+        }
+        const API_AVAILABLE = (typeof GegenPressAPI !== 'undefined');
+        const authToken = safeGetItem('gegenPressToken');
+        const currentUserId = safeGetItem('gegenPressUserId');
+        if (API_AVAILABLE && authToken) GegenPressAPI.setToken(authToken);
+
+        // 登録済みのメディアデータ本体（編集モーダルの初期値・保存対象として保持）
+        let currentMedia = null;
+
         async function loadMedia() {
             document.getElementById('mediaName').textContent = mediaName || 'メディアが指定されていません';
             document.title = (mediaName || 'メディア情報') + ' - Gegen Press!';
@@ -425,6 +500,7 @@
                 const mres = await GegenPressAPI.media.getByName(mediaName);
                 if (mres && mres.success && mres.media) {
                     const m = mres.media;
+                    currentMedia = m;
                     if (m.logo) {
                         badge.style.background = 'none';
                         badge.innerHTML = '<img src="' + esc(m.logo) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">';
@@ -439,6 +515,14 @@
                         link.style.cssText = 'display:block; color:#fff; text-decoration:underline; font-size:11.5px; margin-top:2px;';
                         document.getElementById('mediaSub').after(link);
                     }
+                    if (m.twitterHandle) {
+                        const handle = String(m.twitterHandle).replace(/^@/, '').trim();
+                        const twLink = document.getElementById('mediaTwitterLink');
+                        twLink.href = 'https://x.com/' + encodeURIComponent(handle);
+                        twLink.textContent = '@' + handle;
+                        twLink.style.display = 'block';
+                    }
+                    applyOwnerUI();
                 } else if (mres && mres.success && !mres.media) {
                     document.getElementById('mediaSub').textContent = 'このメディアはまだ「メディアを追加」から正式登録されていません（記者の所属先としてのみ存在します）。';
                 }
@@ -500,6 +584,53 @@
             }
         }
         loadMedia();
+
+        // 編集ボタンの表示判定(登録者本人 or 管理者のみ。未登録メディアは編集対象が無いため表示しない)
+        function applyOwnerUI() {
+            if (!currentMedia) return;
+            const isOwner = (currentMedia.createdBy && currentMedia.createdBy === currentUserId) ||
+                (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.isAdminUid && GegenPressAPI.isAdminUid(currentUserId));
+            if (isOwner) {
+                document.getElementById('editMediaBtn').style.display = 'inline-block';
+            }
+        }
+
+        const editModal = document.getElementById('editModal');
+        function closeModal() { editModal.classList.remove('show'); }
+        document.getElementById('editMediaBtn').addEventListener('click', function () {
+            if (!currentMedia) return;
+            document.getElementById('editDescription').value = currentMedia.description || '';
+            document.getElementById('editWebsite').value = currentMedia.website || '';
+            document.getElementById('editMediaTwitter').value = currentMedia.twitterHandle || '';
+            editModal.classList.add('show');
+        });
+        document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+        document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+        editModal.addEventListener('click', function (e) { if (e.target === editModal) closeModal(); });
+
+        document.getElementById('modalSaveBtn').addEventListener('click', async function () {
+            if (!mediaName) return;
+            const updateData = {
+                description: document.getElementById('editDescription').value.trim(),
+                website: document.getElementById('editWebsite').value.trim() || null,
+                twitterHandle: document.getElementById('editMediaTwitter').value.trim().replace(/^@/, '') || null
+            };
+            const saveBtn = this;
+            saveBtn.disabled = true; saveBtn.textContent = '保存中...';
+            try {
+                const res = await GegenPressAPI.media.update(mediaName, updateData);
+                saveBtn.disabled = false; saveBtn.textContent = '変更を保存';
+                if (res && res.success) {
+                    closeModal();
+                    loadMedia(); // 最新の内容を再読み込みして画面に反映
+                } else {
+                    alert((res && res.message) || '保存に失敗しました。');
+                }
+            } catch (e) {
+                saveBtn.disabled = false; saveBtn.textContent = '変更を保存';
+                alert('保存中にエラーが発生しました: ' + (e.message || e));
+            }
+        });
     </script>
     <script>
         // ===== サイドバー（ハンバーガーメニュー。全ページ共通） =====

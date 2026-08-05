@@ -858,6 +858,7 @@
             description: data.description || '',
             website: data.website || null,
             logo: data.logo || null,
+            twitterHandle: data.twitterHandle || null,
             createdBy: u.uid,
             createdAt: tsNow(), updatedAt: tsNow()
           };
