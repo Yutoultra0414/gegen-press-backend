@@ -2005,12 +2005,15 @@
         function updateShareButtonVisibility() {
             const btn = document.getElementById('shareOnXBtn');
             if (!btn) return;
-            btn.style.display = currentAuthorHandle ? 'inline-flex' : 'none';
+            // Xハンドルの有無にかかわらず常に表示する。
+            // (ハンドルが無い場合は、initShareButton側の処理でテキストなし＝URLのみの共有になる)
+            btn.style.display = 'inline-flex';
         }
 
         function initShareButton() {
             const btn = document.getElementById('shareOnXBtn');
             if (!btn) return;
+            btn.style.display = 'inline-flex'; // ログイン・Xハンドル設定の有無に関わらず最初から表示
             btn.addEventListener('click', function () {
                 // ツイート本文には【@ユーザーネーム】の形式のみを記載する。
                 // (記者本人のXアカウント、無ければ所属メディアのXアカウントが currentAuthorHandle に入る)
