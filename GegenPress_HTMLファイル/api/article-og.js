@@ -106,6 +106,7 @@ module.exports = async function handler(req, res) {
     }
 
     const metaTags = [
+        '<base href="' + esc(origin) + '/">',
         '<title>' + esc(title) + ' - ' + esc(SITE_NAME) + '</title>',
         '<meta property="og:type" content="article">',
         '<meta property="og:site_name" content="' + esc(SITE_NAME) + '">',
