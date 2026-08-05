@@ -79,11 +79,10 @@ service cloud.firestore {
       allow read: if request.auth != null && docId.split('_')[0] == request.auth.uid;
       allow create: if request.auth != null
                     && docId.split('_')[0] == request.auth.uid
-                    && request.resource.data.count == 1;
+                    && (isAdmin() || request.resource.data.count == 1);
       allow update: if request.auth != null
                     && docId.split('_')[0] == request.auth.uid
-                    && resource.data.count < 10
-                    && request.resource.data.count == resource.data.count + 1;
+                    && (isAdmin() || (resource.data.count < 10 && request.resource.data.count == resource.data.count + 1));
     }
 
     // 記者へのレビュー（クチコミ）
