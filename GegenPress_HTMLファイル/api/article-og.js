@@ -55,17 +55,19 @@ module.exports = async function handler(req, res) {
     const pageUrl = origin + '/gegen_press_article_detail.html' + (id ? ('?id=' + encodeURIComponent(id)) : '');
 
     // テンプレートHTMLを読み込む(このファイルと同じリポジトリにコミットされている前提)
-    // ルート直下に置いている想定です。実際の配置場所が違う場合はここのパスを調整してください。
-    // ★重要: ここは "gegen_press_article_detail.html" ではなく、リネーム後の
-    // "_gegen_press_article_detail_template.html" を指す必要があります。
-    // (理由: Vercelは「rewriteのsourceと同名の静的ファイルが存在する場合、静的ファイルを優先し
-    //  rewriteを発動しない」仕様のため、実ファイルの名前を変えて衝突を避けています)
-    const templatePath = path.join(process.cwd(), '_gegen_press_article_detail_template.html');
+    // リネームはもう不要。/api/article-og という専用パスでアクセスするため、
+    // gegen_press_article_detail.html 自体は今まで通りの名前・場所のままでOK。
+    const templatePath = path.join(process.cwd(), 'gegen_press_article_detail.html');
     let html;
     try {
         html = fs.readFileSync(templatePath, 'utf8');
     } catch (e) {
-        res.status(500).send('記事ページのテンプレートが見つかりませんでした: ' + templatePath);
+        // テンプレートが読めない場合でも、記事ページごとサイトを落とさない。
+        // (以前、テンプレートが見つからずエラー文だけを全ユーザーに返してしまう事故があったため、
+        //  必ずトップページへ302リダイレクトして、閲覧自体は継続できるようにする)
+        console.error('OGテンプレートの読み込みに失敗しました:', templatePath, e);
+        res.writeHead(302, { Location: '/gegen_press_top.html' });
+        res.end();
         return;
     }
 
