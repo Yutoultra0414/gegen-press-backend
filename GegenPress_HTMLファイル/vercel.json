@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/gegen_press_article_detail.html",
+      "destination": "/api/article-og"
+    }
+  ]
+}
