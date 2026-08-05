@@ -6,3 +6,10 @@
     }
   ]
 }
+{
+  "functions": {
+    "api/article-og.js": {
+      "includeFiles": "gegen_press_article_detail.html"
+    }
+  }
+}
