@@ -858,7 +858,6 @@
             description: data.description || '',
             website: data.website || null,
             logo: data.logo || null,
-            twitterHandle: data.twitterHandle || null,
             createdBy: u.uid,
             createdAt: tsNow(), updatedAt: tsNow()
           };
@@ -873,6 +872,29 @@
           var fb = await _ready;
           await fb.db.collection('media').doc(name).set(Object.assign({}, data, { updatedAt: tsNow() }), { merge: true });
           return { success: true };
+        } catch (e) { return { success: false, message: String(e) }; }
+      }
+    },
+
+    // ==== Storage（画像アップロード） ====
+    // 記事のサムネイル等をFirebase Storageにアップロードし、公開URLを返す。
+    // Firestoreに直接Base64で保存する方式は、ドキュメントが肥大化するのに加えて
+    // og:image等の「URLとして外部から取得できる画像」としても使えないため、
+    // 実ファイルとしてStorageに保存し、そのダウンロードURLをFirestoreに保存する方式にする。
+    storage: {
+      async uploadImage(blob, folder) {
+        try {
+          var u = await currentUser();
+          if (!u) return { success: false, message: 'ログインが必要です' };
+          if (!firebase.storage) {
+            await loadScript(CDN + 'firebase-storage-compat.js');
+          }
+          var ext = (blob && blob.type && blob.type.indexOf('png') !== -1) ? 'png' : 'jpg';
+          var path = (folder || 'uploads') + '/' + u.uid + '/' + Date.now() + '_' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+          var ref = firebase.storage().ref(path);
+          var snapshot = await ref.put(blob);
+          var url = await snapshot.ref.getDownloadURL();
+          return { success: true, url: url };
         } catch (e) { return { success: false, message: String(e) }; }
       }
     }

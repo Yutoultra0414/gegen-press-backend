@@ -1078,7 +1078,8 @@
         });
 
         // サムネイル選択・圧縮
-        let thumbDataUrl = null;
+        let thumbDataUrl = null; // プレビュー表示・編集時の「変更なし」用
+        let thumbBlob = null; // 今回新しく選んだ画像。送信時にStorageへアップロードする対象
         let thumbFocal = { x: 50, y: 50 }; // フォーカルポイント（%）。デフォルトは中央。
         const thumbDrop = document.getElementById('thumbDrop');
         const thumbInput = document.getElementById('thumbInput');
@@ -1093,6 +1094,7 @@
             document.getElementById('thumbDropLabel').textContent = '処理中...';
             try {
                 thumbDataUrl = await fileToJpeg(file, 640);
+                thumbBlob = await (await fetch(thumbDataUrl)).blob();
                 thumbFocal = { x: 50, y: 50 };
                 renderThumbPicker();
                 document.getElementById('thumbRequiredNote').style.display = 'none';
@@ -1208,6 +1210,21 @@
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
 
+            // 今回新しく画像を選んでいれば、送信前にStorageへアップロードして本物のURLに差し替える。
+            // (編集時に画像を変更していない場合は thumbDataUrl（既存の値）をそのまま使う)
+            let imageToSave = thumbDataUrl;
+            if (thumbBlob) {
+                submitBtn.textContent = '画像をアップロード中...';
+                const upRes = await GegenPressAPI.storage.uploadImage(thumbBlob, 'article-images');
+                if (!upRes || !upRes.success) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = editArticleId ? '変更を保存する' : 'ニュースを投稿する';
+                    alert('画像のアップロードに失敗しました: ' + ((upRes && upRes.message) || '不明なエラー'));
+                    return;
+                }
+                imageToSave = upRes.url;
+            }
+
             if (editArticleId) {
                 submitBtn.textContent = '保存中...';
                 const res = await GegenPressAPI.articles.update(editArticleId, {
@@ -1224,7 +1241,7 @@
                     tags: hashtags,
                     authorId: authorId,
                     authorName: rep ? rep.name : '',
-                    image: thumbDataUrl,
+                    image: imageToSave,
                     imagePosition: thumbFocal,
                     edited: true
                 });
@@ -1255,7 +1272,7 @@
                 authorId: authorId,
                 authorName: rep ? rep.name : '',
                 authorScore: rep ? (rep.trustScore || 0) : 0,
-                image: thumbDataUrl,
+                image: imageToSave,
                 imagePosition: thumbFocal,
                 averageRating: 0,
                 trustScore: rep ? (rep.trustScore || 0) : 0
