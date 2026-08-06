@@ -1522,7 +1522,7 @@
             const deleteBtn = document.getElementById('deleteArticleBtn');
             if (currentArticle && (currentArticle.createdBy === user.uid || currentArticle.authorId === user.uid || GegenPressAPI.isAdminUid(user.uid))) {
                 const editLink = document.getElementById('editArticleLink');
-                const editTarget = (currentArticle.contentType === 'column') ? 'gegen_press_write_column.html' : 'gegen_press_write_article.html';
+                const editTarget = (currentArticle.contentType === 'column') ? '/gegen_press_write_column.html' : '/gegen_press_write_article.html';
                 editLink.href = editTarget + '?id=' + encodeURIComponent(articleId);
                 editLink.textContent = (currentArticle.contentType === 'column') ? 'Edit this column' : 'Edit this article';
                 editLink.style.display = 'inline-block';
@@ -1885,7 +1885,7 @@
                     document.getElementById('authorAvatar').textContent = getInitials(writerName);
                     document.getElementById('authorAvatar').setAttribute('style', avatarStyle(writerName));
                     document.getElementById('authorSection').onclick = function () {
-                        if (a.writerUid) window.location.href = 'gegen_press_user_profile.html?id=' + encodeURIComponent(a.writerUid);
+                        if (a.writerUid) window.location.href = '/gegen_press_user_profile.html?id=' + encodeURIComponent(a.writerUid);
                     };
                     // ユーザーのアイコン画像 · Xハンドルが設定されていれば取得する（無ければ略称バッジ · 共有ボタン非表示のまま）
                     if (a.writerUid && typeof GegenPressAPI !== 'undefined') {
@@ -1907,7 +1907,7 @@
                     document.getElementById('sideAuthorScoreRow').style.display = 'none';
                     const sideLink = document.getElementById('sideAuthorLink');
                     if (a.writerUid) {
-                        sideLink.href = 'gegen_press_user_profile.html?id=' + encodeURIComponent(a.writerUid);
+                        sideLink.href = '/gegen_press_user_profile.html?id=' + encodeURIComponent(a.writerUid);
                         sideLink.style.display = '';
                     } else {
                         sideLink.style.display = 'none';
@@ -1916,7 +1916,7 @@
                     // ==== 通常のニュース記事: 従来通り「Reporter」情報を表示 ====
                     document.getElementById('authorName').textContent = a.authorName || '';
                     document.getElementById('authorSection').onclick = function () {
-                        window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
+                        window.location.href = '/gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
                     };
                     // Reporterの実際のアイコン画像 · Xハンドルが設定されていれば取得する（無ければ略称バッジ · 共有ボタン非表示のまま）
                     if (a.authorId && typeof GegenPressAPI !== 'undefined') {
@@ -1950,7 +1950,7 @@
                         }).catch(function () {});
                     }
                     document.getElementById('sideAuthorBoxTitle').textContent = 'Reporter';
-                    document.getElementById('sideAuthorLink').href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
+                    document.getElementById('sideAuthorLink').href = '/gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
                     document.getElementById('sideAuthorLink').style.display = '';
                     document.getElementById('sideAuthorName').textContent = a.authorName || '';
                     document.getElementById('sideAuthorOutletRow').style.display = '';
@@ -1967,7 +1967,7 @@
                             const uname = uRes.user.username || '';
                             if (uname) {
                                 const link = document.getElementById('postedByLink');
-                                link.href = 'gegen_press_user_profile.html?id=' + encodeURIComponent(a.createdBy);
+                                link.href = '/gegen_press_user_profile.html?id=' + encodeURIComponent(a.createdBy);
                                 document.getElementById('postedByName').textContent = uname;
                                 link.style.display = 'block';
                             }
@@ -2126,7 +2126,7 @@
                 }
                 return tagsPromise;
             }
-            function goSearch(q) { window.location.href = 'gegen_press_search.html?q=' + encodeURIComponent(q); }
+            function goSearch(q) { window.location.href = '/gegen_press_search.html?q=' + encodeURIComponent(q); }
             function renderSuggestions(matches) {
                 if (!matches.length) { suggestBox.style.display = 'none'; suggestBox.innerHTML = ''; return; }
                 suggestBox.innerHTML = matches.map(function (m) {

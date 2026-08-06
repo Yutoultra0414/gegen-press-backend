@@ -1537,8 +1537,8 @@
     <script>
         function goReporter(id) {
             window.location.href = id
-                ? 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(id)
-                : 'gegen_press_reporter_profile.html';
+                ? '/gegen_press_reporter_profile.html?id=' + encodeURIComponent(id)
+                : '/gegen_press_reporter_profile.html';
         }
         function goArticle(id) {
             window.location.href = id
@@ -1837,8 +1837,8 @@
                     e.stopPropagation();
                     const clubId = this.getAttribute('data-club-id');
                     window.location.href = clubId
-                        ? 'gegen_press_club_profile.html?id=' + encodeURIComponent(clubId)
-                        : 'gegen_press_club_profile.html?name=' + encodeURIComponent(this.getAttribute('data-club'));
+                        ? '/gegen_press_club_profile.html?id=' + encodeURIComponent(clubId)
+                        : '/gegen_press_club_profile.html?name=' + encodeURIComponent(this.getAttribute('data-club'));
                 });
             });
             upgradeClubBadgesWithLogos(root);
@@ -1943,7 +1943,7 @@
                 }).join('');
                 wrap.querySelectorAll('[data-id]').forEach(el => {
                     el.addEventListener('click', () => {
-                        window.location.href = 'gegen_press_player_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                        window.location.href = '/gegen_press_player_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
                     });
                 });
                 bindClubBadges(wrap);
@@ -2016,7 +2016,7 @@
                 }).join('');
                 wrap.querySelectorAll('[data-id]').forEach(el => {
                     el.addEventListener('click', () => {
-                        window.location.href = 'gegen_press_player_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                        window.location.href = '/gegen_press_player_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
                     });
                 });
                 bindClubBadges(wrap);
@@ -2074,7 +2074,7 @@
                 }).join('');
                 wrap.querySelectorAll('[data-id]').forEach(el => {
                     el.addEventListener('click', () => {
-                        window.location.href = 'gegen_press_reporter_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                        window.location.href = '/gegen_press_reporter_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
                     });
                 });
 
@@ -2157,7 +2157,7 @@
                 }).join('');
                 wrap.querySelectorAll('[data-name]').forEach(el => {
                     el.addEventListener('click', () => {
-                        window.location.href = 'gegen_press_media_profile.html?name=' + encodeURIComponent(el.getAttribute('data-name'));
+                        window.location.href = '/gegen_press_media_profile.html?name=' + encodeURIComponent(el.getAttribute('data-name'));
                     });
                 });
                 upgradeMediaLogos(wrap);
@@ -2236,7 +2236,7 @@
                 }
                 return tagsPromise;
             }
-            function goSearch(q) { window.location.href = 'gegen_press_search.html?q=' + encodeURIComponent(q); }
+            function goSearch(q) { window.location.href = '/gegen_press_search.html?q=' + encodeURIComponent(q); }
             function renderSuggestions(matches) {
                 if (!matches.length) { suggestBox.style.display = 'none'; suggestBox.innerHTML = ''; return; }
                 suggestBox.innerHTML = matches.map(function (m) {

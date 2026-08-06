@@ -1425,7 +1425,7 @@
                 }
                 return tagsPromise;
             }
-            function goSearch(q) { window.location.href = 'gegen_press_search.html?q=' + encodeURIComponent(q); }
+            function goSearch(q) { window.location.href = '/gegen_press_search.html?q=' + encodeURIComponent(q); }
             function renderSuggestions(matches) {
                 if (!matches.length) { suggestBox.style.display = 'none'; suggestBox.innerHTML = ''; return; }
                 suggestBox.innerHTML = matches.map(function (m) {
