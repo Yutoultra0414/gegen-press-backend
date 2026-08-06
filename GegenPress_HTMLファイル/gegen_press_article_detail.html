@@ -960,7 +960,6 @@
             </div>
         </nav>
         <div class="gp-actions">
-            <a href="#" id="langSwitchLink" class="gp-mypage" style="background:#1d3557;" title="View this page in English">EN</a>
             <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
             <button id="gpSidebarToggle" class="gp-hamburger" aria-label="メニューを開く" type="button">
                 <span></span><span></span><span></span>
@@ -1384,6 +1383,7 @@
 
         let currentArticle = null; // Firestoreから読み込んだニュースデータ
         let currentAuthorHandle = null; // Xで共有ボタン用（記者 or コラム投稿者のXハンドル。@なしで保持）
+        let currentReporterAvgRating = null; // Xで共有ボタン用（記者の平均評価。コラムの場合はnullのまま）
 
         // ==== 評価投稿（ログイン不要・Firestoreに保存） ====
         const ratingSubmitBtn = document.getElementById('ratingSubmit');
@@ -1915,6 +1915,14 @@
                     };
                     // 記者の実際のアイコン画像・Xハンドルが設定されていれば取得する（無ければ略称バッジ・共有ボタン非表示のまま）
                     if (a.authorId && typeof GegenPressAPI !== 'undefined') {
+                        // Xで共有ボタン用：この記者の平均評価(★の数に使う)
+                        if (GegenPressAPI.ratings && GegenPressAPI.ratings.getComputedReporterScore) {
+                            GegenPressAPI.ratings.getComputedReporterScore(a.authorId).then(function (sres) {
+                                if (sres && sres.success && sres.count > 0) {
+                                    currentReporterAvgRating = sres.average;
+                                }
+                            }).catch(function () {});
+                        }
                         GegenPressAPI.reporters.getById(a.authorId).then(function (rres) {
                             if (rres && rres.success && rres.reporter) {
                                 if (rres.reporter.profileImage) {
@@ -2032,10 +2040,23 @@
             if (!btn) return;
             btn.style.display = 'inline-flex'; // ログイン・Xハンドル設定の有無に関わらず最初から表示
             btn.addEventListener('click', function () {
-                // ツイート本文には【@ユーザーネーム】の形式のみを記載する。
-                // (記者本人のXアカウント、無ければ所属メディアのXアカウントが currentAuthorHandle に入る)
+                // ツイート本文のテンプレート:
+                // 信頼度：★★★★☆ ← 記者の平均評価(1〜5、四捨五入)を★の数で表現
+                // 【@ユーザーネーム】← 記者本人、無ければ所属メディアのXアカウント
+                // 詳細は以下リンクをチェック
                 // タイトルやサムネイルは、OGPカード側（/api/article-og が別途担当）に任せる想定。
-                const text = currentAuthorHandle ? ('【@' + currentAuthorHandle + '】') : '';
+                const lines = [];
+                if (currentReporterAvgRating != null) {
+                    const filled = Math.max(0, Math.min(5, Math.round(currentReporterAvgRating)));
+                    lines.push('信頼度：' + '★'.repeat(filled) + '☆'.repeat(5 - filled));
+                }
+                if (currentAuthorHandle) {
+                    lines.push('【@' + currentAuthorHandle + '】');
+                }
+                if (lines.length > 0) {
+                    lines.push('詳細は以下リンクをチェック');
+                }
+                const text = lines.join('\n');
                 // 通常のページURLではなく、OGPタグ付きで返す専用エンドポイントを共有する。
                 // (このURLは既存の静的ファイルと同名にならないため、Vercelの「静的ファイル優先」の
                 //  仕様と衝突せず、確実にog:tags付きのHTMLがXのクローラーに返る)
@@ -2162,15 +2183,6 @@
                 });
                 input.addEventListener('blur', function () { setTimeout(function () { suggestBox.style.display = 'none'; }, 150); });
             }
-        })();
-    </script>
-
-    <script>
-        (function () {
-            var link = document.getElementById('langSwitchLink');
-            if (!link) return;
-            var page = location.pathname.split('/').pop();
-            link.href = '/en/' + page + location.search;
         })();
     </script>
 </body>
