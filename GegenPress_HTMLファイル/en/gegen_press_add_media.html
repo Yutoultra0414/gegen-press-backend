@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Media - Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans JP', 'Roboto', 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
+
+        .page-strip { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 16px 40px; }
+        .page-strip h1 { font-size: 18px; font-weight: 900; }
+        .page-strip p { font-size: 12.5px; color: #888; margin-top: 4px; }
+
+        .container { max-width: 640px; margin: 24px auto; padding: 0 16px 60px; }
+        .card { background: #fff; border: 1px solid #eee; padding: 22px; margin-bottom: 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 12.5px; font-weight: bold; margin-bottom: 5px; }
+        .form-hint { font-size: 11px; color: #999; margin-bottom: 6px; }
+        .form-input, .form-textarea { width: 100%; padding: 9px 12px; border: 1px solid #ddd; font-size: 13px; font-family: inherit; }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .required-badge { background: #e63946; color: #fff; font-size: 10px; padding: 1px 6px; margin-left: 4px; }
+        .optional-badge { background: #eee; color: #888; font-size: 10px; padding: 1px 6px; margin-left: 4px; }
+        .submit-btn {
+            width: 100%; background: #e63946; color: #fff; border: none; padding: 13px;
+            font-size: 14px; font-weight: bold; cursor: pointer;
+        }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .login-notice { background: #fff3cd; color: #856404; padding: 12px 16px; margin-bottom: 16px; font-size: 12.5px; display: none; }
+        .success-box { display: none; text-align: center; padding: 30px 20px; }
+        .success-box h2 { color: #2a9d8f; margin-bottom: 10px; }
+
+        .logo-drop { border: 2px dashed #ddd; padding: 16px; text-align: center; cursor: pointer; }
+        .logo-drop.has-image { padding: 0; border-style: solid; overflow: hidden; }
+        .logo-drop img { width: 100%; max-height: 160px; object-fit: cover; display: block; }
+        .logo-drop-label { color: #999; font-size: 12.5px; }
+
+        /* ===== 共通ヘッダー ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
+        header.gp-header {
+            background: #fff !important; border-bottom: 3px solid #e63946 !important; padding: 6px 24px !important;
+            display: flex !important; align-items: center !important; justify-content: flex-start !important;
+            flex-direction: row !important; flex-wrap: nowrap !important; gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important; position: sticky; top: 0; z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav { display: flex; align-items: stretch; gap: 22px; flex: 1; min-width: 0; overflow-x: visible; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; line-height: 1.15; padding: 6px 2px; white-space: nowrap; }
+        .gp-en { font-size: 13px; font-weight: 900; letter-spacing: 0.5px; color: #111; text-transform: uppercase; }
+        .gp-jp { font-size: 9px; color: #888; font-weight: 600; margin-top: 1px; }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-dropdown-wrap { position: relative; }
+        .gp-dropdown-panel {
+            display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; flex-direction: column;
+        }
+        .gp-dropdown-wrap.open .gp-dropdown-panel, .gp-dropdown-wrap:hover .gp-dropdown-panel { display: flex; }
+        .gp-dropdown-option { display: flex; flex-direction: column; padding: 10px 14px; text-decoration: none; color: #333; border-bottom: 1px solid #eee; }
+        .gp-dropdown-option:last-child { border-bottom: none; }
+        .gp-dropdown-option strong { font-size: 12.5px; }
+        .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
+        .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+        .gp-submenu-wrap { position: relative; }
+        .gp-submenu-trigger { cursor: pointer; justify-content: space-between; display: flex; }
+        .gp-submenu-panel {
+            display: none;
+            position: absolute; top: 0; left: 100%;
+            background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            min-width: 170px; max-height: 320px; overflow-y: auto;
+            z-index: 210; flex-direction: column;
+        }
+        .gp-submenu-wrap.open .gp-submenu-panel { display: flex; }
+        .gp-submenu-option { font-size: 12px; padding: 8px 12px; }
+        @media (max-width: 768px) {
+            .gp-submenu-panel { position: static; box-shadow: none; border: none; border-top: 1px solid #eee; min-width: 0; }
+        }
+        .gp-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-shrink: 0; }
+        .gp-mypage { display: flex; flex-direction: column; align-items: center; background: #e63946; color: #fff; text-decoration: none; padding: 5px 14px; line-height: 1.15; white-space: nowrap; }
+        .gp-mypage .gp-en { color: #fff; font-size: 11px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #c5303c; }
+        @media (max-width: 768px) {
+            header.gp-header { flex-wrap: wrap !important; padding: 8px 14px !important; gap: 0 !important; row-gap: 6px !important; }
+            .gp-logo { order: 1; }
+            .gp-logo img { height: 26px !important; }
+            .gp-actions { order: 2; margin-left: auto; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10px; }
+            .gp-nav { order: 3; flex: 1 1 100%; width: 100%; max-width: 100%; overflow-x: visible; flex-wrap: wrap; justify-content: space-between; gap: 6px 4px; }
+            .gp-nav-item { white-space: nowrap; padding: 4px 2px; }
+            .gp-en { font-size: 11px; }
+            .gp-jp { font-size: 8.5px; }
+            .page-strip { padding: 12px 16px; }
+        }
+    </style>
+    <style>
+        /* ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== */
+        .gp-hamburger {
+            display: flex; flex-direction: column; justify-content: center; gap: 4px;
+            width: 34px; height: 34px; background: none; border: none; cursor: pointer;
+            padding: 6px; flex-shrink: 0; margin-left: 10px;
+        }
+        .gp-hamburger span { display: block; width: 100%; height: 2px; background: #1a1a1a; border-radius: 1px; }
+        .gp-sidebar-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(20,33,61,0.55); z-index: 997;
+        }
+        .gp-sidebar-overlay.open { display: block; }
+        .gp-sidebar {
+            position: fixed; top: 0; right: 0; height: 100%; width: 300px; max-width: 86vw;
+            background: #fff; z-index: 998; box-shadow: -8px 0 24px rgba(0,0,0,0.15);
+            transform: translateX(100%); transition: transform 0.25s ease; overflow-y: auto;
+            display: flex; flex-direction: column;
+        }
+        .gp-sidebar.open { transform: translateX(0); }
+        .gp-sidebar-head {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 18px; border-bottom: 1px solid #eee;
+            font-weight: 900; font-size: 12px; letter-spacing: 2px; color: #999;
+        }
+        .gp-sidebar-head button { background: none; border: none; font-size: 22px; cursor: pointer; color: #333; line-height: 1; }
+        .gp-sidebar-search-wrap { padding: 16px 18px; border-bottom: 1px solid #eee; position: relative; }
+        .gp-sidebar-search { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
+        .gp-sidebar-section { padding: 14px 18px; border-bottom: 1px solid #eee; }
+        .gp-sidebar-section h4 { font-size: 10.5px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 8px; }
+        .gp-sidebar-section a { display: block; padding: 6px 0; font-size: 13px; color: #333; text-decoration: none; }
+        .gp-sidebar-section a:hover { color: #e63946; }
+        .gp-search-suggest {
+            display: none; position: absolute; left: 18px; right: 18px; top: 100%; margin-top: -1px;
+            background: #fff; border: 1px solid #ccc; border-top: none; z-index: 5;
+            max-height: 240px; overflow-y: auto; box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        }
+        .gp-search-suggest .item { padding: 8px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f0f0f0; color: #333; }
+        .gp-search-suggest .item:last-child { border-bottom: none; }
+        .gp-search-suggest .item:hover { background: #fdf1f2; color: #e63946; }
+    </style>
+<style>.gp-jp{display:none !important;} .gp-dropdown-option span{display:none !important;}</style>
+</head>
+<body>
+    <header class="gp-header">
+        <a href="/en/gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="/en/gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">Home</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="newsDropdownWrap">
+                <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">All News</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/en/gegen_press_category.html" class="gp-dropdown-option"><strong>All News</strong><span>All News</span></a>
+                    <div class="gp-submenu-wrap">
+                        <span class="gp-dropdown-option gp-submenu-trigger"><strong>Transfer News</strong><span>Transfer ▸</span></span>
+                        <div class="gp-submenu-panel">
+                            <a href="/en/gegen_press_category.html?articleType=移籍記事&type=confirmed" class="gp-dropdown-option gp-submenu-option"><strong>Confirmed (All Leagues)</strong></a>
+                            <a href="/en/gegen_press_category.html?articleType=移籍記事&type=rumor" class="gp-dropdown-option gp-submenu-option"><strong>Rumors (All Leagues)</strong></a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=プレミアリーグ" class="gp-dropdown-option gp-submenu-option">Premier League</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=ラリーガ" class="gp-dropdown-option gp-submenu-option">La Liga</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=Jリーグ" class="gp-dropdown-option gp-submenu-option">J.League</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=セリエA" class="gp-dropdown-option gp-submenu-option">Serie A</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=ブンデスリーガ" class="gp-dropdown-option gp-submenu-option">Bundesliga</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=リーグアン" class="gp-dropdown-option gp-submenu-option">Ligue 1</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=エールディヴィジ" class="gp-dropdown-option gp-submenu-option">Eredivisie</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=プリメイラ・リーガ" class="gp-dropdown-option gp-submenu-option">Primeira Liga</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=MLS" class="gp-dropdown-option gp-submenu-option">MLS</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=その他リーグ" class="gp-dropdown-option gp-submenu-option">Other Leagues</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=その他" class="gp-dropdown-option gp-submenu-option">Other</a>
+                        </div>
+                    </div>
+                    <a href="/en/gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>Interviews</strong><span>Interviews</span></a>
+                    <a href="/en/gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>General</strong><span>General</span></a>
+                    <a href="/en/gegen_press_category.html?contentType=column" class="gp-dropdown-option"><strong>Columns</strong><span>Columns</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="rankingDropdownWrap">
+                <a class="gp-nav-item" href="#" id="rankingDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">RANKING</span><span class="gp-jp">Ranking</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/en/gegen_press_ranking.html?view=reporters" class="gp-dropdown-option"><strong>Reporter Ranking</strong><span>Reporters</span></a>
+                    <a href="/en/gegen_press_ranking.html?view=media" class="gp-dropdown-option"><strong>Media Ranking</strong><span>Media</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
+                <a class="gp-nav-item active" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">Add Media / Reporter</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/en/gegen_press_add_media.html" class="gp-dropdown-option"><strong>Add Media</strong><span>Add Media</span></a>
+                    <a href="/en/gegen_press_add_reporter.html" class="gp-dropdown-option"><strong>Add Reporter</strong><span>Add Reporter</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="postDropdownWrap">
+                <a class="gp-nav-item" href="#" id="postDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">POST</span><span class="gp-jp">Post</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/en/gegen_press_write_article.html" class="gp-dropdown-option"><strong>Post News</strong><span>Post News</span></a>
+                    <a href="/en/gegen_press_write_column.html" class="gp-dropdown-option"><strong>Post Column</strong><span>Post Column</span></a>
+                </div>
+            </div>
+        </nav>
+        <div class="gp-actions">
+            <a href="#" id="langSwitchLink" class="gp-mypage" style="background:#1d3557;" title="View in Japanese">JP</a>
+            <a href="/gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">My Page</span></a>
+            <button id="gpSidebarToggle" class="gp-hamburger" aria-label="Open menu" type="button">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== -->
+    <div id="gpSidebarOverlay" class="gp-sidebar-overlay"></div>
+    <aside id="gpSidebar" class="gp-sidebar">
+        <div class="gp-sidebar-head">
+            <span>MENU</span>
+            <button id="gpSidebarClose" aria-label="Close" type="button">&times;</button>
+        </div>
+        <div class="gp-sidebar-search-wrap">
+            <input type="text" id="gpSidebarSearch" class="gp-sidebar-search" placeholder="Search teams, players, #hashtags" autocomplete="off">
+            <div id="gpSidebarSuggest" class="gp-search-suggest"></div>
+        </div>
+        <nav class="gp-sidebar-section">
+            <h4>Contents</h4>
+            <a href="/gegen_press_guide.html">New Here?</a>
+            <a href="/en/gegen_press_category.html">All News</a>
+            <a href="/en/gegen_press_ranking.html">Reporter Ranking</a>
+            <a href="/gegen_press_players.html">Players</a>
+            <a href="/en/gegen_press_write_article.html">Post News</a>
+        </nav>
+        <nav class="gp-sidebar-section">
+            <h4>Join</h4>
+            <a href="/en/gegen_press_add_reporter.html">Add Reporter</a>
+            <a href="/en/gegen_press_add_media.html">Add Media</a>
+            <a href="/gegen_press_add_player.html">Add Player</a>
+            <a href="/gegen_press_login.html">Log In / Sign Up</a>
+        </nav>
+        <nav class="gp-sidebar-section">
+            <h4>About</h4>
+            <a href="/gegen_press_terms.html">Terms of Service</a>
+            <a href="/gegen_press_privacy.html">Privacy Policy</a>
+            <a href="mailto:gegenpressmanagement@gmail.com">Contact</a>
+        </nav>
+    </aside>
+    <script>
+        (function () {
+            var wrap = document.getElementById('addMediaDropdownWrap');
+            var trigger = document.getElementById('addMediaDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('postDropdownWrap');
+            var trigger = document.getElementById('postDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('newsDropdownWrap');
+            var trigger = document.getElementById('newsDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('rankingDropdownWrap');
+            var trigger = document.getElementById('rankingDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            document.querySelectorAll('.gp-submenu-trigger').forEach(function (trigger) {
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var wrap = trigger.closest('.gp-submenu-wrap');
+                    if (wrap) wrap.classList.toggle('open');
+                });
+            });
+        })();
+    </script>
+
+
+
+
+    <div class="page-strip">
+        <h1>Add Media</h1>
+        <p>Register a new media outlet like Sky Sports or Marca. Once registered, it can be selected as an affiliation when adding reporters.</p>
+    </div>
+
+    <div class="container">
+        <div class="login-notice" id="loginNotice">You must be logged in to add media.<a href="/gegen_press_login.html">Log In / Sign Up</a></div>
+
+        <div class="card" id="formCard">
+            <form id="mediaForm">
+                <!-- スクショから自動入力（AI下書き。あくまで下書きで、確認・修正してから登録する運用） -->
+                <div class="form-group" style="background:#f0f7ff; border:1px solid #cfe3fb; border-radius:8px; padding:16px 18px;">
+                    <label class="form-label" style="margin-bottom:4px;">Auto-fill from screenshot<span class="optional-badge">Optional</span></label>
+                    <p class="form-hint">Upload a screenshot of the media's X profile etc. to auto-fill the fields below (up to 10 times a day, shared with news/column/reporter registration usage).<strong>This will not be submitted automatically. Please review and edit before registering.</strong></p>
+                    <input type="file" id="aiScreenshotInput" accept="image/*" style="display:none;">
+                    <button type="button" id="aiScreenshotBtn" style="background:#1d3557; color:#fff; border:none; border-radius:6px; padding:9px 18px; font-size:12.5px; font-weight:bold; cursor:pointer;">Choose an image to auto-fill</button>
+                    <div id="aiScreenshotStatus" style="margin-top:8px; font-size:12.5px; color:#666;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Media Name<span class="required-badge">Required</span></label>
+                    <p class="form-hint">e.g. Sky Sports, The Athletic, Marca. Names already registered can't be reused.</p>
+                    <input type="text" class="form-input" id="mediaName" placeholder="Enter media name" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Logo Image<span class="optional-badge">Optional</span></label>
+                    <div class="logo-drop" id="logoDrop">
+                        <div class="logo-drop-label" id="logoDropLabel">Click to select an image</div>
+                    </div>
+                    <input type="file" id="logoInput" accept="image/*" style="display:none;">
+                    <button type="button" id="logoUrlToggle" style="background:none; border:none; color:#457b9d; font-size:11.5px; text-decoration:underline; cursor:pointer; padding:6px 0 0; display:block;">Enter an image URL directly</button>
+                    <div id="logoUrlRow" style="display:none; margin-top:6px;">
+                        <input type="text" class="form-input" id="logoUrlInput" placeholder="https://... image URL" style="margin-bottom:6px;">
+                        <button type="button" class="check-btn" id="logoUrlApply">Use this image</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Official Site URL<span class="optional-badge">Optional</span></label>
+                    <input type="text" class="form-input" id="mediaWebsite" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">X (Twitter) handle<span class="optional-badge">Optional</span></label>
+                    <p class="form-hint">Used instead when a reporter has no X account of their own, for article sharing. Include the @. e.g. @SkySportsNews</p>
+                    <input type="text" class="form-input" id="mediaTwitterHandle" placeholder="@username">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description<span class="optional-badge">Optional</span></label>
+                    <textarea class="form-textarea" id="mediaDescription" placeholder="Briefly describe this media outlet"></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Add Media</button>
+            </form>
+        </div>
+
+        <div class="card success-box" id="successBox">
+            <h2>Added!</h2>
+            <p id="successName"></p>
+            <div style="margin-top:16px; display:flex; gap:10px; justify-content:center;">
+                <a href="/en/gegen_press_add_reporter.html" class="submit-btn" style="display:inline-block; width:auto; padding:10px 20px; text-decoration:none;">Add another reporter</a>
+                <a href="/en/gegen_press_top.html" style="display:inline-block; padding:10px 20px; border:1px solid #ccc; color:#333; text-decoration:none;">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/api-client.js" onerror="console.warn('api-client.js not found')"></script>
+    <script>
+        const API_AVAILABLE = (typeof GegenPressAPI !== 'undefined');
+        let IS_LOGGED_IN = false;
+        async function checkLoginState() {
+            if (!API_AVAILABLE) return;
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+            IS_LOGGED_IN = !!user;
+            if (!IS_LOGGED_IN) {
+                document.getElementById('loginNotice').style.display = 'block';
+                document.getElementById('submitBtn').disabled = true;
+            }
+        }
+        checkLoginState();
+
+        // =========================================================
+        // スクショから自動入力（AI下書き）
+        // =========================================================
+        document.getElementById('aiScreenshotBtn').addEventListener('click', () => document.getElementById('aiScreenshotInput').click());
+        document.getElementById('aiScreenshotInput').addEventListener('change', async function () {
+            const file = this.files && this.files[0];
+            this.value = '';
+            if (!file) return;
+            if (!API_AVAILABLE) { alert('This feature is currently unavailable (load error).'); return; }
+            const user = await GegenPressAPI._currentUser();
+            if (!user) { alert('Please log in'); return; }
+            const statusEl = document.getElementById('aiScreenshotStatus');
+            const btn = document.getElementById('aiScreenshotBtn');
+            btn.disabled = true;
+            statusEl.style.color = '#666';
+            statusEl.textContent = 'Loading image...';
+            try {
+                const dataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => reject(new Error('Failed to load the image'));
+                    reader.readAsDataURL(file);
+                });
+                statusEl.textContent = 'AI is analyzing the content (may take several seconds)...';
+                const idToken = await user.getIdToken();
+                const res = await fetch('/api/analyze-screenshot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idToken, image: dataUrl, contentType: 'media' })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    statusEl.style.color = '#c5303c';
+                    statusEl.textContent = '✗ ' + (data.message || 'Analysis failed');
+                    btn.disabled = false;
+                    return;
+                }
+                if (data.draft.name) document.getElementById('mediaName').value = data.draft.name;
+                if (data.draft.twitterHandle) document.getElementById('mediaTwitterHandle').value = data.draft.twitterHandle.replace(/^@/, '');
+                if (data.draft.description) document.getElementById('mediaDescription').value = data.draft.description;
+                if (data.draft.website) document.getElementById('mediaWebsite').value = data.draft.website;
+                statusEl.style.color = '#2a9d8f';
+                statusEl.textContent = '✓ Draft filled in. Please review and edit before registering.';
+            } catch (e) {
+                statusEl.style.color = '#c5303c';
+                statusEl.textContent = '✗ An error occurred: ' + e.message;
+            }
+            btn.disabled = false;
+        });
+
+        // ロゴ画像選択・圧縮
+        let logoDataUrl = null;
+        const logoDrop = document.getElementById('logoDrop');
+        const logoInput = document.getElementById('logoInput');
+        logoDrop.addEventListener('click', () => logoInput.click());
+        logoInput.addEventListener('change', async function () {
+            const file = this.files && this.files[0];
+            if (!file) return;
+            if (!file.type || file.type.indexOf('image/') !== 0) { alert('Please select an image file'); return; }
+            document.getElementById('logoDropLabel').textContent = 'Processing...';
+            try {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const img = new Image();
+                    img.onload = function () {
+                        const size = 240;
+                        const canvas = document.createElement('canvas');
+                        canvas.width = size; canvas.height = size;
+                        const ctx = canvas.getContext('2d');
+                        const s = Math.min(img.width, img.height);
+                        ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+                        logoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                        logoDrop.classList.add('has-image');
+                        logoDrop.innerHTML = '<img src="' + logoDataUrl + '" alt="">';
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            } catch (e) {
+                alert('Failed to process the image: ' + (e.message || e));
+                document.getElementById('logoDropLabel').textContent = 'Click to select an image';
+            }
+        });
+
+        document.getElementById('logoUrlToggle').addEventListener('click', function () {
+            const row = document.getElementById('logoUrlRow');
+            row.style.display = (row.style.display === 'none') ? 'block' : 'none';
+        });
+        document.getElementById('logoUrlApply').addEventListener('click', function () {
+            const url = document.getElementById('logoUrlInput').value.trim();
+            if (!url || !/^https?:\/\//.test(url)) { alert('Please enter an image URL starting with http(s)://'); return; }
+            // URL指定の場合は圧縮・トリミングをせず、そのままそのURLを使う
+            logoDataUrl = url;
+            logoDrop.classList.add('has-image');
+            logoDrop.innerHTML = '<img src="' + url + '" alt="">';
+            document.getElementById('logoUrlRow').style.display = 'none';
+        });
+
+        document.getElementById('mediaForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const name = document.getElementById('mediaName').value.trim();
+            if (!name) { alert('Media name is required'); return; }
+            if (!API_AVAILABLE || !IS_LOGGED_IN) { alert('You must be logged in'); return; }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true; submitBtn.textContent = 'Adding...';
+
+            const res = await GegenPressAPI.media.create({
+                name: name,
+                description: document.getElementById('mediaDescription').value.trim(),
+                website: document.getElementById('mediaWebsite').value.trim() || null,
+                twitterHandle: document.getElementById('mediaTwitterHandle').value.trim().replace(/^@/, '') || null,
+                logo: logoDataUrl
+            });
+
+            submitBtn.disabled = false; submitBtn.textContent = 'Add Media';
+
+            if (res && res.success) {
+                document.getElementById('formCard').style.display = 'none';
+                document.getElementById('successBox').style.display = 'block';
+                document.getElementById('successName').textContent = name + '  added.';
+            } else {
+                alert((res && res.message) || 'Failed to add.');
+            }
+        });
+    </script>
+    <script>
+        // ===== サイドバー（ハンバーガーメニュー。全ページ共通） =====
+        (function () {
+            var toggle = document.getElementById('gpSidebarToggle');
+            var closeBtn = document.getElementById('gpSidebarClose');
+            var sidebar = document.getElementById('gpSidebar');
+            var overlay = document.getElementById('gpSidebarOverlay');
+            if (!toggle || !sidebar) return;
+            function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('open'); }
+            function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+            toggle.addEventListener('click', openSidebar);
+            closeBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // 検索サジェスト（「もしかして」：よく使われるハッシュタグを頻度順で候補表示）
+            var input = document.getElementById('gpSidebarSearch');
+            var suggestBox = document.getElementById('gpSidebarSuggest');
+            var popularTags = null, tagsPromise = null;
+            function normalize(s) { return (s || '').trim().toLowerCase().replace(/^#+/, ''); }
+            function ensureTags() {
+                if (popularTags) return Promise.resolve(popularTags);
+                if (!tagsPromise) {
+                    tagsPromise = (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.articles && GegenPressAPI.articles.getPopularTags)
+                        ? GegenPressAPI.articles.getPopularTags().then(function (res) { popularTags = (res && res.success) ? res.tags : []; return popularTags; })
+                        : Promise.resolve([]);
+                }
+                return tagsPromise;
+            }
+            function goSearch(q) { window.location.href = '/gegen_press_search.html?q=' + encodeURIComponent(q); }
+            function renderSuggestions(matches) {
+                if (!matches.length) { suggestBox.style.display = 'none'; suggestBox.innerHTML = ''; return; }
+                suggestBox.innerHTML = matches.map(function (m) {
+                    var safe = String(m.tag).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    return '<div class="item" data-tag="' + safe + '">#' + safe + '</div>';
+                }).join('');
+                suggestBox.style.display = 'block';
+                Array.prototype.forEach.call(suggestBox.querySelectorAll('.item'), function (el) {
+                    el.addEventListener('mousedown', function (e) {
+                        e.preventDefault();
+                        goSearch(this.getAttribute('data-tag'));
+                    });
+                });
+            }
+            if (input) {
+                input.addEventListener('input', function () {
+                    var raw = normalize(this.value);
+                    if (!raw) { suggestBox.style.display = 'none'; return; }
+                    ensureTags().then(function (tags) {
+                        renderSuggestions(tags.filter(function (t) { return normalize(t.tag).indexOf(raw) >= 0; }).slice(0, 6));
+                    });
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        var q = this.value.trim();
+                        if (q) goSearch(q);
+                    }
+                });
+                input.addEventListener('blur', function () { setTimeout(function () { suggestBox.style.display = 'none'; }, 150); });
+            }
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var link = document.getElementById('langSwitchLink');
+            if (!link) return;
+            var page = location.pathname.split('/').pop();
+            link.href = '/' + page + location.search;
+        })();
+    </script>
+</body>
+</html>

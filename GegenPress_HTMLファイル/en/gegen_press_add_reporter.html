@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Reporter | Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans JP', 'Segoe UI', 'Hiragino Sans', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        
+            font-size: 13px;
+        }
+
+        /* ヘッダー */
+        header {
+            background: #fff;
+            border-bottom: 3px solid #e63946;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: #e63946;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .logo:hover { opacity: 0.8; }
+        .header-nav { display: flex; gap: 30px; align-items: center; }
+        .nav-link { color: #333; text-decoration: none; font-weight: 600; transition: all 0.3s ease; }
+        .nav-link:hover { color: #e63946; }
+        .back-button {
+            background-color: #e63946; color: #fff; border: none;
+            padding: 10px 20px; border-radius: 4px; cursor: pointer;
+            font-weight: bold; transition: all 0.3s ease;
+        }
+        .back-button:hover { background-color: #c5303c; }
+
+        /* ページタイトル */
+        .page-title-section {
+            background: #e63946;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-title-section::before {
+            content: '';
+            position: absolute;
+            top: -50px; right: -100px;
+            width: 400px; height: 400px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        .page-title-content { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+        .page-title { font-size: 42px; font-weight: 900; margin-bottom: 15px; letter-spacing: 2px; color: #fff; }
+        .page-subtitle { font-size: 17px; opacity: 0.9; color: #fff; line-height: 1.6; }
+
+        /* コンテナ */
+        .container { max-width: 800px; margin: 0 auto; padding: 50px 40px; }
+
+        /* ログイン必須の注意バナー */
+        .login-notice {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border: 2px solid #ffc107;
+            border-left: 4px solid #ffc107;
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #856404;
+            display: none;
+        }
+        .login-notice a { color: #e63946; font-weight: bold; text-decoration: none; }
+        .login-notice a:hover { text-decoration: underline; }
+
+        /* フォームカード */
+        .form-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 40px;
+        }
+
+        .form-intro {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .form-group { margin-bottom: 28px; }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .required-badge {
+            background-color: #e63946; color: #fff;
+            font-size: 10px; padding: 2px 7px; border-radius: 3px;
+            margin-left: 8px; letter-spacing: 0.5px;
+        }
+        .optional-badge {
+            background-color: #ccc; color: #fff;
+            font-size: 10px; padding: 2px 7px; border-radius: 3px;
+            margin-left: 8px; letter-spacing: 0.5px;
+        }
+
+        .form-hint { font-size: 12px; color: #999; margin-bottom: 10px; line-height: 1.5; }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #333;
+            background-color: #fff;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #e63946;
+            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
+        }
+        .form-textarea { resize: vertical; min-height: 100px; }
+
+        /* 名前入力＋重複チェック */
+        .name-check-row { display: flex; gap: 10px; }
+        .name-check-row .form-input { flex: 1; }
+        .check-btn {
+            background-color: #fff;
+            border: 2px solid #e63946;
+            color: #e63946;
+            padding: 0 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+        .check-btn:hover { background-color: #e63946; color: #fff; }
+        .check-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* 重複チェック結果 */
+        .duplicate-result { margin-top: 12px; display: none; }
+        .duplicate-result.show { display: block; }
+        .duplicate-ok {
+            background-color: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .duplicate-found {
+            background-color: #f8d7da;
+            border: 1px solid #dc3545;
+            color: #721c24;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .duplicate-card {
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .dup-avatar {
+            width: 40px; height: 40px;
+            background: #e63946;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: bold; font-size: 16px;
+            flex-shrink: 0;
+        }
+        .dup-info { flex: 1; }
+        .dup-info h4 { font-size: 14px; color: #000; margin-bottom: 2px; }
+        .dup-info p { font-size: 12px; color: #999; }
+        .dup-use-btn {
+            background-color: #e63946; color: #fff; border: none;
+            padding: 8px 14px; border-radius: 4px; cursor: pointer;
+            font-size: 12px; font-weight: bold; white-space: nowrap;
+        }
+        .dup-use-btn:hover { background-color: #c5303c; }
+
+        /* 専門分野タグ選択 */
+        .expertise-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+        .expertise-tag {
+            background-color: #fff;
+            border: 2px solid #ddd;
+            color: #666;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        .expertise-tag:hover { border-color: #e63946; color: #e63946; }
+        .expertise-tag.selected {
+            background-color: #e63946;
+            border-color: #e63946;
+            color: #fff;
+        }
+
+        /* 送信ボタン */
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 35px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+        }
+        .submit-btn {
+            flex: 1;
+            background: #e63946;
+            color: #fff;
+            border: none;
+            padding: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .cancel-btn {
+            background-color: transparent;
+            border: 2px solid #ddd;
+            color: #666;
+            padding: 16px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        .cancel-btn:hover { border-color: #999; color: #333; }
+
+        /* 成功メッセージ */
+        .success-message {
+            display: none;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+        }
+        .success-message.show { display: block; }
+        .success-message h2 { color: #155724; font-size: 26px; margin-bottom: 12px; }
+        .success-message p { color: #155724; font-size: 15px; line-height: 1.6; margin-bottom: 25px; }
+        .success-actions { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .success-actions button {
+            padding: 12px 24px; border-radius: 6px; cursor: pointer;
+            font-weight: bold; font-size: 14px; border: none; transition: all 0.3s ease;
+        }
+        .btn-view { background-color: #e63946; color: #fff; }
+        .btn-view:hover { background-color: #c5303c; }
+        .btn-another { background-color: #fff; border: 2px solid #28a745 !important; color: #28a745; }
+        .btn-another:hover { background-color: #28a745; color: #fff; }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; padding: 15px 20px; }
+            .logo { font-size: 24px; }
+            .page-title-section { padding: 40px 20px; }
+            .page-title { font-size: 30px; }
+            .container { padding: 30px 20px; }
+            .form-card { padding: 25px; }
+            .name-check-row { flex-direction: column; }
+            .check-btn { padding: 12px; }
+            .form-actions { flex-direction: column; }
+        }
+    
+        /* ===== コンパクトヘッダー（モバイル・小画面用の上書き） ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 14px !important;
+            }
+            .logo img { height: 26px !important; }
+            .header-nav {
+                width: auto !important;
+                gap: 10px !important;
+                justify-content: flex-end !important;
+            }
+            .header-nav a, .nav-link {
+                font-size: 12px !important;
+                padding: 3px 4px !important;
+                white-space: nowrap !important;
+            }
+            .back-button {
+                padding: 5px 10px !important;
+                font-size: 12px !important;
+                white-space: nowrap !important;
+            }
+            .search-bar {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 6px 12px !important;
+                font-size: 13px !important;
+            }
+        }
+    
+        /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
+        header.gp-header {
+            background: #fff !important;
+            border-bottom: 3px solid #e63946 !important;
+            padding: 6px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav {
+            display: flex;
+            align-items: stretch;
+            gap: 22px;
+            flex: 1;
+            min-width: 0;
+            overflow-x: visible;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            line-height: 1.15;
+            padding: 6px 2px;
+            white-space: nowrap;
+        }
+        .gp-en {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            color: #111;
+            text-transform: uppercase;
+        }
+        .gp-jp {
+            font-size: 10px;
+            color: #888;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .gp-mypage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #e63946;
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 14px;
+            border-radius: 5px;
+            line-height: 1.15;
+            white-space: nowrap;
+        }
+        .gp-mypage .gp-en { color: #fff; font-size: 12px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #c5303c; }
+        header.gp-header .search-bar {
+            width: 150px !important;
+            margin: 0 !important;
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+        }
+        /* 薄いページ名ストリップ */
+        .gp-page-strip {
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 9px 24px;
+        }
+        .gp-page-strip h1 {
+            font-size: 16px;
+            font-weight: 900;
+            color: #333;
+            max-width: 1280px;
+            margin: 0 auto;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 768px) {
+            /* ヘッダーはロゴ+マイページの行と、ナビの行に分けて折り返す。
+               横スクロールしないと押せない問題への対応。 */
+            header.gp-header {
+                flex-wrap: wrap !important;
+                padding: 8px 14px !important;
+                gap: 0 !important;
+                row-gap: 6px !important;
+            }
+            .gp-logo { order: 1; }
+            .gp-logo img { height: 26px !important; }
+            .gp-actions { order: 2; margin-left: auto; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10.5px; }
+            .gp-nav {
+                order: 3;
+                flex: 1 1 100%;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 6px 4px;
+            }
+            .gp-nav-item {
+                white-space: nowrap;
+                padding: 4px 2px;
+            }
+            .gp-en { font-size: 11.5px; }
+            .gp-jp { font-size: 9px; }
+            header.gp-header .search-bar { display: none !important; }
+            .gp-page-strip { padding: 8px 14px; }
+            .gp-page-strip h1 { font-size: 14.5px; }
+        }
+    
+        .gp-dropdown-wrap { position: relative; }
+        .gp-dropdown-panel {
+            display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; flex-direction: column;
+        }
+        .gp-dropdown-wrap.open .gp-dropdown-panel, .gp-dropdown-wrap:hover .gp-dropdown-panel { display: flex; }
+        .gp-dropdown-option { display: flex; flex-direction: column; padding: 10px 14px; text-decoration: none; color: #333; border-bottom: 1px solid #eee; }
+        .gp-dropdown-option:last-child { border-bottom: none; }
+        .gp-dropdown-option strong { font-size: 12.5px; }
+        .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
+        .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+        .gp-submenu-wrap { position: relative; }
+        .gp-submenu-trigger { cursor: pointer; justify-content: space-between; display: flex; }
+        .gp-submenu-panel {
+            display: none;
+            position: absolute; top: 0; left: 100%;
+            background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            min-width: 170px; max-height: 320px; overflow-y: auto;
+            z-index: 210; flex-direction: column;
+        }
+        .gp-submenu-wrap.open .gp-submenu-panel { display: flex; }
+        .gp-submenu-option { font-size: 12px; padding: 8px 12px; }
+        @media (max-width: 768px) {
+            .gp-submenu-panel { position: static; box-shadow: none; border: none; border-top: 1px solid #eee; min-width: 0; }
+        }
+    
+    </style>
+    <style>
+        /* ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== */
+        .gp-hamburger {
+            display: flex; flex-direction: column; justify-content: center; gap: 4px;
+            width: 34px; height: 34px; background: none; border: none; cursor: pointer;
+            padding: 6px; flex-shrink: 0; margin-left: 10px;
+        }
+        .gp-hamburger span { display: block; width: 100%; height: 2px; background: #1a1a1a; border-radius: 1px; }
+        .gp-sidebar-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(20,33,61,0.55); z-index: 997;
+        }
+        .gp-sidebar-overlay.open { display: block; }
+        .gp-sidebar {
+            position: fixed; top: 0; right: 0; height: 100%; width: 300px; max-width: 86vw;
+            background: #fff; z-index: 998; box-shadow: -8px 0 24px rgba(0,0,0,0.15);
+            transform: translateX(100%); transition: transform 0.25s ease; overflow-y: auto;
+            display: flex; flex-direction: column;
+        }
+        .gp-sidebar.open { transform: translateX(0); }
+        .gp-sidebar-head {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 18px; border-bottom: 1px solid #eee;
+            font-weight: 900; font-size: 12px; letter-spacing: 2px; color: #999;
+        }
+        .gp-sidebar-head button { background: none; border: none; font-size: 22px; cursor: pointer; color: #333; line-height: 1; }
+        .gp-sidebar-search-wrap { padding: 16px 18px; border-bottom: 1px solid #eee; position: relative; }
+        .gp-sidebar-search { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
+        .gp-sidebar-section { padding: 14px 18px; border-bottom: 1px solid #eee; }
+        .gp-sidebar-section h4 { font-size: 10.5px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 8px; }
+        .gp-sidebar-section a { display: block; padding: 6px 0; font-size: 13px; color: #333; text-decoration: none; }
+        .gp-sidebar-section a:hover { color: #e63946; }
+        .gp-search-suggest {
+            display: none; position: absolute; left: 18px; right: 18px; top: 100%; margin-top: -1px;
+            background: #fff; border: 1px solid #ccc; border-top: none; z-index: 5;
+            max-height: 240px; overflow-y: auto; box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        }
+        .gp-search-suggest .item { padding: 8px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f0f0f0; color: #333; }
+        .gp-search-suggest .item:last-child { border-bottom: none; }
+        .gp-search-suggest .item:hover { background: #fdf1f2; color: #e63946; }
+    </style>
+<style>.gp-jp{display:none !important;} .gp-dropdown-option span{display:none !important;}</style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="gp-header">
+        <a href="/en/gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="/en/gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">Home</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="newsDropdownWrap">
+                <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">All News</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/en/gegen_press_category.html" class="gp-dropdown-option"><strong>All News</strong><span>All News</span></a>
+                    <div class="gp-submenu-wrap">
+                        <span class="gp-dropdown-option gp-submenu-trigger"><strong>Transfer News</strong><span>Transfer ▸</span></span>
+                        <div class="gp-submenu-panel">
+                            <a href="/en/gegen_press_category.html?articleType=移籍記事&type=confirmed" class="gp-dropdown-option gp-submenu-option"><strong>Confirmed (All Leagues)</strong></a>
+                            <a href="/en/gegen_press_category.html?articleType=移籍記事&type=rumor" class="gp-dropdown-option gp-submenu-option"><strong>Rumors (All Leagues)</strong></a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=プレミアリーグ" class="gp-dropdown-option gp-submenu-option">Premier League</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=ラリーガ" class="gp-dropdown-option gp-submenu-option">La Liga</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=Jリーグ" class="gp-dropdown-option gp-submenu-option">J.League</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=セリエA" class="gp-dropdown-option gp-submenu-option">Serie A</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=ブンデスリーガ" class="gp-dropdown-option gp-submenu-option">Bundesliga</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=リーグアン" class="gp-dropdown-option gp-submenu-option">Ligue 1</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=エールディヴィジ" class="gp-dropdown-option gp-submenu-option">Eredivisie</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=プリメイラ・リーガ" class="gp-dropdown-option gp-submenu-option">Primeira Liga</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=MLS" class="gp-dropdown-option gp-submenu-option">MLS</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=その他リーグ" class="gp-dropdown-option gp-submenu-option">Other Leagues</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=その他" class="gp-dropdown-option gp-submenu-option">Other</a>
+                        </div>
+                    </div>
+                    <a href="/en/gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>Interviews</strong><span>Interviews</span></a>
+                    <a href="/en/gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>General</strong><span>General</span></a>
+                    <a href="/en/gegen_press_category.html?contentType=column" class="gp-dropdown-option"><strong>Columns</strong><span>Columns</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="rankingDropdownWrap">
+                <a class="gp-nav-item" href="#" id="rankingDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">RANKING</span><span class="gp-jp">Ranking</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/en/gegen_press_ranking.html?view=reporters" class="gp-dropdown-option"><strong>Reporter Ranking</strong><span>Reporters</span></a>
+                    <a href="/en/gegen_press_ranking.html?view=media" class="gp-dropdown-option"><strong>Media Ranking</strong><span>Media</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
+                <a class="gp-nav-item active" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">Add Media / Reporter</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/en/gegen_press_add_media.html" class="gp-dropdown-option"><strong>Add Media</strong><span>Add Media</span></a>
+                    <a href="/en/gegen_press_add_reporter.html" class="gp-dropdown-option"><strong>Add Reporter</strong><span>Add Reporter</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="postDropdownWrap">
+                <a class="gp-nav-item" href="#" id="postDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">POST</span><span class="gp-jp">Post</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/en/gegen_press_write_article.html" class="gp-dropdown-option"><strong>Post News</strong><span>Post News</span></a>
+                    <a href="/en/gegen_press_write_column.html" class="gp-dropdown-option"><strong>Post Column</strong><span>Post Column</span></a>
+                </div>
+            </div>
+        </nav>
+        <div class="gp-actions">
+            <a href="#" id="langSwitchLink" class="gp-mypage" style="background:#1d3557;" title="View in Japanese">JP</a>
+            <a href="/gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">My Page</span></a>
+            <button id="gpSidebarToggle" class="gp-hamburger" aria-label="Open menu" type="button">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== -->
+    <div id="gpSidebarOverlay" class="gp-sidebar-overlay"></div>
+    <aside id="gpSidebar" class="gp-sidebar">
+        <div class="gp-sidebar-head">
+            <span>MENU</span>
+            <button id="gpSidebarClose" aria-label="Close" type="button">&times;</button>
+        </div>
+        <div class="gp-sidebar-search-wrap">
+            <input type="text" id="gpSidebarSearch" class="gp-sidebar-search" placeholder="Search teams, players, #hashtags" autocomplete="off">
+            <div id="gpSidebarSuggest" class="gp-search-suggest"></div>
+        </div>
+        <nav class="gp-sidebar-section">
+            <h4>Contents</h4>
+            <a href="/gegen_press_guide.html">New Here?</a>
+            <a href="/en/gegen_press_category.html">All News</a>
+            <a href="/en/gegen_press_ranking.html">Reporter Ranking</a>
+            <a href="/gegen_press_players.html">Players</a>
+            <a href="/en/gegen_press_write_article.html">Post News</a>
+        </nav>
+        <nav class="gp-sidebar-section">
+            <h4>Join</h4>
+            <a href="/en/gegen_press_add_reporter.html">Add Reporter</a>
+            <a href="/en/gegen_press_add_media.html">Add Media</a>
+            <a href="/gegen_press_add_player.html">Add Player</a>
+            <a href="/gegen_press_login.html">Log In / Sign Up</a>
+        </nav>
+        <nav class="gp-sidebar-section">
+            <h4>About</h4>
+            <a href="/gegen_press_terms.html">Terms of Service</a>
+            <a href="/gegen_press_privacy.html">Privacy Policy</a>
+            <a href="mailto:gegenpressmanagement@gmail.com">Contact</a>
+        </nav>
+    </aside>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('addMediaDropdownWrap');
+            var trigger = document.getElementById('addMediaDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('postDropdownWrap');
+            var trigger = document.getElementById('postDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('newsDropdownWrap');
+            var trigger = document.getElementById('newsDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('rankingDropdownWrap');
+            var trigger = document.getElementById('rankingDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            document.querySelectorAll('.gp-submenu-trigger').forEach(function (trigger) {
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var wrap = trigger.closest('.gp-submenu-wrap');
+                    if (wrap) wrap.classList.toggle('open');
+                });
+            });
+        })();
+    </script>
+
+
+
+
+
+    <!-- ページタイトル -->
+    <div class="gp-page-strip"><h1>Add Reporter</h1></div>
+
+    <!-- メインコンテンツ -->
+    <div class="container">
+        <!-- ログイン必須通知 -->
+        <div class="login-notice" id="loginNotice">You must be logged in to add a reporter.<a href="/gegen_press_login.html">Log In / Sign Up here</a>
+        </div>
+
+        <!-- フォーム -->
+        <div class="form-card" id="formCard">
+            <p class="form-intro">Only the reporter's name is required. Other fields can be filled in as much as you know, and can be edited anytime later. To avoid duplicates, we recommend checking for existing reporters with the same name before adding.</p>
+
+            <form id="reporterForm">
+                <!-- スクショから自動入力（AI下書き。あくまで下書きで、確認・修正してから登録する運用） -->
+                <div class="form-group" style="background:#f0f7ff; border:1px solid #cfe3fb; border-radius:8px; padding:16px 18px;">
+                    <label class="form-label" style="margin-bottom:4px;">Auto-fill from screenshot<span class="optional-badge">Optional</span></label>
+                    <p class="form-hint">Upload a screenshot of the reporter's X profile etc. to auto-fill the fields below (up to 10 times a day, shared with news/column posting usage).<strong>This will not be submitted automatically. Please review and edit before registering.</strong></p>
+                    <input type="file" id="aiScreenshotInput" accept="image/*" style="display:none;">
+                    <button type="button" id="aiScreenshotBtn" style="background:#1d3557; color:#fff; border:none; border-radius:6px; padding:9px 18px; font-size:12.5px; font-weight:bold; cursor:pointer;">Choose an image to auto-fill</button>
+                    <div id="aiScreenshotStatus" style="margin-top:8px; font-size:12.5px; color:#666;"></div>
+                </div>
+
+                <!-- 記者名 -->
+                <div class="form-group">
+                    <label class="form-label">Reporter Name<span class="required-badge">Required</span></label>
+                    <p class="form-hint">e.g. Fabrizio Romano, Sky Sports</p>
+                    <div class="name-check-row">
+                        <input type="text" class="form-input" id="reporterName" placeholder="Enter reporter name" autocomplete="off">
+                        <button type="button" class="check-btn" id="checkBtn">Check for duplicates</button>
+                    </div>
+                    <div class="duplicate-result" id="duplicateResult"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Reporter name (Romaji / English)<span class="optional-badge">Optional</span></label>
+                    <p class="form-hint">If registering a Japanese reporter name, you can also enter the Romaji spelling.</p>
+                    <input type="text" class="form-input" id="nameRomaji" placeholder="e.g. Taro Yamada">
+                </div>
+
+                <!-- 所属メディア -->
+                <div class="form-group">
+                    <label class="form-label">Media Outlet<span class="optional-badge">Optional</span></label>
+                    <p class="form-hint">Choose from media already registered via "Add Media". If not listed, enter it directly via "Other", or register the media first.</p>
+                    <select class="form-input" id="mediaOutletSelect" style="margin-bottom:8px;">
+                        <option value="">Loading...</option>
+                    </select>
+                    <input type="text" class="form-input" id="mediaOutlet" placeholder="Enter media outlet" style="display:none;">
+                </div>
+
+                <!-- 記者の種別 -->
+                <div class="form-group">
+                    <label class="form-label">Reporter Type<span class="optional-badge">Optional</span></label>
+                    <p class="form-hint">Used to categorize the ranking.</p>
+                    <select class="form-input" id="reporterType">
+                        <option value="">Please select</option>
+                        <option value="番記者">Club Reporter (covers a specific club)</option>
+                        <option value="移籍専門">Transfer Specialist</option>
+                        <option value="大手メディア">Major Media Affiliation</option>
+                        <option value="独立ジャーナリスト">Independent Journalist</option>
+                        <option value="その他">Other</option>
+                    </select>
+                    <input type="text" class="form-input" id="beatClub" placeholder="Enter the club covered (e.g. Manchester City)" style="display:none; margin-top:10px;">
+                </div>
+
+                <!-- X(Twitter)ハンドル -->
+                <div class="form-group">
+                    <label class="form-label">X (Twitter) handle<span class="optional-badge">Optional</span></label>
+                    <p class="form-hint">Include the @. e.g. @FabrizioRomano</p>
+                    <input type="text" class="form-input" id="twitterHandle" placeholder="@username">
+                </div>
+
+                <!-- 専門分野 -->
+                <div class="form-group">
+                    <label class="form-label">Expertise<span class="optional-badge">Optional</span></label>
+                    <p class="form-hint">Tap all that apply (multiple allowed)</p>
+                    <div class="expertise-tags" id="expertiseTags">
+                        <span class="expertise-tag" data-value="移籍情報">Transfers</span>
+                        <span class="expertise-tag" data-value="プレミアリーグ">Premier League</span>
+                        <span class="expertise-tag" data-value="ラリーガ">La Liga</span>
+                        <span class="expertise-tag" data-value="セリエA">Serie A</span>
+                        <span class="expertise-tag" data-value="ブンデスリーガ">Bundesliga</span>
+                        <span class="expertise-tag" data-value="リーグアン">Ligue 1</span>
+                        <span class="expertise-tag" data-value="エールディヴィジ">Eredivisie</span>
+                        <span class="expertise-tag" data-value="プリメイラ・リーガ">Primeira Liga</span>
+                        <span class="expertise-tag" data-value="Jリーグ">J.League</span>
+                        <span class="expertise-tag" data-value="MLS">MLS</span>
+                        <span class="expertise-tag" data-value="日本サッカー">Japanese Football</span>
+                        <span class="expertise-tag" data-value="代表チーム">National Teams</span>
+                        <span class="expertise-tag" data-value="その他リーグ">Other Leagues</span>
+                    </div>
+                </div>
+
+                <!-- 説明 -->
+                <div class="form-group">
+                    <label class="form-label">Description / Notes<span class="optional-badge">Optional</span></label>
+                    <p class="form-hint">Freely describe this reporter's traits, why they're trustworthy, etc.</p>
+                    <textarea class="form-textarea" id="reporterBio" placeholder="e.g. Known for breaking transfer news quickly and with high accuracy."></textarea>
+                </div>
+
+                <!-- アクション -->
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="window.location.href='/en/gegen_press_ranking.html'">Cancel</button>
+                    <button type="submit" class="submit-btn" id="submitBtn">Add Reporter</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 成功メッセージ -->
+        <div class="success-message" id="successMessage">
+            <h2>Reporter added</h2>
+            <p id="successText">The new reporter has been registered in the database. Their trust score will grow as the community rates their articles.</p>
+            <div class="success-actions">
+                <button class="btn-view" onclick="window.location.href='/en/gegen_press_reporter_profile.html'">View reporter page</button>
+                <button class="btn-another" id="addAnotherBtn">Add another</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API クライアント（バックエンド接続用） -->
+    <!-- 本番デプロイ時は api-client.js を同じフォルダに置けば下の行が有効になります -->
+    <script src="/api-client.js" onerror="console.warn('api-client.js not found. Running in demo mode.')"></script>
+    <script>
+        // =========================================================
+        // 動作モードの判定
+        // api-client.js が読み込まれ、かつトークンがあれば本番API、
+        // そうでなければデモモードで動作します（プレビューでもそのまま動く）。
+        // =========================================================
+        const API_AVAILABLE = (typeof GegenPressAPI !== 'undefined');
+
+        // localStorage を安全に読む（プレビュー環境で例外が出ても落ちないように）
+        function safeGetToken() {
+            try {
+                return localStorage.getItem('gegenPressToken');
+            } catch (e) {
+                return null;
+            }
+        }
+
+        const authToken = safeGetToken();
+        if (API_AVAILABLE && authToken) {
+            GegenPressAPI.setToken(authToken);
+        }
+
+        // ログイン状態:
+        // - 本番モード: トークンがあればログイン済み
+        // - デモモード: 常にログイン済みとして扱う
+        const IS_LOGGED_IN = API_AVAILABLE ? !!authToken : true;
+
+        if (!IS_LOGGED_IN) {
+            document.getElementById('loginNotice').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+        }
+
+        // =========================================================
+        // 所属メディアのプルダウン（「メディアを追加」で登録済みのメディア一覧から選ぶ）
+        // =========================================================
+        async function initMediaOutletPicker() {
+            const sel = document.getElementById('mediaOutletSelect');
+            const textEl = document.getElementById('mediaOutlet');
+            let mediaList = [];
+            if (API_AVAILABLE && GegenPressAPI.media && GegenPressAPI.media.getAll) {
+                try {
+                    const res = await GegenPressAPI.media.getAll();
+                    if (res && res.success) mediaList = (res.media || []).map(m => m.name || m.id).filter(Boolean);
+                } catch (e) { console.warn('Failed to load media list:', e); }
+            }
+            const collator = (typeof Intl !== 'undefined') ? new Intl.Collator('ja') : null;
+            mediaList.sort((a, b) => collator ? collator.compare(a, b) : a.localeCompare(b));
+
+            if (mediaList.length === 0) {
+                sel.style.display = 'none';
+                textEl.style.display = 'block';
+                return;
+            }
+            sel.innerHTML = '<option value="">未設定</option>' +
+                mediaList.map(m => '<option value="' + m.replace(/"/g, '&quot;') + '">' + m.replace(/</g, '&lt;') + '</option>').join('') +
+                '<option value="__other__">その他（一覧にないメディアを直接入力）</option>';
+            sel.addEventListener('change', function () {
+                if (this.value === '__other__') {
+                    textEl.style.display = 'block';
+                    textEl.value = '';
+                    textEl.focus();
+                } else {
+                    textEl.style.display = 'none';
+                    textEl.value = this.value;
+                }
+            });
+        }
+        initMediaOutletPicker();
+
+        // =========================================================
+        // スクショから自動入力（AI下書き）
+        // =========================================================
+        document.getElementById('aiScreenshotBtn').addEventListener('click', () => document.getElementById('aiScreenshotInput').click());
+        document.getElementById('aiScreenshotInput').addEventListener('change', async function () {
+            const file = this.files && this.files[0];
+            this.value = '';
+            if (!file) return;
+            if (!API_AVAILABLE) { alert('This feature is currently unavailable (load error).'); return; }
+            const user = await GegenPressAPI._currentUser();
+            if (!user) { alert('Please log in'); return; }
+            const statusEl = document.getElementById('aiScreenshotStatus');
+            const btn = document.getElementById('aiScreenshotBtn');
+            btn.disabled = true;
+            statusEl.style.color = '#666';
+            statusEl.textContent = 'Loading image...';
+            try {
+                const dataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => reject(new Error('Failed to load the image'));
+                    reader.readAsDataURL(file);
+                });
+                statusEl.textContent = 'AI is analyzing the content (may take several seconds)...';
+                const idToken = await user.getIdToken();
+                const res = await fetch('/api/analyze-screenshot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idToken, image: dataUrl, contentType: 'reporter' })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    statusEl.style.color = '#c5303c';
+                    statusEl.textContent = '✗ ' + (data.message || 'Analysis failed');
+                    btn.disabled = false;
+                    return;
+                }
+                applyAiDraft(data.draft);
+                statusEl.style.color = '#2a9d8f';
+                statusEl.textContent = '✓ Draft filled in. Please review and edit before registering.';
+            } catch (e) {
+                statusEl.style.color = '#c5303c';
+                statusEl.textContent = '✗ An error occurred: ' + e.message;
+            }
+            btn.disabled = false;
+        });
+
+        function applyAiDraft(draft) {
+            if (draft.name) document.getElementById('reporterName').value = draft.name;
+            if (draft.twitterHandle) document.getElementById('twitterHandle').value = draft.twitterHandle.replace(/^@/, '');
+            if (draft.bio) document.getElementById('reporterBio').value = draft.bio;
+            if (draft.mediaOutlet) {
+                const textEl = document.getElementById('mediaOutlet');
+                document.getElementById('mediaOutletSelect').style.display = 'none';
+                textEl.style.display = 'block';
+                textEl.value = draft.mediaOutlet;
+            }
+            if (draft.suggestedReporterType) {
+                const typeSel = document.getElementById('reporterType');
+                const match = Array.from(typeSel.options).some(o => o.value === draft.suggestedReporterType);
+                if (match) {
+                    typeSel.value = draft.suggestedReporterType;
+                    typeSel.dispatchEvent(new Event('change'));
+                }
+            }
+        }
+
+        // =========================================================
+        // 専門分野タグの選択
+        // =========================================================
+        document.getElementById('reporterType').addEventListener('change', function () {
+            document.getElementById('beatClub').style.display = (this.value === 'Club Reporter') ? 'block' : 'none';
+        });
+
+        const selectedExpertise = new Set();
+        document.querySelectorAll('.expertise-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                if (selectedExpertise.has(value)) {
+                    selectedExpertise.delete(value);
+                    this.classList.remove('selected');
+                } else {
+                    selectedExpertise.add(value);
+                    this.classList.add('selected');
+                }
+            });
+        });
+
+        // =========================================================
+        // 重複チェック
+        // API があれば本番、なければデモ用の既存記者リストと照合
+        // =========================================================
+        const DEMO_EXISTING_REPORTERS = [
+            { name: 'Fabrizio Romano', mediaOutlet: 'Transfer Specialist', trustScore: 96 },
+            { name: 'Sky Sports', mediaOutlet: 'Premier League Specialist', trustScore: 92 },
+            { name: 'Marca Sports', mediaOutlet: 'Spain Coverage', trustScore: 88 },
+        ];
+
+        let duplicateConfirmed = false; // 重複ありでも追加を許可したか
+
+        // 重複チェックの共通関数（本番API → 失敗時デモ）
+        async function runDuplicateCheck(name) {
+            if (API_AVAILABLE) {
+                try {
+                    const res = await GegenPressAPI.reporters.checkDuplicate(name);
+                    if (res && res.success) {
+                        return {
+                            exists: res.exists,
+                            duplicates: (res.duplicates || []).map(r => ({
+                                name: r.name,
+                                mediaOutlet: r.mediaOutlet || 'Affiliation unknown',
+                                trustScore: r.trustScore || 0,
+                                id: r.id,
+                            })),
+                        };
+                    }
+                } catch (e) {
+                    console.warn('Duplicate-check API failed, falling back to demo:', e);
+                }
+            }
+            // デモ判定
+            const matches = DEMO_EXISTING_REPORTERS.filter(
+                r => r.name.toLowerCase() === name.toLowerCase()
+            );
+            return { exists: matches.length > 0, duplicates: matches };
+        }
+
+        document.getElementById('checkBtn').addEventListener('click', async function() {
+            const name = document.getElementById('reporterName').value.trim();
+            const resultDiv = document.getElementById('duplicateResult');
+            const btn = this;
+
+            if (!name) {
+                resultDiv.className = 'duplicate-result show';
+                resultDiv.innerHTML = '<div class="duplicate-found">Please enter the reporter\'s name.</div>';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Checking...';
+
+            const result = await runDuplicateCheck(name);
+
+            btn.disabled = false;
+            btn.textContent = 'Check for duplicates';
+            resultDiv.className = 'duplicate-result show';
+
+            if (!result.exists) {
+                resultDiv.innerHTML = '<div class="duplicate-ok">この名前の記者はまだ登録されていません。追加できます。</div>';
+                duplicateConfirmed = true;
+            } else {
+                let html = '<div class="duplicate-found">A reporter with this name is already registered. Use the one below, or add a new one if it\'s a different person.</div>';
+                result.duplicates.forEach(r => {
+                    const initial = r.name.charAt(0).toUpperCase();
+                    const link = r.id
+                        ? `gegen_press_reporter_profile.html?id=${encodeURIComponent(r.id)}`
+                        : '/en/gegen_press_reporter_profile.html';
+                    html += `
+                        <div class="duplicate-card">
+                            <div class="dup-avatar">${initial}</div>
+                            <div class="dup-info">
+                                <h4>${r.name}</h4>
+                                <p>${r.mediaOutlet} · Trust ${r.trustScore}/100</p>
+                            </div>
+                            <button type="button" class="dup-use-btn" onclick="window.location.href='${link}'">Use this reporter</button>
+                        </div>
+                    `;
+                });
+                resultDiv.innerHTML = html;
+                duplicateConfirmed = false;
+            }
+        });
+
+        // 名前を変更したら重複チェック結果をリセット
+        document.getElementById('reporterName').addEventListener('input', function() {
+            document.getElementById('duplicateResult').className = 'duplicate-result';
+            duplicateConfirmed = false;
+        });
+
+        // =========================================================
+        // フォーム送信
+        // API があれば本番、なければデモ動作
+        // =========================================================
+        document.getElementById('reporterForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('reporterName').value.trim();
+            if (!name) {
+                alert('Reporter name is required.');
+                document.getElementById('reporterName').focus();
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+
+            // 入力データをまとめる
+            const reporterData = {
+                name: name,
+                nameRomaji: document.getElementById('nameRomaji').value.trim() || null,
+                reporterType: document.getElementById('reporterType').value || null,
+                beatClub: document.getElementById('reporterType').value === 'Club Reporter'
+                    ? (document.getElementById('beatClub').value.trim() || null) : null,
+                mediaOutlet: document.getElementById('mediaOutlet').value.trim() || null,
+                twitterHandle: document.getElementById('twitterHandle').value.trim() || null,
+                expertise: Array.from(selectedExpertise),
+                bio: document.getElementById('reporterBio').value.trim() || '',
+                // 重複チェックで既存があったが、それでも追加する場合に true
+                allowDuplicate: duplicateConfirmed === false,
+            };
+
+            // --- 本番モード ---
+            if (API_AVAILABLE && IS_LOGGED_IN) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Adding...';
+                try {
+                    const res = await GegenPressAPI.reporters.create(reporterData);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Add Reporter';
+
+                    if (res && res.success) {
+                        showSuccess(name);
+                    } else if (res && res.duplicates) {
+                        // 409: 重複あり。確認を促してフォーム上部に表示
+                        const resultDiv = document.getElementById('duplicateResult');
+                        resultDiv.className = 'duplicate-result show';
+                        resultDiv.innerHTML = '<div class="duplicate-found">A reporter with this name is already registered. After checking, press "Add Reporter" again if you still want to add a new one.</div>';
+                        duplicateConfirmed = false;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        alert((res && res.message) || 'Failed to add. Please try again later.');
+                    }
+                } catch (e) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Add Reporter';
+                    alert('A network error occurred. Please check your connection.');
+                }
+                return;
+            }
+
+            // --- デモモード ---
+            console.log('Submitted data (demo):', reporterData);
+            showSuccess(name);
+        });
+
+        function showSuccess(name) {
+            document.getElementById('formCard').style.display = 'none';
+            document.getElementById('loginNotice').style.display = 'none';
+            const successMsg = document.getElementById('successMessage');
+            document.getElementById('successText').textContent =
+                `${name} has been registered in the database. Their trust score will grow as the community rates them.`;
+            successMsg.classList.add('show');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 続けて追加
+        document.getElementById('addAnotherBtn').addEventListener('click', function() {
+            document.getElementById('reporterForm').reset();
+            selectedExpertise.clear();
+            document.querySelectorAll('.expertise-tag').forEach(t => t.classList.remove('selected'));
+            document.getElementById('duplicateResult').className = 'duplicate-result';
+            duplicateConfirmed = false;
+            document.getElementById('successMessage').classList.remove('show');
+            document.getElementById('formCard').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+    <script>
+        // ===== サイドバー（ハンバーガーメニュー。全ページ共通） =====
+        (function () {
+            var toggle = document.getElementById('gpSidebarToggle');
+            var closeBtn = document.getElementById('gpSidebarClose');
+            var sidebar = document.getElementById('gpSidebar');
+            var overlay = document.getElementById('gpSidebarOverlay');
+            if (!toggle || !sidebar) return;
+            function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('open'); }
+            function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+            toggle.addEventListener('click', openSidebar);
+            closeBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // 検索サジェスト（「もしかして」：よく使われるハッシュタグを頻度順で候補表示）
+            var input = document.getElementById('gpSidebarSearch');
+            var suggestBox = document.getElementById('gpSidebarSuggest');
+            var popularTags = null, tagsPromise = null;
+            function normalize(s) { return (s || '').trim().toLowerCase().replace(/^#+/, ''); }
+            function ensureTags() {
+                if (popularTags) return Promise.resolve(popularTags);
+                if (!tagsPromise) {
+                    tagsPromise = (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.articles && GegenPressAPI.articles.getPopularTags)
+                        ? GegenPressAPI.articles.getPopularTags().then(function (res) { popularTags = (res && res.success) ? res.tags : []; return popularTags; })
+                        : Promise.resolve([]);
+                }
+                return tagsPromise;
+            }
+            function goSearch(q) { window.location.href = '/gegen_press_search.html?q=' + encodeURIComponent(q); }
+            function renderSuggestions(matches) {
+                if (!matches.length) { suggestBox.style.display = 'none'; suggestBox.innerHTML = ''; return; }
+                suggestBox.innerHTML = matches.map(function (m) {
+                    var safe = String(m.tag).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    return '<div class="item" data-tag="' + safe + '">#' + safe + '</div>';
+                }).join('');
+                suggestBox.style.display = 'block';
+                Array.prototype.forEach.call(suggestBox.querySelectorAll('.item'), function (el) {
+                    el.addEventListener('mousedown', function (e) {
+                        e.preventDefault();
+                        goSearch(this.getAttribute('data-tag'));
+                    });
+                });
+            }
+            if (input) {
+                input.addEventListener('input', function () {
+                    var raw = normalize(this.value);
+                    if (!raw) { suggestBox.style.display = 'none'; return; }
+                    ensureTags().then(function (tags) {
+                        renderSuggestions(tags.filter(function (t) { return normalize(t.tag).indexOf(raw) >= 0; }).slice(0, 6));
+                    });
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        var q = this.value.trim();
+                        if (q) goSearch(q);
+                    }
+                });
+                input.addEventListener('blur', function () { setTimeout(function () { suggestBox.style.display = 'none'; }, 150); });
+            }
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var link = document.getElementById('langSwitchLink');
+            if (!link) return;
+            var page = location.pathname.split('/').pop();
+            link.href = '/' + page + location.search;
+        })();
+    </script>
+</body>
+</html>
