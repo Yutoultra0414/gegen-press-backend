@@ -620,7 +620,7 @@
 
                 <!-- 英語版（管理人のみ表示・必須） -->
                 <div class="form-group" id="englishFieldsGroup" style="display:none; background:#f0f7ff; border:1px solid #cfe3fb; border-radius:8px; padding:16px 18px;">
-                    <label class="form-label" style="margin-bottom:4px;">English version <span class="required-badge">Required (admin only)</span></label>
+                    <label class="form-label" style="margin-bottom:4px;">English version <span class="optional-badge">Optional (admin only)</span></label>
                     <p class="form-hint">This content is shown on the English site (/en/). Please write natural English that conveys the meaning, not a literal translation.</p>
 
                     <label class="form-label" style="margin-top:12px;">English Title</label>
@@ -1250,11 +1250,6 @@
             if (selectedCategories.size === 0) { alert('Please select at least one subcategory'); return; }
             if (!desc) { alert('Please enter a summary'); return; }
             if (!content) { alert('Please enter the body text'); return; }
-            if (isAdminUser) {
-                if (!titleEn) { alert('Please enter the English Title'); return; }
-                if (!descEn) { alert('Please enter the English Summary'); return; }
-                if (!contentEn) { alert('Please enter the English Body'); return; }
-            }
 
             // 報道日時（時刻が未入力の場合は00:00扱い。「日にちだけ」の比較用途では十分です）
             const reportedAtDate = new Date(reportedDate + 'T' + (reportedTime || '00:00') + ':00');
