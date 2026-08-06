@@ -1,15 +1,22 @@
 /**
  * /api/analyze-screenshot
  *
- * ニュース・コラムの投稿画面から呼ばれる。スクリーンショット画像を受け取り、
- * Gemini APIでOCR＋日本語への翻訳（要約）＋項目分けを行い、フォームへの
- * 「下書き」として使える構造化データを返す。
+ * ニュース・コラムの投稿画面、および記者・メディアの登録画面から呼ばれる。
+ * スクリーンショット画像を受け取り、Gemini APIでOCR＋日本語への翻訳（要約）＋
+ * 項目分けを行い、フォームへの「下書き」として使える構造化データを返す。
+ *
+ * contentType で解析パターンを切り替える:
+ *   'news' / 'column' … ニュース・コラム投稿用（従来通り）
+ *   'reporter'         … 記者登録用（Xプロフィール等のスクショから）
+ *   'media'            … メディア登録用（Xプロフィール等のスクショから）
  *
  * セキュリティ設計（詳しくはREADME_AI_SCREENSHOT.md参照）:
  *   - Gemini APIキーはこの関数の中（サーバー側の環境変数）にしか存在しない。
  *     ブラウザには一切渡らない。
  *   - 1日10回/ユーザーの上限は、この関数の中の変数ではなく、Firestoreの
- *     セキュリティルール（aiUsage コレクション）で強制する。
+ *     セキュリティルール（aiUsage コレクション）で強制する。これはニュース・
+ *     コラム・記者・メディアのどの用途で呼ばれても共通の1つのカウンターであり、
+ *     用途ごとに個別の上限があるわけではない（合計で1日10回）。
  *     ユーザー本人のIDトークンでFirestoreの利用回数カウンターを+1しようとし、
  *     ルールがそれを許可した場合（＝上限未満だった場合）だけ、実際にGeminiを呼ぶ。
  *     これにより、この関数自身が「今日何回使われたか」を管理する必要がなく、
@@ -52,6 +59,7 @@ export default async function handler(req, res) {
   }
 
   // ---- ② Firestoreの利用回数カウンターを+1しようとする（ここが実質的な1日10回の関所） ----
+  // ニュース/コラム/記者/メディアのどの用途でも、この関所は共通(合計で1日10回)。
   const todayKey = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"（UTC基準）
   const docId = uid + '_' + todayKey;
   const docPath = 'projects/' + projectId + '/databases/(default)/documents/aiUsage/' + docId;
@@ -100,38 +108,91 @@ export default async function handler(req, res) {
     return;
   }
 
-  // ---- ③ ここまで来たら上限内。Geminiに画像を送って下書きを作らせる ----
-  const isColumn = contentType === 'column';
-  const categoryOptions = isColumn
-    ? ['移籍分析', '戦術分析', '選手考察', '監督・クラブ経営', '育成・下部組織', 'ジャーナリスト論', 'メディア論', '海外の反応', 'コラム全般', 'その他']
-    : ['移籍情報', 'プレミアリーグ', 'ラリーガ', 'セリエA', 'ブンデスリーガ', 'リーグアン', 'エールディヴィジ', 'プリメイラ・リーガ', 'MLS', '日本サッカー', '代表チーム', 'その他リーグ'];
+  // ---- ③ ここまで来たら上限内。contentTypeに応じたプロンプト/スキーマを組み立てる ----
+  let promptText, responseSchema;
 
-  const promptText = [
-    '添付はサッカー関連のSNS投稿・記事のスクリーンショットです。以下を行い、指定したJSON形式のみで返答してください。',
-    '1. 画像内の文章を読み取り、内容を理解する（英語・スペイン語・イタリア語等どの言語でもよい）。',
-    '2. 見出し(headline): 80文字以内の日本語の見出しを作る。',
-    '3. 概要(description): 1〜2文・140文字以内で日本語要約する。',
-    '4. 本文(body): 日本語で300〜600文字程度の記事文にする。**画像の文章をそのまま翻訳するのではなく、内容を理解した上で自分の言葉で書き直す**こと（著作権上、原文の逐語訳・丸写しは禁止）。',
-    '5. ハッシュタグ(hashtags): 関連する選手名・クラブ名などを日本語表記で3〜6個、配列で。',
-    '6. サブカテゴリ(suggestedCategory): 次の選択肢から最も近いものを1つだけ厳密に選ぶ: ' + categoryOptions.join('、'),
-    !isColumn ? '7. 記者名(reporterNameGuess): 画像内に記者・ジャーナリストの名前（アカウント名等）が見て取れる場合、その表記のまま入れる。わからなければ空文字。' : '',
-    !isColumn ? '8. 記事の種類(suggestedArticleTypes): 「移籍記事」「インタビュー記事」「一般記事」のうち当てはまるものを配列で（複数可）。' : '',
-    '画像から読み取れない項目は空文字または空配列にしてください。推測で断定的な事実を作り上げないでください。'
-  ].filter(Boolean).join('\n');
+  if (contentType === 'reporter') {
+    promptText = [
+      '添付はサッカー記者・ジャーナリストのX(Twitter)プロフィール画面などのスクリーンショットです。',
+      '以下を行い、指定したJSON形式のみで返答してください。',
+      '1. 画像内の文章を読み取り、内容を理解する（英語・スペイン語・イタリア語等どの言語でもよい）。',
+      '2. 氏名(name): 表示されている名前をそのまま入れる。わからなければ空文字。',
+      '3. Xユーザーネーム(twitterHandle): @から始まるユーザーネームを、@を除いて入れる。わからなければ空文字。',
+      '4. 紹介文(bio): プロフィール文(bio)の内容を、日本語で100文字程度に要約する。' +
+        '**原文をそのまま翻訳するのではなく、内容を理解した上で自分の言葉で要約する**こと（著作権上、原文の逐語訳・丸写しは禁止）。',
+      '5. 所属メディア(mediaOutlet): プロフィールに所属先メディア名の記載があれば、その名称のみを入れる。わからなければ空文字。',
+      '6. 記者の種別(suggestedReporterType): 次の選択肢から最も近いものを1つだけ厳密に選ぶ: 番記者、移籍専門、大手メディア、独立ジャーナリスト、その他。判断がつかなければ空文字。',
+      '画像から読み取れない項目は空文字にしてください。推測で断定的な事実を作り上げないでください。'
+    ].join('\n');
 
-  const responseSchema = {
-    type: 'OBJECT',
-    properties: {
-      headline: { type: 'STRING' },
-      description: { type: 'STRING' },
-      body: { type: 'STRING' },
-      hashtags: { type: 'ARRAY', items: { type: 'STRING' } },
-      suggestedCategory: { type: 'STRING' },
-      reporterNameGuess: { type: 'STRING' },
-      suggestedArticleTypes: { type: 'ARRAY', items: { type: 'STRING' } }
-    },
-    required: ['headline', 'description', 'body', 'hashtags', 'suggestedCategory']
-  };
+    responseSchema = {
+      type: 'OBJECT',
+      properties: {
+        name: { type: 'STRING' },
+        twitterHandle: { type: 'STRING' },
+        bio: { type: 'STRING' },
+        mediaOutlet: { type: 'STRING' },
+        suggestedReporterType: { type: 'STRING' }
+      },
+      required: ['name']
+    };
+  } else if (contentType === 'media') {
+    promptText = [
+      '添付はサッカー系メディア・報道機関のX(Twitter)プロフィール画面などのスクリーンショットです。',
+      '以下を行い、指定したJSON形式のみで返答してください。',
+      '1. 画像内の文章を読み取り、内容を理解する（英語・スペイン語・イタリア語等どの言語でもよい）。',
+      '2. メディア名(name): 表示されている名称をそのまま入れる。わからなければ空文字。',
+      '3. Xユーザーネーム(twitterHandle): @から始まるユーザーネームを、@を除いて入れる。わからなければ空文字。',
+      '4. 紹介文(description): プロフィール文の内容を、日本語で100文字程度に要約する。' +
+        '**原文をそのまま翻訳するのではなく、内容を理解した上で自分の言葉で要約する**こと（著作権上、原文の逐語訳・丸写しは禁止）。',
+      '5. 公式サイトURL(website): プロフィールにリンクの記載があれば、そのURLをそのまま入れる。わからなければ空文字。',
+      '画像から読み取れない項目は空文字にしてください。推測で断定的な事実を作り上げないでください。'
+    ].join('\n');
+
+    responseSchema = {
+      type: 'OBJECT',
+      properties: {
+        name: { type: 'STRING' },
+        twitterHandle: { type: 'STRING' },
+        description: { type: 'STRING' },
+        website: { type: 'STRING' }
+      },
+      required: ['name']
+    };
+  } else {
+    // 従来通り: ニュース / コラム
+    const isColumn = contentType === 'column';
+    const categoryOptions = isColumn
+      ? ['移籍分析', '戦術分析', '選手考察', '監督・クラブ経営', '育成・下部組織', 'ジャーナリスト論', 'メディア論', '海外の反応', 'コラム全般', 'その他']
+      : ['移籍情報', 'プレミアリーグ', 'ラリーガ', 'セリエA', 'ブンデスリーガ', 'リーグアン', 'エールディヴィジ', 'プリメイラ・リーガ', 'MLS', '日本サッカー', '代表チーム', 'その他リーグ'];
+
+    promptText = [
+      '添付はサッカー関連のSNS投稿・記事のスクリーンショットです。以下を行い、指定したJSON形式のみで返答してください。',
+      '1. 画像内の文章を読み取り、内容を理解する（英語・スペイン語・イタリア語等どの言語でもよい）。',
+      '2. 見出し(headline): 80文字以内の日本語の見出しを作る。',
+      '3. 概要(description): 1〜2文・140文字以内で日本語要約する。',
+      '4. 本文(body): 日本語で300〜600文字程度の記事文にする。**画像の文章をそのまま翻訳するのではなく、内容を理解した上で自分の言葉で書き直す**こと（著作権上、原文の逐語訳・丸写しは禁止）。',
+      '5. ハッシュタグ(hashtags): 関連する選手名・クラブ名などを日本語表記で3〜6個、配列で。',
+      '6. サブカテゴリ(suggestedCategory): 次の選択肢から最も近いものを1つだけ厳密に選ぶ: ' + categoryOptions.join('、'),
+      !isColumn ? '7. 記者名(reporterNameGuess): 画像内に記者・ジャーナリストの名前（アカウント名等）が見て取れる場合、その表記のまま入れる。わからなければ空文字。' : '',
+      !isColumn ? '8. 記事の種類(suggestedArticleTypes): 「移籍記事」「インタビュー記事」「一般記事」のうち当てはまるものを配列で（複数可）。' : '',
+      '画像から読み取れない項目は空文字または空配列にしてください。推測で断定的な事実を作り上げないでください。'
+    ].filter(Boolean).join('\n');
+
+    responseSchema = {
+      type: 'OBJECT',
+      properties: {
+        headline: { type: 'STRING' },
+        description: { type: 'STRING' },
+        body: { type: 'STRING' },
+        hashtags: { type: 'ARRAY', items: { type: 'STRING' } },
+        suggestedCategory: { type: 'STRING' },
+        reporterNameGuess: { type: 'STRING' },
+        suggestedArticleTypes: { type: 'ARRAY', items: { type: 'STRING' } }
+      },
+      required: ['headline', 'description', 'body', 'hashtags', 'suggestedCategory']
+    };
+  }
 
   try {
     const match = /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/.exec(image);
