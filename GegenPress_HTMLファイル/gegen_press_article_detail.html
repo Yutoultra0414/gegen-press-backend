@@ -1091,7 +1091,9 @@
                     <div class="author-info">
                         <h3 id="authorName">Fabrizio Romano</h3>
                         <p id="authorHandle">@FabrizioRomano</p>
-                        <p id="authorMediaOutlet" style="display:none; font-size:11.5px; color:#888; margin-top:1px;"></p>
+                        <p id="authorMediaOutlet" style="display:none; font-size:13px; font-weight:bold; color:#fff; margin-top:2px; align-items:center; gap:5px;">
+                            <span id="authorMediaOutletName"></span><img id="authorMediaOutletIcon" style="display:none; width:1em; height:1em; border-radius:3px; object-fit:cover; vertical-align:middle;" alt="">
+                        </p>
                     </div>
                 </div>
                 <a id="postedByLink" href="#" style="display:none; font-size:11px; color:#888; text-decoration:none; margin:-6px 0 4px 2px;">投稿: <span id="postedByName"></span></a>
@@ -1922,21 +1924,29 @@
                                 const reporterHandle = rres.reporter.twitterHandle
                                     ? String(rres.reporter.twitterHandle).replace(/^@/, '').trim() : '';
                                 if (rres.reporter.mediaOutlet) {
-                                    const outletEl = document.getElementById('authorMediaOutlet');
-                                    outletEl.textContent = rres.reporter.mediaOutlet;
-                                    outletEl.style.display = 'block';
+                                    document.getElementById('authorMediaOutletName').textContent = rres.reporter.mediaOutlet;
+                                    document.getElementById('authorMediaOutlet').style.display = 'flex';
                                 }
                                 if (reporterHandle) {
                                     currentAuthorHandle = reporterHandle;
                                     updateShareButtonVisibility();
-                                } else if (rres.reporter.mediaOutlet && typeof GegenPressAPI.media !== 'undefined' && GegenPressAPI.media.getByName) {
-                                    // 記者本人にXアカウントが無い場合は、所属メディアのXアカウントを代わりに使う
+                                }
+                                // 所属メディアの情報(アイコン・記者にXが無い場合のフォールバック用ハンドル)を取得
+                                if (rres.reporter.mediaOutlet && typeof GegenPressAPI.media !== 'undefined' && GegenPressAPI.media.getByName) {
                                     GegenPressAPI.media.getByName(rres.reporter.mediaOutlet).then(function (mres) {
-                                        const mediaHandle = (mres && mres.success && mres.media && mres.media.twitterHandle)
-                                            ? String(mres.media.twitterHandle).replace(/^@/, '').trim() : '';
-                                        if (mediaHandle) {
-                                            currentAuthorHandle = mediaHandle;
-                                            updateShareButtonVisibility();
+                                        if (!mres || !mres.success || !mres.media) return;
+                                        if (mres.media.logo) {
+                                            const iconEl = document.getElementById('authorMediaOutletIcon');
+                                            iconEl.src = mres.media.logo;
+                                            iconEl.style.display = 'inline-block';
+                                        }
+                                        if (!reporterHandle && mres.media.twitterHandle) {
+                                            // 記者本人にXアカウントが無い場合は、所属メディアのXアカウントを代わりに使う
+                                            const mediaHandle = String(mres.media.twitterHandle).replace(/^@/, '').trim();
+                                            if (mediaHandle) {
+                                                currentAuthorHandle = mediaHandle;
+                                                updateShareButtonVisibility();
+                                            }
                                         }
                                     }).catch(function () {});
                                 }
