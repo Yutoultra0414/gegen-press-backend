@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All News | Gegen Press!</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Segoe UI', 'Hiragino Sans', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        
+            font-size: 13px;
+        }
+
+        /* ヘッダー */
+        header {
+            background: #fff;
+            border-bottom: 3px solid #e63946;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: #e63946;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #e63946;
+        }
+
+        .back-button {
+            background-color: #e63946;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #c5303c;
+        }
+
+        /* ページタイトル */
+        .page-title-section {
+            background: #e63946;
+            padding: 34px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-title-section::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .page-title-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            color: #fff;
+            margin-top: 4px;
+        }
+
+        /* コンテナ */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 30px 40px 60px;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* サイドバー（クイックリンク方式） */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            position: sticky;
+            top: 90px;
+        }
+
+        .quicklink-box h3 {
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-left: 2px;
+        }
+
+        .quicklink-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quicklink-item {
+            display: block;
+            padding: 8px 2px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
+            border-bottom: 1px solid #e5e5e5;
+            transition: color 0.2s ease;
+        }
+
+        .quicklink-item:hover,
+        .quicklink-item.active {
+            color: #e63946;
+        }
+
+        .quicklink-item .count {
+            float: right;
+            color: #999;
+            font-weight: 400;
+            font-size: 12px;
+        }
+
+        /* メインコンテンツ */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 46px;
+            min-width: 0;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 900;
+            color: #111;
+            background: none;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            padding: 0 0 8px;
+            position: relative;
+            border-bottom: 2px solid #e8e8e8;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 48px;
+            height: 2px;
+            background: #e63946;
+        }
+
+        .empty-note {
+            font-size: 13px;
+            color: #999;
+            padding: 16px 0;
+        }
+
+        /* ===== 直近のニュース（トップの画像メインのグリッド） ===== */
+        .latest-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 18px;
+        }
+
+        .hero-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            background: #fff;
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .hero-card:hover {
+            box-shadow: 0 10px 26px rgba(0,0,0,0.11);
+            transform: translateY(-2px);
+        }
+
+        .hero-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #14213d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            font-weight: bold;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .cat-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #e63946;
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-body {
+            padding: 16px 18px 18px;
+        }
+
+        .hero-title {
+            font-size: 20px;
+            font-weight: 900;
+            line-height: 1.35;
+            color: #000;
+            margin-bottom: 10px;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .card-meta .author-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        /* 右側：サイド小ニュースリスト */
+        .side-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .side-card {
+            display: flex;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+            background: #fff;
+            border-radius: 2px;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .side-card:hover {
+            box-shadow: 0 6px 16px rgba(0,0,0,0.09);
+        }
+
+        .side-thumb {
+            width: 96px;
+            height: 72px;
+            flex-shrink: 0;
+            border-radius: 2px;
+            overflow: hidden;
+            background: #14213d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.85);
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .side-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .side-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .side-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: #000;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* ===== リーグ別セクション（NFL Nation 風） ===== */
+        .league-section {
+            scroll-margin-top: 90px;
+        }
+
+        .league-feature {
+            display: flex;
+            gap: 18px;
+            background: #fff;
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            margin-bottom: 14px;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .league-feature:hover {
+            box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+        }
+
+        .league-feature-thumb {
+            width: 38%;
+            flex-shrink: 0;
+            background: #14213d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.85);
+            font-size: 12px;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .league-feature-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .league-feature-body {
+            flex: 1;
+            padding: 16px 18px 16px 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .league-feature-title {
+            font-size: 18px;
+            font-weight: 900;
+            line-height: 1.35;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .league-feature-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* リーグセクションの小カード横並び */
+        .league-row {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 6px;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+        }
+
+        .league-card {
+            flex: 0 0 200px;
+            max-width: 200px;
+            scroll-snap-align: start;
+            background: #fff;
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .league-card:hover {
+            box-shadow: 0 8px 18px rgba(0,0,0,0.09);
+        }
+
+        .league-card-thumb {
+            width: 100%;
+            height: 112px;
+            background: #14213d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.85);
+            font-size: 10px;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .league-card-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .league-card-body {
+            padding: 10px 11px 12px;
+        }
+
+        .league-card-title {
+            font-size: 12.5px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: #000;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+                order: -1;
+            }
+
+            /* 横スクロールしないと押せない/はみ出る問題への対応：
+               折り返しチップ表示にする（ヘッダーナビと同じ考え方） */
+            .quicklink-list {
+                flex-direction: row;
+                flex-wrap: wrap;
+                overflow-x: visible;
+                gap: 8px 10px;
+                max-width: 100%;
+            }
+
+            .quicklink-item {
+                border-bottom: none;
+                background: #fff;
+                border: 1px solid #e5e5e5;
+                border-radius: 2px;
+                white-space: nowrap;
+                padding: 6px 14px;
+            }
+
+            .quicklink-item:hover,
+            .quicklink-item.active {
+                border-color: #e63946;
+                color: #e63946;
+            }
+
+            .quicklink-item .count { display: none; }
+
+            .latest-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 14px !important;
+            }
+            .logo img { height: 26px !important; }
+            .header-nav {
+                width: auto !important;
+                gap: 10px !important;
+                justify-content: flex-end !important;
+            }
+            .header-nav a, .nav-link {
+                font-size: 12px !important;
+                padding: 3px 4px !important;
+                white-space: nowrap !important;
+            }
+            .back-button {
+                padding: 5px 10px !important;
+                font-size: 12px !important;
+                white-space: nowrap !important;
+            }
+
+            .page-title-section { padding: 20px 16px; }
+            .page-title { font-size: 22px; }
+            .page-subtitle { font-size: 12.5px; }
+
+            .container {
+                padding: 16px 0 40px;
+                gap: 20px;
+            }
+
+            .quicklink-box { padding: 0 16px; }
+
+            .main-content { padding: 0 12px; gap: 34px; }
+
+            /* 画像を画面幅いっぱいに（モバイルは画像を最優先） */
+            .hero-card, .league-feature {
+                margin: 0 -12px;
+                border-radius: 2px;
+                width: calc(100% + 24px);
+            }
+
+            .hero-thumb { aspect-ratio: 16 / 10; }
+
+            .hero-body { padding: 14px 16px 18px; }
+            .hero-title { font-size: 18px; }
+
+            .league-feature {
+                flex-direction: column;
+            }
+            .league-feature-thumb {
+                width: 100%;
+                height: 200px;
+            }
+            .league-feature-body { padding: 14px 16px 16px; }
+
+            .side-card { margin: 0; border-radius: 2px; }
+
+            .section-title { margin: 0 4px 12px; }
+        }
+    
+        /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
+        header.gp-header {
+            background: #fff !important;
+            border-bottom: 3px solid #e63946 !important;
+            padding: 6px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav {
+            display: flex;
+            align-items: stretch;
+            gap: 22px;
+            flex: 1;
+            min-width: 0;
+            overflow-x: visible;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            line-height: 1.15;
+            padding: 6px 2px;
+            white-space: nowrap;
+        }
+        .gp-en {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            color: #111;
+            text-transform: uppercase;
+        }
+        .gp-jp {
+            font-size: 10px;
+            color: #888;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .gp-mypage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #e63946;
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 14px;
+            border-radius: 2px;
+            line-height: 1.15;
+            white-space: nowrap;
+        }
+        .gp-mypage .gp-en { color: #fff; font-size: 12px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #c5303c; }
+        header.gp-header .search-bar {
+            width: 150px !important;
+            margin: 0 !important;
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+        }
+        /* 薄いページ名ストリップ */
+        .gp-page-strip {
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 9px 24px;
+        }
+        .gp-page-strip h1 {
+            font-size: 16px;
+            font-weight: 900;
+            color: #333;
+            max-width: 1280px;
+            margin: 0 auto;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 768px) {
+            /* ヘッダーはロゴ+マイページの行と、ナビの行に分けて折り返す。
+               横スクロールしないと押せない問題への対応。 */
+            header.gp-header {
+                flex-wrap: wrap !important;
+                padding: 8px 14px !important;
+                gap: 0 !important;
+                row-gap: 6px !important;
+            }
+            .gp-logo { order: 1; }
+            .gp-logo img { height: 26px !important; }
+            .gp-actions { order: 2; margin-left: auto; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10.5px; }
+            .gp-nav {
+                order: 3;
+                flex: 1 1 100%;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 6px 4px;
+            }
+            .gp-nav-item {
+                white-space: nowrap;
+                padding: 4px 2px;
+            }
+            .gp-en { font-size: 11.5px; }
+            .gp-jp { font-size: 9px; }
+            header.gp-header .search-bar { display: none !important; }
+            .gp-page-strip { padding: 8px 14px; }
+            .gp-page-strip h1 { font-size: 14.5px; }
+        }
+    
+        .gp-dropdown-wrap { position: relative; }
+        .gp-dropdown-panel {
+            display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; flex-direction: column;
+        }
+        .gp-dropdown-wrap.open .gp-dropdown-panel, .gp-dropdown-wrap:hover .gp-dropdown-panel { display: flex; }
+        .gp-dropdown-option { display: flex; flex-direction: column; padding: 10px 14px; text-decoration: none; color: #333; border-bottom: 1px solid #eee; }
+        .gp-dropdown-option:last-child { border-bottom: none; }
+        .gp-dropdown-option strong { font-size: 12.5px; }
+        .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
+        .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+        .gp-submenu-wrap { position: relative; }
+        .gp-submenu-trigger { cursor: pointer; justify-content: space-between; display: flex; }
+        .gp-submenu-panel {
+            display: none;
+            position: absolute; top: 0; left: 100%;
+            background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            min-width: 170px; max-height: 320px; overflow-y: auto;
+            z-index: 210; flex-direction: column;
+        }
+        .gp-submenu-wrap.open .gp-submenu-panel { display: flex; }
+        .gp-submenu-option { font-size: 12px; padding: 8px 12px; }
+        @media (max-width: 768px) {
+            .gp-submenu-panel { position: static; box-shadow: none; border: none; border-top: 1px solid #eee; min-width: 0; }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    
+    </style>
+    <style>
+        /* ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== */
+        .gp-hamburger {
+            display: flex; flex-direction: column; justify-content: center; gap: 4px;
+            width: 34px; height: 34px; background: none; border: none; cursor: pointer;
+            padding: 6px; flex-shrink: 0; margin-left: 10px;
+        }
+        .gp-hamburger span { display: block; width: 100%; height: 2px; background: #1a1a1a; border-radius: 1px; }
+        .gp-sidebar-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(20,33,61,0.55); z-index: 997;
+        }
+        .gp-sidebar-overlay.open { display: block; }
+        .gp-sidebar {
+            position: fixed; top: 0; right: 0; height: 100%; width: 300px; max-width: 86vw;
+            background: #fff; z-index: 998; box-shadow: -8px 0 24px rgba(0,0,0,0.15);
+            transform: translateX(100%); transition: transform 0.25s ease; overflow-y: auto;
+            display: flex; flex-direction: column;
+        }
+        .gp-sidebar.open { transform: translateX(0); }
+        .gp-sidebar-head {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 18px; border-bottom: 1px solid #eee;
+            font-weight: 900; font-size: 12px; letter-spacing: 2px; color: #999;
+        }
+        .gp-sidebar-head button { background: none; border: none; font-size: 22px; cursor: pointer; color: #333; line-height: 1; }
+        .gp-sidebar-search-wrap { padding: 16px 18px; border-bottom: 1px solid #eee; position: relative; }
+        .gp-sidebar-search { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
+        .gp-sidebar-section { padding: 14px 18px; border-bottom: 1px solid #eee; }
+        .gp-sidebar-section h4 { font-size: 10.5px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 8px; }
+        .gp-sidebar-section a { display: block; padding: 6px 0; font-size: 13px; color: #333; text-decoration: none; }
+        .gp-sidebar-section a:hover { color: #e63946; }
+        .gp-search-suggest {
+            display: none; position: absolute; left: 18px; right: 18px; top: 100%; margin-top: -1px;
+            background: #fff; border: 1px solid #ccc; border-top: none; z-index: 5;
+            max-height: 240px; overflow-y: auto; box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        }
+        .gp-search-suggest .item { padding: 8px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f0f0f0; color: #333; }
+        .gp-search-suggest .item:last-child { border-bottom: none; }
+        .gp-search-suggest .item:hover { background: #fdf1f2; color: #e63946; }
+    </style>
+<style>.gp-jp{display:none !important;} .gp-dropdown-option span{display:none !important;}</style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="gp-header">
+        <a href="gegen_press_top.html" class="gp-logo"><img src="/logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">Home</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="newsDropdownWrap">
+                <a class="gp-nav-item active" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">All News</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="gegen_press_category.html" class="gp-dropdown-option"><strong>All News</strong><span>All News</span></a>
+                    <div class="gp-submenu-wrap">
+                        <span class="gp-dropdown-option gp-submenu-trigger"><strong>Transfer News</strong><span>Transfer ▸</span></span>
+                        <div class="gp-submenu-panel">
+                            <a href="gegen_press_category.html?articleType=移籍記事&type=confirmed" class="gp-dropdown-option gp-submenu-option"><strong>Confirmed (All Leagues)</strong></a>
+                            <a href="gegen_press_category.html?articleType=移籍記事&type=rumor" class="gp-dropdown-option gp-submenu-option"><strong>Rumors (All Leagues)</strong></a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=プレミアリーグ" class="gp-dropdown-option gp-submenu-option">Premier League</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=ラリーガ" class="gp-dropdown-option gp-submenu-option">La Liga</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=Jリーグ" class="gp-dropdown-option gp-submenu-option">J.League</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=セリエA" class="gp-dropdown-option gp-submenu-option">Serie A</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=ブンデスリーガ" class="gp-dropdown-option gp-submenu-option">Bundesliga</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=リーグアン" class="gp-dropdown-option gp-submenu-option">Ligue 1</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=エールディヴィジ" class="gp-dropdown-option gp-submenu-option">Eredivisie</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=プリメイラ・リーガ" class="gp-dropdown-option gp-submenu-option">Primeira Liga</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=MLS" class="gp-dropdown-option gp-submenu-option">MLS</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=その他リーグ" class="gp-dropdown-option gp-submenu-option">Other Leagues</a>
+                        <a href="gegen_press_category.html?articleType=移籍記事&league=その他" class="gp-dropdown-option gp-submenu-option">Other</a>
+                        </div>
+                    </div>
+                    <a href="gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>Interviews</strong><span>Interviews</span></a>
+                    <a href="gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>General</strong><span>General</span></a>
+                    <a href="gegen_press_category.html?contentType=column" class="gp-dropdown-option"><strong>Columns</strong><span>Columns</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="rankingDropdownWrap">
+                <a class="gp-nav-item" href="#" id="rankingDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">RANKING</span><span class="gp-jp">Ranking</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/gegen_press_ranking.html?view=reporters" class="gp-dropdown-option"><strong>Reporter Ranking</strong><span>Reporters</span></a>
+                    <a href="/gegen_press_ranking.html?view=media" class="gp-dropdown-option"><strong>Media Ranking</strong><span>Media</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
+                <a class="gp-nav-item" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">Add Media / Reporter</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/gegen_press_add_media.html" class="gp-dropdown-option"><strong>Add Media</strong><span>Add Media</span></a>
+                    <a href="/gegen_press_add_reporter.html" class="gp-dropdown-option"><strong>Add Reporter</strong><span>Add Reporter</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="postDropdownWrap">
+                <a class="gp-nav-item" href="#" id="postDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">POST</span><span class="gp-jp">Post</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/gegen_press_write_article.html" class="gp-dropdown-option"><strong>Post News</strong><span>Post News</span></a>
+                    <a href="/gegen_press_write_column.html" class="gp-dropdown-option"><strong>Post Column</strong><span>Post Column</span></a>
+                </div>
+            </div>
+        </nav>
+        <div class="gp-actions">
+            <a href="#" id="langSwitchLink" class="gp-mypage" style="background:#1d3557;" title="View this page in Japanese">JP</a>
+            <a href="/gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">My Page</span></a>
+            <button id="gpSidebarToggle" class="gp-hamburger" aria-label="Open menu" type="button">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== -->
+    <div id="gpSidebarOverlay" class="gp-sidebar-overlay"></div>
+    <aside id="gpSidebar" class="gp-sidebar">
+        <div class="gp-sidebar-head">
+            <span>MENU</span>
+            <button id="gpSidebarClose" aria-label="Close" type="button">&times;</button>
+        </div>
+        <div class="gp-sidebar-search-wrap">
+            <input type="text" id="gpSidebarSearch" class="gp-sidebar-search" placeholder="Search teams, players, #hashtags" autocomplete="off">
+            <div id="gpSidebarSuggest" class="gp-search-suggest"></div>
+        </div>
+        <nav class="gp-sidebar-section">
+            <h4>Contents</h4>
+            <a href="/gegen_press_guide.html">New Here?</a>
+            <a href="gegen_press_category.html">All News</a>
+            <a href="/gegen_press_ranking.html">Reporter Ranking</a>
+            <a href="/gegen_press_players.html">Players</a>
+            <a href="/gegen_press_write_article.html">Post News</a>
+        </nav>
+        <nav class="gp-sidebar-section">
+            <h4>Join</h4>
+            <a href="/gegen_press_add_reporter.html">Add Reporter</a>
+            <a href="/gegen_press_add_media.html">Add Media</a>
+            <a href="/gegen_press_add_player.html">Add Player</a>
+            <a href="/gegen_press_login.html">Log In / Sign Up</a>
+        </nav>
+        <nav class="gp-sidebar-section">
+            <h4>About</h4>
+            <a href="/gegen_press_terms.html">Terms of Service</a>
+            <a href="/gegen_press_privacy.html">Privacy Policy</a>
+            <a href="mailto:gegenpressmanagement@gmail.com">Contact</a>
+        </nav>
+    </aside>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('addMediaDropdownWrap');
+            var trigger = document.getElementById('addMediaDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('postDropdownWrap');
+            var trigger = document.getElementById('postDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('newsDropdownWrap');
+            var trigger = document.getElementById('newsDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('rankingDropdownWrap');
+            var trigger = document.getElementById('rankingDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            document.querySelectorAll('.gp-submenu-trigger').forEach(function (trigger) {
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var wrap = trigger.closest('.gp-submenu-wrap');
+                    if (wrap) wrap.classList.toggle('open');
+                });
+            });
+        })();
+    </script>
+
+
+
+
+
+    <!-- ページタイトル -->
+    <div class="gp-page-strip"><h1>All News</h1></div>
+
+    <!-- メインコンテンツ -->
+    <div class="container">
+        <!-- サイドバー（クイックリンク） -->
+        <aside class="sidebar">
+            <div class="quicklink-box">
+                <h3>Go</h3>
+                <div class="quicklink-list" id="quicklinkList">
+                    <a href="#sec-latest" class="quicklink-item active">Latest News</a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- メイン -->
+        <main class="main-content" id="mainContent">
+            <!-- 直近のニュース -->
+            <section class="league-section" id="sec-latest">
+                <div class="section-title">Latest News</div>
+                <div class="latest-grid" id="latestGrid">
+                    <p class="empty-note">Loading...</p>
+                </div>
+            </section>
+
+            <!-- リーグ別セクションはJSで生成 -->
+            <div id="leagueSections"></div>
+        </main>
+    </div>
+
+    <script src="/api-client.js" onerror="console.warn('api-client.js not loaded')"></script>
+    <script>
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = String(name).trim().split(/\s+/).filter(p => /[A-Za-z0-9\u00C0-\u024F]/.test(p.charAt(0)));
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            const one = parts[0] || String(name).trim();
+            return one.substring(0, 2).toUpperCase();
+        }
+        const AVATAR_PALETTE = [
+            ['#e63946', '#a4161a'], ['#1d3557', '#14213d'], ['#2a9d8f', '#1f7a6f'],
+            ['#e76f51', '#c44a30'], ['#6a4c93', '#4e3470'], ['#457b9d', '#2f5a73'],
+            ['#588157', '#3a5a3a'], ['#bc6c25', '#8a4e16']
+        ];
+        function avatarColor(name) {
+            let h = 0; const s = name || '';
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+        }
+        function avatarStyle(name) {
+            const g = avatarColor(name);
+            return 'background: ' + g[0] + ';';
+        }
+        function fmtDate(ts) {
+            try {
+                const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                if (!d || isNaN(d)) return '';
+                const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+            } catch (e) { return ''; }
+        }
+        function sortByDateDesc(list) {
+            return list.slice().sort((a, b) => {
+                const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                return tb - ta;
+            });
+        }
+
+        // 表示するリーグと表示順（ユーザー指定）
+        const LEAGUES = ['Premier League', 'La Liga', 'J.League', 'Serie A', 'Bundesliga', 'Ligue 1', 'Eredivisie', 'Primeira Liga', 'MLS', 'Other Leagues', 'Other'];
+
+        // ニュースが属するリーグ一覧を返す（新しい categories 配列／旧来の category 単体どちらにも対応）。
+        // 上記6リーグのどれにも一致しないものは「Other」に分類する
+        function bucketsOf(article) {
+            const cats = Array.isArray(article.categories) && article.categories.length > 0
+                ? article.categories
+                : [article.category || ''];
+            const known = cats.filter(c => LEAGUES.slice(0, -1).indexOf(c) !== -1);
+            return known.length > 0 ? known : ['Other'];
+        }
+
+        function thumbHtml(article) {
+            if (article.image) {
+                const pos = (article.imagePosition && typeof article.imagePosition.x === 'number' && typeof article.imagePosition.y === 'number')
+                    ? (article.imagePosition.x + '% ' + article.imagePosition.y + '%') : '50% 50%';
+                return '<img src="' + esc(article.image) + '" alt="" style="object-position:' + pos + ';">';
+            }
+            return esc(article.category || 'Gegen Press!');
+        }
+
+        function metaHtml(a) {
+            const byName = a.authorName || a.writerName || '';
+            const idAttr = a.contentType === 'column'
+                ? ' data-writer-id="' + esc(a.writerUid || '') + '"'
+                : ' data-author-id="' + esc(a.authorId || '') + '"';
+            return (
+                '<div class="card-meta">' +
+                    '<span class="author-dot author-avatar-badge"' + idAttr + ' style="overflow:hidden;' + avatarStyle(byName) + '">' + esc(getInitials(byName)) + '</span>' +
+                    '<span>' + esc(byName) + '</span>' +
+                    '<span> · </span>' +
+                    '<span>' + esc(fmtDate(a.createdAt)) + '</span>' +
+                '</div>'
+            );
+        }
+
+        // Reporter（Columnsの場合はWriter本人）の実際のアイコン画像があれば、頭文字バッジを画像に差し替える
+        const _authorAvatarCache = {};
+        const _writerAvatarCache = {};
+        async function upgradeAuthorAvatars(root) {
+            if (typeof GegenPressAPI === 'undefined') return;
+            const ids = new Set();
+            root.querySelectorAll('.author-avatar-badge[data-author-id]').forEach(el => {
+                const id = el.getAttribute('data-author-id');
+                if (id) ids.add(id);
+            });
+            for (const id of ids) {
+                try {
+                    if (!(id in _authorAvatarCache)) {
+                        const rres = await GegenPressAPI.reporters.getById(id);
+                        _authorAvatarCache[id] = (rres && rres.success && rres.reporter && rres.reporter.profileImage) || null;
+                    }
+                    const img = _authorAvatarCache[id];
+                    if (img) {
+                        root.querySelectorAll('.author-avatar-badge[data-author-id="' + CSS.escape(id) + '"]').forEach(el => {
+                            el.style.background = 'none';
+                            el.innerHTML = '<img src="' + esc(img) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                        });
+                    }
+                } catch (e) { /* 取得できなければ頭文字バッジのまま */ }
+            }
+            const writerIds = new Set();
+            root.querySelectorAll('.author-avatar-badge[data-writer-id]').forEach(el => {
+                const id = el.getAttribute('data-writer-id');
+                if (id) writerIds.add(id);
+            });
+            for (const id of writerIds) {
+                try {
+                    if (!(id in _writerAvatarCache)) {
+                        const ures = await GegenPressAPI.users.get(id);
+                        _writerAvatarCache[id] = (ures && ures.success && ures.user && ures.user.profileImage) || null;
+                    }
+                    const img = _writerAvatarCache[id];
+                    if (img) {
+                        root.querySelectorAll('.author-avatar-badge[data-writer-id="' + CSS.escape(id) + '"]').forEach(el => {
+                            el.style.background = 'none';
+                            el.innerHTML = '<img src="' + esc(img) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                        });
+                    }
+                } catch (e) { /* 取得できなければ頭文字バッジのまま */ }
+            }
+        }
+
+        function heroCardHtml(a) {
+            return (
+                '<a class="hero-card" data-id="' + esc(a.id) + '">' +
+                    '<div class="hero-thumb">' +
+                        '<span class="cat-tag">' + esc(a.category || '') + '</span>' +
+                        thumbHtml(a) +
+                    '</div>' +
+                    '<div class="hero-body">' +
+                        '<div class="hero-title">' + esc(a.title) + '</div>' +
+                        metaHtml(a) +
+                    '</div>' +
+                '</a>'
+            );
+        }
+
+        function sideCardHtml(a) {
+            return (
+                '<a class="side-card" data-id="' + esc(a.id) + '">' +
+                    '<div class="side-thumb">' + thumbHtml(a) + '</div>' +
+                    '<div class="side-body">' +
+                        '<div class="side-title">' + esc(a.title) + '</div>' +
+                        metaHtml(a) +
+                    '</div>' +
+                '</a>'
+            );
+        }
+
+        function leagueFeatureHtml(a) {
+            return (
+                '<a class="league-feature" data-id="' + esc(a.id) + '">' +
+                    '<div class="league-feature-thumb">' + thumbHtml(a) + '</div>' +
+                    '<div class="league-feature-body">' +
+                        '<div class="league-feature-title">' + esc(a.title) + '</div>' +
+                        '<div class="league-feature-desc">' + esc(a.description || '') + '</div>' +
+                        metaHtml(a) +
+                    '</div>' +
+                '</a>'
+            );
+        }
+
+        function leagueCardHtml(a) {
+            return (
+                '<a class="league-card" data-id="' + esc(a.id) + '">' +
+                    '<div class="league-card-thumb">' + thumbHtml(a) + '</div>' +
+                    '<div class="league-card-body">' +
+                        '<div class="league-card-title">' + esc(a.title) + '</div>' +
+                        metaHtml(a) +
+                    '</div>' +
+                '</a>'
+            );
+        }
+
+        function attachClickHandlers(root) {
+            root.querySelectorAll('[data-id]').forEach(el => {
+                el.addEventListener('click', () => {
+                    window.location.href = 'gegen_press_article_detail.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                });
+            });
+        }
+
+        function renderLatest(articles) {
+            const grid = document.getElementById('latestGrid');
+            const sorted = sortByDateDesc(articles);
+            if (sorted.length === 0) {
+                grid.innerHTML = '<p class="empty-note">No news yet.</p>';
+                return;
+            }
+            const hero = sorted[0];
+            const rest = sorted.slice(1, 4);
+            grid.innerHTML = (
+                heroCardHtml(hero) +
+                '<div class="side-list">' + rest.map(sideCardHtml).join('') + '</div>'
+            );
+            attachClickHandlers(grid);
+        }
+
+        // 特定のリーグの記事を全件、一覧表示する（「もっと見る」からの遷移先）
+        function renderFullLeagueList(league, articles) {
+            const mainEl = document.getElementById('mainContent');
+            const sorted = sortByDateDesc(articles);
+            const listHtml = sorted.length === 0
+                ? '<p class="empty-note">No news in this category yet.</p>'
+                : '<div class="league-row" style="flex-wrap:wrap; overflow-x:visible;">' + sorted.map(leagueCardHtml).join('') + '</div>';
+
+            mainEl.innerHTML =
+                '<section class="league-section">' +
+                    '<div class="section-title">' + esc(league) + '(all ' + sorted.length + ')</div>' +
+                    '<a href="gegen_press_category.html" style="display:inline-block; margin:10px 0; font-size:12.5px; color:#e63946; text-decoration:none; font-weight:bold;">← Back to all news</a>' +
+                    listHtml +
+                '</section>';
+            attachClickHandlers(mainEl);
+        }
+
+        function renderLeagueSections(articles) {
+            const wrap = document.getElementById('leagueSections');
+            const quicklinkList = document.getElementById('quicklinkList');
+            const grouped = {};
+            LEAGUES.forEach(l => grouped[l] = []);
+            articles.forEach(a => bucketsOf(a).forEach(b => grouped[b].push(a)));
+
+            let html = '';
+            let linksHtml = '<a href="#sec-latest" class="quicklink-item active">Latest News</a>';
+
+            LEAGUES.forEach((league, idx) => {
+                const anchor = 'sec-league-' + idx;
+                const list = sortByDateDesc(grouped[league]);
+                linksHtml += '<a href="#' + anchor + '" class="quicklink-item">' + esc(league) +
+                    '<span class="count">' + list.length + '</span></a>';
+
+                html += '<section class="league-section" id="' + anchor + '">';
+                html += '<div class="section-title">' + esc(league) + '</div>';
+                if (list.length === 0) {
+                    html += '<p class="empty-note">No news in this category yet.</p>';
+                } else {
+                    html += leagueFeatureHtml(list[0]);
+                    const rowItems = list.slice(1, 5);
+                    if (rowItems.length > 0) {
+                        html += '<div class="league-row">' + rowItems.map(leagueCardHtml).join('') + '</div>';
+                    }
+                    if (list.length > 5) {
+                        html += '<div style="text-align:center; margin-top:10px;">' +
+                            '<a href="gegen_press_category.html?league=' + encodeURIComponent(league) + '" style="display:inline-block; background:#fff; border:1px solid #ccc; padding:8px 20px; font-size:12.5px; color:#333; text-decoration:none;">See more (all ' + list.length + ') →</a>' +
+                            '</div>';
+                    }
+                }
+                html += '</section>';
+            });
+
+            wrap.innerHTML = html;
+            quicklinkList.innerHTML = linksHtml;
+            attachClickHandlers(wrap);
+        }
+
+        async function loadCategoryPage() {
+            const grid = document.getElementById('latestGrid');
+            if (typeof GegenPressAPI === 'undefined') {
+                grid.innerHTML = '<p class="empty-note">Could not load news.</p>';
+                return;
+            }
+            try {
+                const res = await GegenPressAPI.articles.getAll();
+                if (!res || !res.success) {
+                    grid.innerHTML = '<p class="empty-note">Failed to load news.</p>';
+                    return;
+                }
+                let articles = res.articles || [];
+                articles.forEach(function (a) {
+                    if (a.title_en) a.title = a.title_en;
+                    if (a.description_en) a.description = a.description_en;
+                    if (a.content_en) a.content = a.content_en;
+                });
+                const urlParams = new URLSearchParams(window.location.search);
+
+                // ?contentType=column：Columnsだけを一覧表示する専用モード（NEWSメニューの「Columns」から遷移）
+                const contentTypeParam = urlParams.get('contentType');
+                if (contentTypeParam === 'column') {
+                    const columns = articles.filter(a => a.contentType === 'column');
+                    renderFullLeagueList('Columns', columns);
+                    upgradeAuthorAvatars(document.getElementById('mainContent'));
+                    return;
+                }
+                // ※「すべてのニュース」（フィルタ無しの通常表示）には、ご要望通りColumnsも一緒に含めています。
+
+                // ?league=Premier League 等：そのリーグの全記事だけを一覧表示する専用モード
+                // （リーグ別セクションの「もっと見る」、または NEWS メニューの「移籍記事」→各リーグから遷移）
+                // ?articleType= / ?type= が同時に指定されていれば、それも合わせて絞り込みます
+                const leagueParam = urlParams.get('league');
+                if (leagueParam) {
+                    let filtered = articles.filter(a => bucketsOf(a).includes(leagueParam));
+                    const at = urlParams.get('articleType');
+                    const nt = urlParams.get('type');
+                    let label = leagueParam;
+                    if (at) { filtered = filtered.filter(a => Array.isArray(a.articleTypes) && a.articleTypes.includes(at)); label += ' · ' + at; }
+                    if (nt === 'confirmed' || nt === 'rumor') { filtered = filtered.filter(a => a.newsType === nt); label += ' · ' + (nt === 'confirmed' ? 'Confirmed' : 'Rumor'); }
+                    renderFullLeagueList(label, filtered);
+                    upgradeAuthorAvatars(document.getElementById('mainContent'));
+                    return;
+                }
+
+                // ?articleType=移籍記事/Interviews/General と ?type=confirmed/rumor で絞り込み
+                // （NEWSナビのドロップダウンから遷移時。リーグ別のセクション分けはこれまで通り変更していません）
+                const params = new URLSearchParams(window.location.search);
+                const articleTypeParam = params.get('articleType');
+                const typeParam = params.get('type');
+                const bannerParts = [];
+
+                if (articleTypeParam) {
+                    articles = articles.filter(a => Array.isArray(a.articleTypes) && a.articleTypes.includes(articleTypeParam));
+                    bannerParts.push('「' + articleTypeParam + '」');
+                }
+                if (typeParam === 'confirmed' || typeParam === 'rumor') {
+                    articles = articles.filter(a => a.newsType === typeParam);
+                    bannerParts.push(typeParam === 'confirmed' ? '"Confirmed"' : '"Transfer rumor"');
+                }
+                if (bannerParts.length > 0) {
+                    const banner = document.createElement('div');
+                    banner.style.cssText = 'max-width:1040px; margin:14px auto 0; padding:10px 16px; background:#fff3cd; color:#856404; font-size:12.5px; display:flex; justify-content:space-between; align-items:center;';
+                    banner.innerHTML =
+                        '<span>' + bannerParts.join(' · ') + ' only.</span>' +
+                        '<a href="gegen_press_category.html" style="color:#856404; font-weight:bold; text-decoration:underline;">Clear filters</a>';
+                    document.querySelector('.main-content').prepend(banner);
+                }
+
+                renderLatest(articles);
+                renderLeagueSections(articles);
+                upgradeAuthorAvatars(document.getElementById('mainContent'));
+            } catch (e) {
+                grid.innerHTML = '<p class="empty-note">An error occurred while loading news.</p>';
+            }
+        }
+        loadCategoryPage();
+
+        // スクロールで各セクションが徐々に見えてくる演出
+        (function () {
+            function applyReveal() {
+                const targets = document.querySelectorAll('.league-section, #sec-latest');
+                targets.forEach(el => { if (!el.classList.contains('reveal')) el.classList.add('reveal'); });
+                if (!('IntersectionObserver' in window)) {
+                    targets.forEach(el => el.classList.add('revealed'));
+                    return;
+                }
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('revealed');
+                            io.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.05 });
+                targets.forEach(el => io.observe(el));
+            }
+            // 記事の読み込み（非同期）が終わってからセクションが揃うので、少し遅らせて適用する
+            setTimeout(applyReveal, 400);
+        })();
+    </script>
+    <script>
+        // ===== サイドバー（ハンバーガーメニュー。全ページ共通） =====
+        (function () {
+            var toggle = document.getElementById('gpSidebarToggle');
+            var closeBtn = document.getElementById('gpSidebarClose');
+            var sidebar = document.getElementById('gpSidebar');
+            var overlay = document.getElementById('gpSidebarOverlay');
+            if (!toggle || !sidebar) return;
+            function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('open'); }
+            function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+            toggle.addEventListener('click', openSidebar);
+            closeBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // 検索サジェスト（「もしかして」：よく使われるハッシュタグを頻度順で候補表示）
+            var input = document.getElementById('gpSidebarSearch');
+            var suggestBox = document.getElementById('gpSidebarSuggest');
+            var popularTags = null, tagsPromise = null;
+            function normalize(s) { return (s || '').trim().toLowerCase().replace(/^#+/, ''); }
+            function ensureTags() {
+                if (popularTags) return Promise.resolve(popularTags);
+                if (!tagsPromise) {
+                    tagsPromise = (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.articles && GegenPressAPI.articles.getPopularTags)
+                        ? GegenPressAPI.articles.getPopularTags().then(function (res) { popularTags = (res && res.success) ? res.tags : []; return popularTags; })
+                        : Promise.resolve([]);
+                }
+                return tagsPromise;
+            }
+            function goSearch(q) { window.location.href = 'gegen_press_search.html?q=' + encodeURIComponent(q); }
+            function renderSuggestions(matches) {
+                if (!matches.length) { suggestBox.style.display = 'none'; suggestBox.innerHTML = ''; return; }
+                suggestBox.innerHTML = matches.map(function (m) {
+                    var safe = String(m.tag).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    return '<div class="item" data-tag="' + safe + '">#' + safe + '</div>';
+                }).join('');
+                suggestBox.style.display = 'block';
+                Array.prototype.forEach.call(suggestBox.querySelectorAll('.item'), function (el) {
+                    el.addEventListener('mousedown', function (e) {
+                        e.preventDefault();
+                        goSearch(this.getAttribute('data-tag'));
+                    });
+                });
+            }
+            if (input) {
+                input.addEventListener('input', function () {
+                    var raw = normalize(this.value);
+                    if (!raw) { suggestBox.style.display = 'none'; return; }
+                    ensureTags().then(function (tags) {
+                        renderSuggestions(tags.filter(function (t) { return normalize(t.tag).indexOf(raw) >= 0; }).slice(0, 6));
+                    });
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        var q = this.value.trim();
+                        if (q) goSearch(q);
+                    }
+                });
+                input.addEventListener('blur', function () { setTimeout(function () { suggestBox.style.display = 'none'; }, 150); });
+            }
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var link = document.getElementById('langSwitchLink');
+            if (!link) return;
+            var page = location.pathname.split('/').pop();
+            link.href = '/' + page + location.search;
+        })();
+    </script>
+</body>
+</html>
