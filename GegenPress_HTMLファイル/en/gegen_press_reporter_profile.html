@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabrizio Romano | Gegen Press!</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Segoe UI', 'Hiragino Sans', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        
+            font-size: 13px;
+        }
+
+        /* ヘッダー */
+        header {
+            background: #fff;
+            border-bottom: 3px solid #e63946;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: #e63946;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .back-button {
+            background-color: #e63946;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #c5303c;
+        }
+
+        /* プロフィールヘッダー */
+        .profile-header {
+            background: #e63946;
+            padding: 18px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+        }
+
+        .header-edit-actions {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            z-index: 2;
+            display: flex;
+            gap: 8px;
+        }
+
+        .profile-content {
+            max-width: 1040px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
+            padding-right: 70px; /* 右上の編集ボタンと重ならないように */
+        }
+
+        .avatar-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        #setIconBtn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.9);
+            font-size: 10.5px;
+            font-weight: bold;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .profile-avatar {
+            width: 76px;
+            height: 76px;
+            background: #e63946;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info { min-width: 0; flex: 1; }
+
+        .profile-info h1 {
+            font-size: 22px;
+            margin-bottom: 1px;
+            font-weight: 900;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #reporterNameRomaji {
+            font-size: 13.5px;
+            color: rgba(255,255,255,0.85);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 5px;
+        }
+
+        .header-sub-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 11.5px;
+        }
+        .header-sub-row .subtitle,
+        .header-sub-row #reporterTypeBadge,
+        .header-sub-row #headerTwitterLink {
+            color: rgba(255,255,255,0.9);
+            font-size: 11.5px;
+        }
+        .header-sub-row #headerTwitterLink { text-decoration: underline; font-weight: bold; color: #fff; }
+        .header-sub-row #reporterTypeBadge {
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 4px;
+            padding: 1px 6px;
+        }
+
+        .creator-badge { font-size: 10px; }
+
+        .profile-meta {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 12px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .meta-label {
+            font-size: 10px;
+            opacity: 0.85;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        .profile-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-follow {
+            background-color: #000;
+            color: #e63946;
+            border: 2px solid #e63946;
+            padding: 7px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-follow:hover {
+            background-color: #e63946;
+            color: #fff;
+        }
+
+        .btn-share {
+            background-color: transparent;
+            color: #fff;
+            border: 1.5px solid #fff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 10.5px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .btn-share:hover {
+            background-color: #fff;
+            color: #e63946;
+        }
+
+        /* 関連する記者 */
+        .related-reporters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 12px;
+        }
+        .related-reporter-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .related-reporter-card:hover {
+            border-color: #e63946;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+        }
+        .related-reporter-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 900;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .related-reporter-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .related-reporter-info h4 { font-size: 13px; margin-bottom: 2px; }
+        .related-reporter-info p { font-size: 11px; color: #888; }
+
+        /* 編集ボタン（追加した本人のみ表示） */
+        .btn-edit-reporter {
+            background-color: #fff;
+            color: #e63946;
+            border: 1.5px solid #fff;
+            padding: 5px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 10.5px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            display: none; /* デフォルト非表示。本人だけ表示 */
+        }
+        .btn-edit-reporter:hover {
+            background-color: transparent;
+            color: #fff;
+        }
+
+        /* 「あなたが追加した記者」バッジ */
+        .creator-badge {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            width: fit-content;
+        }
+
+        /* 編集モーダル */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+            padding: 40px 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background-color: #fff;
+            border-radius: 10px;
+            max-width: 560px;
+            width: 100%;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .modal-header h2 {
+            font-size: 24px;
+            color: #e63946;
+            font-weight: 900;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 26px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-close:hover { color: #e63946; }
+        .modal-subtitle {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .modal-group { margin-bottom: 20px; }
+        .modal-label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .modal-input, .modal-textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        .modal-input:focus, .modal-textarea:focus {
+            outline: none;
+            border-color: #e63946;
+            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
+        }
+        .modal-textarea { resize: vertical; min-height: 90px; }
+        .modal-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .modal-tag {
+            background-color: #fff;
+            border: 2px solid #ddd;
+            color: #666;
+            padding: 7px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        .modal-tag:hover { border-color: #e63946; color: #e63946; }
+        .modal-tag.selected { background-color: #e63946; border-color: #e63946; color: #fff; }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        .modal-save {
+            flex: 1;
+            background: #e63946;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        .modal-save:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+        .modal-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .modal-cancel {
+            background-color: transparent;
+            border: 2px solid #ddd;
+            color: #666;
+            padding: 14px 26px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .modal-cancel:hover { border-color: #999; color: #333; }
+
+        /* メインコンテンツ */
+        .main-content {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 40px;
+        }
+
+        /* スコアセクション */
+        .score-section {
+            background: #fff;
+            border: 2px solid #e63946;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+        }
+
+        .score-title {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #e63946;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .score-row {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .score-display {
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .score-number {
+            font-size: 36px;
+            font-weight: 900;
+            color: #e63946;
+            line-height: 1;
+        }
+
+        .score-max {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .score-stats-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-left: 2px solid #eee;
+            padding-left: 18px;
+        }
+        .stat-line {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .stat-line .number {
+            font-size: 16px;
+            font-weight: bold;
+            color: #e63946;
+            min-width: 34px;
+        }
+        .stat-line .label {
+            font-size: 11.5px;
+            color: #999;
+        }
+
+        /* ニュースセクション */
+        .articles-section {
+            margin-bottom: 40px;
+        }
+
+        .articles-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #e63946;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 4px solid #e63946;
+            padding-left: 12px;
+        }
+
+        .article-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .article-card:hover {
+            border-color: #e63946;
+            transform: translateX(5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        }
+
+        .article-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .article-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .article-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .article-rating {
+            display: flex;
+            gap: 4px;
+        }
+
+        .star {
+            color: #e63946;
+            font-size: 14px;
+        }
+
+        .star.empty {
+            color: #ddd;
+        }
+
+        .article-preview {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #ddd;
+            padding-top: 12px;
+        }
+
+        /* レビューセクション */
+        .reviews-section {
+            margin-bottom: 40px;
+        }
+
+        .reviews-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #e63946;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 4px solid #e63946;
+            padding-left: 12px;
+        }
+
+        .review-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-left: 3px solid #e63946;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .review-author {
+            font-weight: bold;
+            color: #000;
+        }
+
+        .review-rating {
+            display: flex;
+            gap: 3px;
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .review-content {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .review-helpful {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+        }
+
+        .helpful-btn {
+            background-color: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .helpful-btn:hover {
+            color: #e63946;
+        }
+
+        /* サイドバー */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sidebar-box {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .sidebar-box:hover {
+            border-color: #e63946;
+        }
+
+        .sidebar-box h3 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #e63946;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #e63946;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            margin-right: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background-color: #c5303c;
+            transform: scale(1.05);
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .profile-header {
+                padding: 12px 16px;
+            }
+
+            .header-edit-actions {
+                top: 8px;
+                right: 10px;
+                gap: 6px;
+            }
+            .btn-share, .btn-edit-reporter {
+                padding: 4px 9px;
+                font-size: 9.5px;
+            }
+
+            .profile-content {
+                padding-right: 54px;
+                gap: 10px;
+            }
+
+            .profile-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+            }
+
+            .profile-info h1 {
+                font-size: 17px;
+            }
+
+            #reporterNameRomaji { font-size: 11.5px; }
+            .header-sub-row { font-size: 10.5px; gap: 6px; }
+            .header-sub-row .subtitle,
+            .header-sub-row #reporterTypeBadge,
+            .header-sub-row #headerTwitterLink { font-size: 10.5px; }
+
+            .main-content {
+                padding: 40px 20px;
+            }
+
+            .profile-buttons {
+                width: 100%;
+            }
+
+            .btn-follow,
+            .btn-share {
+                flex: 1;
+            }
+        }
+    
+        /* ===== コンパクトヘッダー（モバイル・小画面用の上書き） ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 8px 14px !important;
+            }
+            .logo img { height: 26px !important; }
+            .header-nav {
+                width: auto !important;
+                gap: 10px !important;
+                justify-content: flex-end !important;
+            }
+            .header-nav a, .nav-link {
+                font-size: 12px !important;
+                padding: 3px 4px !important;
+                white-space: nowrap !important;
+            }
+            .back-button {
+                padding: 5px 10px !important;
+                font-size: 12px !important;
+                white-space: nowrap !important;
+            }
+            .search-bar {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 6px 12px !important;
+                font-size: 13px !important;
+            }
+        }
+    
+        /* ===== 新コンパクト共通ヘッダー（ESPN風・全ページ共通） ===== */
+        html, body { max-width: 100%; overflow-x: hidden; }
+        header.gp-header {
+            background: #fff !important;
+            border-bottom: 3px solid #e63946 !important;
+            padding: 6px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 26px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .gp-logo { display: block; flex-shrink: 0; }
+        .gp-logo img { height: 34px !important; width: auto; display: block; }
+        .gp-nav {
+            display: flex;
+            align-items: stretch;
+            gap: 22px;
+            flex: 1;
+            min-width: 0;
+            overflow-x: visible;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .gp-nav::-webkit-scrollbar { display: none; }
+        .gp-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            line-height: 1.15;
+            padding: 6px 2px;
+            white-space: nowrap;
+        }
+        .gp-en {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            color: #111;
+            text-transform: uppercase;
+        }
+        .gp-jp {
+            font-size: 10px;
+            color: #888;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .gp-nav-item:hover .gp-en { color: #e63946; }
+        .gp-nav-item.active { box-shadow: inset 0 -3px 0 #e63946; }
+        .gp-nav-item.active .gp-en { color: #e63946; }
+        .gp-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .gp-mypage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #e63946;
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 14px;
+            border-radius: 5px;
+            line-height: 1.15;
+            white-space: nowrap;
+        }
+        .gp-mypage .gp-en { color: #fff; font-size: 12px; }
+        .gp-mypage .gp-jp { color: rgba(255,255,255,0.85); }
+        .gp-mypage:hover { background: #c5303c; }
+        header.gp-header .search-bar {
+            width: 150px !important;
+            margin: 0 !important;
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+        }
+        /* 薄いページ名ストリップ */
+        .gp-page-strip {
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 9px 24px;
+        }
+        .gp-page-strip h1 {
+            font-size: 16px;
+            font-weight: 900;
+            color: #333;
+            max-width: 1280px;
+            margin: 0 auto;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 768px) {
+            /* ヘッダーはロゴ+マイページの行と、ナビの行に分けて折り返す。
+               横スクロールしないと押せない問題への対応。 */
+            header.gp-header {
+                flex-wrap: wrap !important;
+                padding: 8px 14px !important;
+                gap: 0 !important;
+                row-gap: 6px !important;
+            }
+            .gp-logo { order: 1; }
+            .gp-logo img { height: 26px !important; }
+            .gp-actions { order: 2; margin-left: auto; }
+            .gp-mypage { padding: 4px 10px; }
+            .gp-mypage .gp-en { font-size: 10.5px; }
+            .gp-nav {
+                order: 3;
+                flex: 1 1 100%;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 6px 4px;
+            }
+            .gp-nav-item {
+                white-space: nowrap;
+                padding: 4px 2px;
+            }
+            .gp-en { font-size: 11.5px; }
+            .gp-jp { font-size: 9px; }
+            header.gp-header .search-bar { display: none !important; }
+            .gp-page-strip { padding: 8px 14px; }
+            .gp-page-strip h1 { font-size: 14.5px; }
+        }
+    
+        .gp-dropdown-wrap { position: relative; }
+        .gp-dropdown-panel {
+            display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; flex-direction: column;
+        }
+        .gp-dropdown-wrap.open .gp-dropdown-panel, .gp-dropdown-wrap:hover .gp-dropdown-panel { display: flex; }
+        .gp-dropdown-option { display: flex; flex-direction: column; padding: 10px 14px; text-decoration: none; color: #333; border-bottom: 1px solid #eee; }
+        .gp-dropdown-option:last-child { border-bottom: none; }
+        .gp-dropdown-option strong { font-size: 12.5px; }
+        .gp-dropdown-option span { font-size: 10px; color: #888; text-transform: uppercase; }
+        .gp-dropdown-option:hover { background: #f8f8f8; color: #e63946; }
+        .gp-submenu-wrap { position: relative; }
+        .gp-submenu-trigger { cursor: pointer; justify-content: space-between; display: flex; }
+        .gp-submenu-panel {
+            display: none;
+            position: absolute; top: 0; left: 100%;
+            background: #fff; border: 1px solid #ddd;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            min-width: 170px; max-height: 320px; overflow-y: auto;
+            z-index: 210; flex-direction: column;
+        }
+        .gp-submenu-wrap.open .gp-submenu-panel { display: flex; }
+        .gp-submenu-option { font-size: 12px; padding: 8px 12px; }
+        @media (max-width: 768px) {
+            .gp-submenu-panel { position: static; box-shadow: none; border: none; border-top: 1px solid #eee; min-width: 0; }
+        }
+    
+    </style>
+    <style>
+        /* ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== */
+        .gp-hamburger {
+            display: flex; flex-direction: column; justify-content: center; gap: 4px;
+            width: 34px; height: 34px; background: none; border: none; cursor: pointer;
+            padding: 6px; flex-shrink: 0; margin-left: 10px;
+        }
+        .gp-hamburger span { display: block; width: 100%; height: 2px; background: #1a1a1a; border-radius: 1px; }
+        .gp-sidebar-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(20,33,61,0.55); z-index: 997;
+        }
+        .gp-sidebar-overlay.open { display: block; }
+        .gp-sidebar {
+            position: fixed; top: 0; right: 0; height: 100%; width: 300px; max-width: 86vw;
+            background: #fff; z-index: 998; box-shadow: -8px 0 24px rgba(0,0,0,0.15);
+            transform: translateX(100%); transition: transform 0.25s ease; overflow-y: auto;
+            display: flex; flex-direction: column;
+        }
+        .gp-sidebar.open { transform: translateX(0); }
+        .gp-sidebar-head {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 18px; border-bottom: 1px solid #eee;
+            font-weight: 900; font-size: 12px; letter-spacing: 2px; color: #999;
+        }
+        .gp-sidebar-head button { background: none; border: none; font-size: 22px; cursor: pointer; color: #333; line-height: 1; }
+        .gp-sidebar-search-wrap { padding: 16px 18px; border-bottom: 1px solid #eee; position: relative; }
+        .gp-sidebar-search { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
+        .gp-sidebar-section { padding: 14px 18px; border-bottom: 1px solid #eee; }
+        .gp-sidebar-section h4 { font-size: 10.5px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 8px; }
+        .gp-sidebar-section a { display: block; padding: 6px 0; font-size: 13px; color: #333; text-decoration: none; }
+        .gp-sidebar-section a:hover { color: #e63946; }
+        .gp-search-suggest {
+            display: none; position: absolute; left: 18px; right: 18px; top: 100%; margin-top: -1px;
+            background: #fff; border: 1px solid #ccc; border-top: none; z-index: 5;
+            max-height: 240px; overflow-y: auto; box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        }
+        .gp-search-suggest .item { padding: 8px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f0f0f0; color: #333; }
+        .gp-search-suggest .item:last-child { border-bottom: none; }
+        .gp-search-suggest .item:hover { background: #fdf1f2; color: #e63946; }
+    </style>
+<style>.gp-jp{display:none !important;} .gp-dropdown-option span{display:none !important;}</style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="gp-header">
+        <a href="/en/gegen_press_top.html" class="gp-logo"><img src="logo.png" alt="Gegen Press!"></a>
+        <nav class="gp-nav">
+            <a class="gp-nav-item" href="/en/gegen_press_top.html"><span class="gp-en">HOME</span><span class="gp-jp">Home</span></a>
+            <div class="gp-nav-item gp-dropdown-wrap" id="newsDropdownWrap">
+                <a class="gp-nav-item" href="#" id="newsDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">NEWS</span><span class="gp-jp">All News</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/en/gegen_press_category.html" class="gp-dropdown-option"><strong>All News</strong><span>All News</span></a>
+                    <div class="gp-submenu-wrap">
+                        <span class="gp-dropdown-option gp-submenu-trigger"><strong>Transfer News</strong><span>Transfer ▸</span></span>
+                        <div class="gp-submenu-panel">
+                            <a href="/en/gegen_press_category.html?articleType=移籍記事&type=confirmed" class="gp-dropdown-option gp-submenu-option"><strong>Confirmed (All Leagues)</strong></a>
+                            <a href="/en/gegen_press_category.html?articleType=移籍記事&type=rumor" class="gp-dropdown-option gp-submenu-option"><strong>Rumors (All Leagues)</strong></a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=プレミアリーグ" class="gp-dropdown-option gp-submenu-option">Premier League</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=ラリーガ" class="gp-dropdown-option gp-submenu-option">La Liga</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=Jリーグ" class="gp-dropdown-option gp-submenu-option">J.League</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=セリエA" class="gp-dropdown-option gp-submenu-option">Serie A</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=ブンデスリーガ" class="gp-dropdown-option gp-submenu-option">Bundesliga</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=リーグアン" class="gp-dropdown-option gp-submenu-option">Ligue 1</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=エールディヴィジ" class="gp-dropdown-option gp-submenu-option">Eredivisie</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=プリメイラ・リーガ" class="gp-dropdown-option gp-submenu-option">Primeira Liga</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=MLS" class="gp-dropdown-option gp-submenu-option">MLS</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=その他リーグ" class="gp-dropdown-option gp-submenu-option">Other Leagues</a>
+                        <a href="/en/gegen_press_category.html?articleType=移籍記事&league=その他" class="gp-dropdown-option gp-submenu-option">Other</a>
+                        </div>
+                    </div>
+                    <a href="/en/gegen_press_category.html?articleType=%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>Interviews</strong><span>Interviews</span></a>
+                    <a href="/en/gegen_press_category.html?articleType=%E4%B8%80%E8%88%AC%E8%A8%98%E4%BA%8B" class="gp-dropdown-option"><strong>General</strong><span>General</span></a>
+                    <a href="/en/gegen_press_category.html?contentType=column" class="gp-dropdown-option"><strong>Columns</strong><span>Columns</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="rankingDropdownWrap">
+                <a class="gp-nav-item" href="#" id="rankingDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">RANKING</span><span class="gp-jp">Ranking</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/gegen_press_ranking.html?view=reporters" class="gp-dropdown-option"><strong>Reporter Ranking</strong><span>Reporters</span></a>
+                    <a href="/gegen_press_ranking.html?view=media" class="gp-dropdown-option"><strong>Media Ranking</strong><span>Media</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="addMediaDropdownWrap">
+                <a class="gp-nav-item" href="#" id="addMediaDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">ADD MEDIA</span><span class="gp-jp">Add Media / Reporter</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/gegen_press_add_media.html" class="gp-dropdown-option"><strong>Add Media</strong><span>Add Media</span></a>
+                    <a href="/gegen_press_add_reporter.html" class="gp-dropdown-option"><strong>Add Reporter</strong><span>Add Reporter</span></a>
+                </div>
+            </div>
+            <div class="gp-nav-item gp-dropdown-wrap" id="postDropdownWrap">
+                <a class="gp-nav-item" href="#" id="postDropdownTrigger" style="padding:6px 2px;"><span class="gp-en">POST</span><span class="gp-jp">Post</span></a>
+                <div class="gp-dropdown-panel">
+                    <a href="/gegen_press_write_article.html" class="gp-dropdown-option"><strong>Post News</strong><span>Post News</span></a>
+                    <a href="/gegen_press_write_column.html" class="gp-dropdown-option"><strong>Post Column</strong><span>Post Column</span></a>
+                </div>
+            </div>
+        </nav>
+        <div class="gp-actions">
+            <a href="#" id="langSwitchLink" class="gp-mypage" style="background:#1d3557;" title="この記事を日本語で表示">JP</a>
+            <a href="/gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">My Page</span></a>
+            <button id="gpSidebarToggle" class="gp-hamburger" aria-label="Open menu" type="button">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== サイドバー（ハンバーガーメニュー。全ページ共通） ===== -->
+    <div id="gpSidebarOverlay" class="gp-sidebar-overlay"></div>
+    <aside id="gpSidebar" class="gp-sidebar">
+        <div class="gp-sidebar-head">
+            <span>MENU</span>
+            <button id="gpSidebarClose" aria-label="Close" type="button">&times;</button>
+        </div>
+        <div class="gp-sidebar-search-wrap">
+            <input type="text" id="gpSidebarSearch" class="gp-sidebar-search" placeholder="Search teams, players, #hashtags" autocomplete="off">
+            <div id="gpSidebarSuggest" class="gp-search-suggest"></div>
+        </div>
+        <nav class="gp-sidebar-section">
+            <h4>Contents</h4>
+            <a href="/gegen_press_guide.html">New Here?</a>
+            <a href="/en/gegen_press_category.html">All News</a>
+            <a href="/gegen_press_ranking.html">Reporter Ranking</a>
+            <a href="/gegen_press_players.html">Players</a>
+            <a href="/gegen_press_write_article.html">Post News</a>
+        </nav>
+        <nav class="gp-sidebar-section">
+            <h4>Join</h4>
+            <a href="/gegen_press_add_reporter.html">Add Reporter</a>
+            <a href="/gegen_press_add_media.html">Add Media</a>
+            <a href="/gegen_press_add_player.html">Add Player</a>
+            <a href="/gegen_press_login.html">Log In / Sign Up</a>
+        </nav>
+        <nav class="gp-sidebar-section">
+            <h4>About</h4>
+            <a href="/gegen_press_terms.html">Terms of Service</a>
+            <a href="/gegen_press_privacy.html">Privacy Policy</a>
+            <a href="mailto:gegenpressmanagement@gmail.com">Contact</a>
+        </nav>
+    </aside>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('addMediaDropdownWrap');
+            var trigger = document.getElementById('addMediaDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('postDropdownWrap');
+            var trigger = document.getElementById('postDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('newsDropdownWrap');
+            var trigger = document.getElementById('newsDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var wrap = document.getElementById('rankingDropdownWrap');
+            var trigger = document.getElementById('rankingDropdownTrigger');
+            if (!wrap || !trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) wrap.classList.remove('open');
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            document.querySelectorAll('.gp-submenu-trigger').forEach(function (trigger) {
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var wrap = trigger.closest('.gp-submenu-wrap');
+                    if (wrap) wrap.classList.toggle('open');
+                });
+            });
+        })();
+    </script>
+
+
+
+
+
+    <!-- プロフィールヘッダー -->
+    <div id="pageLoadingIndicator" style="text-align:center; padding:80px 20px; color:#999; font-size:13px;">Loading...</div>
+    <div id="pageContentWrap" style="opacity:0; transition:opacity 0.25s ease;">
+    <section class="profile-header profile-header-compact">
+        <div class="header-edit-actions">
+            <a class="btn-share" id="postAsReporterBtn" href="#" style="display:none; text-decoration:none;">Post News</a>
+            <button class="btn-edit-reporter" id="editReporterBtn">Edit</button>
+        </div>
+        <div class="profile-content profile-content-compact">
+            <div class="avatar-col">
+                <button type="button" id="setIconBtn" style="display:none;">Set icon</button>
+                <input type="file" id="iconFileInput" accept="image/*" style="display:none;">
+                <button type="button" id="iconUrlToggle" style="display:none; background:none; border:none; color:#457b9d; font-size:10.5px; text-decoration:underline; cursor:pointer; padding:4px 0 0;">Set by URL</button>
+                <div id="iconUrlRow" style="display:none; margin-top:4px; width:140px;">
+                    <input type="text" class="modal-input" id="iconUrlInput" placeholder="https://..." style="font-size:11px; padding:6px 8px; margin-bottom:4px;">
+                    <button type="button" id="iconUrlApply" style="width:100%; font-size:11px; padding:5px; background:#e63946; color:#fff; border:none; border-radius:4px; cursor:pointer;">Set</button>
+                </div>
+                <div class="profile-avatar profile-avatar-compact" id="profileAvatar">F</div>
+            </div>
+            <div class="profile-info profile-info-compact">
+                <div class="creator-badge" id="creatorBadge" style="display:none;">A reporter you added</div>
+                <h1 id="reporterNameHeading">Fabrizio Romano</h1>
+                <div id="reporterNameRomaji" style="display:none;"></div>
+                <div class="header-sub-row">
+                    <span class="subtitle" id="reporterSubtitle"></span>
+                    <span id="reporterTypeBadge" style="display:none;"></span>
+                    <a id="headerTwitterLink" href="#" target="_blank" rel="noopener" style="display:none;"></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <div class="main-content">
+        <main>
+            <!-- 記者ランク（記事の★評価から自動算出。直接評価はできません） -->
+            <div class="score-section score-section-compact">
+                <div class="score-title">Reporter Rank</div>
+                <div class="score-row">
+                    <div class="score-display">
+                        <div class="score-number" id="scoreNumber">96</div>
+                        <div class="score-max">/ 100</div>
+                    </div>
+                    <div class="score-stats-vertical">
+                        <div class="stat-line"><span class="number" id="statAverageRating">4.8</span><span class="label">Avg. Rating</span></div>
+                        <div class="stat-line"><span class="number" id="statArticleCount">284</span><span class="label">Articles</span></div>
+                    </div>
+                </div>
+                <p style="font-size:11px; color:#999; margin-top:8px;">Automatically calculated from the average of star ratings on news under this reporter's name. The reporter cannot be rated directly.</p>
+            </div>
+
+            <!-- ニュースセクション -->
+            <section class="articles-section">
+                <h2 class="articles-title">Latest News</h2>
+                <div id="articlesList">
+                <div class="article-card">
+                    <div class="article-header">
+                        <div>
+                            <div class="article-title">Manchester City Announce Major Squad Overhaul</div>
+                            <div class="article-time">Jun 27, 2024 14:30</div>
+                        </div>
+                        <div class="article-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                    </div>
+                    <div class="article-preview">Premier League giants Manchester City have announced major signings for next season, with several top European players set to join...</div>
+                    <div class="article-meta">
+                        <span>Views: 524</span>
+                        <span>Comments: 34</span>
+                        <span>Ratings: 89</span>
+                    </div>
+                </div>
+
+                <div class="article-card">
+                    <div class="article-header">
+                        <div>
+                            <div class="article-title">United Eyeing Real Madrid Star</div>
+                            <div class="article-time">Jun 26, 2024 11:15</div>
+                        </div>
+                        <div class="article-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                    </div>
+                    <div class="article-preview">Latest reports say Manchester United are progressing in contract talks with a Real Madrid star, confirmed by multiple sources...</div>
+                    <div class="article-meta">
+                        <span>Views: 892</span>
+                        <span>Comments: 56</span>
+                        <span>Ratings: 145</span>
+                    </div>
+                </div>
+
+                <div class="article-card">
+                    <div class="article-header">
+                        <div>
+                            <div class="article-title">PSG Win Race for France Midfielder</div>
+                            <div class="article-time">Jun 25, 2024 09:45</div>
+                        </div>
+                        <div class="article-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                    </div>
+                    <div class="article-preview">PSG have successfully signed a promising France midfielder, beating offers from several big clubs...</div>
+                    <div class="article-meta">
+                        <span>Views: 1,234</span>
+                        <span>Comments: 78</span>
+                        <span>Ratings: 267</span>
+                    </div>
+                </div>
+                </div><!-- /#articlesList -->
+            </section>
+
+            <!-- レビューセクション -->
+            <section class="reviews-section">
+                <h2 class="reviews-title">User Reviews</h2>
+
+                <!-- 記者への直接評価は廃止。記事についた★評価の平均がこの記者のスコアになります -->
+                <div style="background:#f5f5f5; border:1px solid #e5e5e5; padding:14px 16px; margin-bottom:16px; font-size:12.5px; color:#666;">This reporter cannot be rated directly. The average of star ratings on news under this reporter's name is reflected in the score above. Here you can share impressions and comments about the reporter.</div>
+
+                <!-- レビュー投稿フォーム（ログイン必須・星評価なし） -->
+                <div id="reviewForm" style="display:none; background:#fff; border:1px solid #ddd; padding:16px; margin-bottom:20px;">
+                    <p id="reviewLoginNote" style="font-size:12.5px; color:#e63946; margin-bottom:10px; display:none;">Posting requires <a href="/gegen_press_login.html" style="color:#e63946; font-weight:bold;">Log In</a> </p>
+                    <textarea id="reviewText" placeholder="Write a comment about this reporter" style="width:100%; min-height:70px; padding:10px; border:1px solid #ddd; font-size:13px; resize:vertical; font-family:inherit;"></textarea>
+                    <button id="reviewSubmitBtn" style="margin-top:8px; background:#e63946; color:#fff; border:none; padding:9px 18px; font-size:13px; font-weight:bold; cursor:pointer;">Post Review</button>
+                </div>
+
+                <div id="reviewsList"></div>
+                <div style="text-align:center; margin-top:12px;">
+                    <button id="reviewsShowAllBtn" style="display:none; background:#fff; border:1px solid #ccc; padding:8px 20px; font-size:12.5px; cursor:pointer;">See all</button>
+                </div>
+
+                <!-- この記者にまつわるハッシュタグ -->
+                <div style="margin-top:24px;">
+                    <h3 style="font-size:13px; color:#666; margin-bottom:10px;">Hashtags related to this reporter</h3>
+                    <div id="reporterHashtags" style="display:flex; flex-wrap:wrap; gap:8px;">
+                        <p style="color:#999; font-size:12.5px;">Loading...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <!-- 専門分野 -->
+            <div class="sidebar-box">
+                <h3>Expertise</h3>
+                <div id="expertiseTags">
+                <div style="margin-bottom: 10px;">
+                    <span class="tag">Transfers</span>
+                    <span class="tag">Premier League</span>
+                    <span class="tag">Serie A</span>
+                </div>
+                <div>
+                    <span class="tag">La Liga</span>
+                    <span class="tag">Ligue 1</span>
+                    <span class="tag">Bundesliga</span>
+                </div>
+                </div><!-- /#expertiseTags -->
+            </div>
+
+            <!-- 直近の投稿 -->
+            <div class="sidebar-box">
+                <h3>Recent Posts</h3>
+                <div id="sidebarRecentArticles" style="display:flex; flex-direction:column;"></div>
+            </div>
+
+            <!-- 関連する記者 -->
+            <div class="sidebar-box" id="sidebarRelatedReportersBox" style="display:none;">
+                <h3>Related Reporters</h3>
+                <div id="sidebarRelatedReporters" style="display:flex; flex-direction:column;"></div>
+            </div>
+        </aside>
+    </div>
+    </div><!-- /#pageContentWrap -->
+
+    <!-- 記者編集モーダル -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Edit Reporter Info</h2>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <p class="modal-subtitle">You can edit the reporter info you added. Ratings such as the trust score cannot be changed.</p>
+
+            <div class="modal-group">
+                <label class="modal-label">Reporter name</label>
+                <input type="text" class="modal-input" id="editName" placeholder="Reporter name">
+            </div>
+            <div class="modal-group" style="position:relative;">
+                <label class="modal-label">Media outlet</label>
+                <input type="text" class="modal-input" id="editMedia" placeholder="Enter a media outlet (registered ones will be suggested)" autocomplete="off">
+                <div id="editMediaSuggest" class="gp-search-suggest" style="left:0; right:0;"></div>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">X (Twitter) handle</label>
+                <input type="text" class="modal-input" id="editTwitter" placeholder="@username">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">Nationality</label>
+                <select class="modal-input" id="editNationality">
+                    <option value="">Please select</option>
+                </select>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">Expertise</label>
+                <div class="modal-tags" id="editTags">
+                    <span class="modal-tag" data-value="移籍情報">Transfers</span>
+                    <span class="modal-tag" data-value="プレミアリーグ">Premier League</span>
+                    <span class="modal-tag" data-value="ラリーガ">La Liga</span>
+                    <span class="modal-tag" data-value="セリエA">Serie A</span>
+                    <span class="modal-tag" data-value="ブンデスリーガ">Bundesliga</span>
+                    <span class="modal-tag" data-value="リーグアン">Ligue 1</span>
+                    <span class="modal-tag" data-value="エールディヴィジ">Eredivisie</span>
+                    <span class="modal-tag" data-value="プリメイラ・リーガ">Primeira Liga</span>
+                    <span class="modal-tag" data-value="Jリーグ">J.League</span>
+                    <span class="modal-tag" data-value="MLS">MLS</span>
+                    <span class="modal-tag" data-value="日本サッカー">Japanese Football</span>
+                    <span class="modal-tag" data-value="代表チーム">National Teams</span>
+                    <span class="modal-tag" data-value="その他リーグ">Other Leagues</span>
+                </div>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">Description / Notes</label>
+                <textarea class="modal-textarea" id="editBio" placeholder="Notable traits of this reporter, etc."></textarea>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">Hashtags</label>
+                <p style="font-size:11px; color:#999; margin-bottom:6px;">Confirm with Enter or comma. Shown at the bottom of this reporter's page.</p>
+                <div id="editHashtagChips" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;"></div>
+                <input type="text" class="modal-input" id="editHashtagInput" placeholder="Type #tag and press Enter">
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-cancel" id="modalCancelBtn">Cancel</button>
+                <button class="modal-save" id="modalSaveBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 本番デプロイ時は api-client.js を同じフォルダに置けば下の行が有効になります -->
+    <script src="/clubs-data.js" onerror="console.warn('clubs-data.js not found')"></script>
+    <script src="/api-client.js" onerror="console.warn('api-client.js not found. Running in demo mode.')"></script>
+    <script>
+        // =========================================================
+        // 記者編集機能（追加した本人のみ）
+        // =========================================================
+        const API_AVAILABLE = (typeof GegenPressAPI !== 'undefined');
+
+        function safeGetItem(key) {
+            try { return localStorage.getItem(key); } catch (e) { return null; }
+        }
+
+        // 表示中の記者ID（本番では URL の ?id= から取得）
+        function getReporterId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        const authToken = safeGetItem('gegenPressToken');
+        const currentUserId = safeGetItem('gegenPressUserId');
+        if (API_AVAILABLE && authToken) {
+            GegenPressAPI.setToken(authToken);
+        }
+
+        // 現在表示中の記者データ（本番ではAPIから取得して埋める）
+        // デモでは、この記者を「自分が追加した」ことにするかをフラグで切り替え
+        let currentReporter = {
+            id: getReporterId() || null,
+            name: document.getElementById('reporterNameHeading').textContent.trim(),
+            mediaOutlet: document.getElementById('reporterSubtitle').textContent.trim(),
+            twitterHandle: '',
+            expertise: [],
+            bio: '',
+            createdBy: null,
+            source: 'official',
+        };
+
+        // この記者を編集できるか判定
+        // 本番: currentReporter.createdBy === currentUserId
+        // デモ: API未接続なら、お試しで編集ボタンを表示する
+        const DEMO_SHOW_EDIT = !API_AVAILABLE; // デモでは編集UIを体験できるよう表示
+
+        // -------- 表示用ヘルパー --------
+        function escapeHtml(str) {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function formatDate(value) {
+            if (!value) return '';
+            try {
+                const d = value.toDate ? value.toDate()
+                    : new Date(value._seconds ? value._seconds * 1000 : (value.seconds ? value.seconds * 1000 : value));
+                if (isNaN(d.getTime())) return '';
+                const _m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                return `${_m[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+            } catch (e) { return ''; }
+        }
+        function starString(rating) {
+            const n = Math.round(rating || 0);
+            let s = '';
+            for (let i = 0; i < 5; i++) {
+                s += `<span class="star${i < n ? '' : ' empty'}">★</span>`;
+            }
+            return s;
+        }
+
+        // -------- アバター（頭文字・色） --------
+        // 名前から頭文字を最大2文字つくる（"Fabrizio Romano" -> "FR", "Marca" -> "MA"）
+        function getInitials(name) {
+            if (!name) return '?';
+            // 記号だけの語（"&" など）は除外
+            const parts = name.trim().split(/\s+/).filter(function (p) {
+                return /[A-Za-z0-9\u00C0-\u024F]/.test(p.charAt(0));
+            });
+            if (parts.length >= 2) {
+                return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+            }
+            const one = parts[0] || name.trim();
+            return one.substring(0, 2).toUpperCase();
+        }
+
+        // 名前から決まった色（記者ごとに毎回同じ色になる）
+        const AVATAR_PALETTE = [
+            ['#e63946', '#a4161a'], // レッド（ブランド）
+            ['#1d3557', '#14213d'], // ネイビー
+            ['#2a9d8f', '#1f7a6f'], // ティール
+            ['#e76f51', '#c44a30'], // バーントオレンジ
+            ['#6a4c93', '#4e3470'], // パープル
+            ['#457b9d', '#2f5a73'], // スチールブルー
+            ['#588157', '#3a5a3a'], // グリーン
+            ['#bc6c25', '#8a4e16']  // アンバー
+        ];
+        function avatarColor(name) {
+            let h = 0;
+            const s = name || '';
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+        }
+
+        // アバターを描画（profileImage があれば画像、無ければ頭文字）
+        function renderAvatar(el, r) {
+            if (!el) return;
+            var img = r.profileImage || r.avatarUrl;
+            if (img) {
+                el.innerHTML = '<img src="' + escapeHtml(img) + '" alt="' + escapeHtml(r.name || '') + '">';
+                el.style.background = 'none';
+                return;
+            }
+            el.textContent = getInitials(r.name);
+            const g = avatarColor(r.name);
+            el.style.background = g[0];
+        }
+
+        // -------- ヘッダー・スコアの反映 --------
+        function renderReporterHeader(r) {
+            // 英語版では、ローマ字名があればそれを見出しに使う
+            if (r.nameRomaji) {
+                document.getElementById('reporterNameHeading').textContent = r.nameRomaji;
+            } else if (r.name) {
+                document.getElementById('reporterNameHeading').textContent = r.name;
+            }
+            const romajiEl = document.getElementById('reporterNameRomaji');
+            if (r.nameRomaji && r.name && r.nameRomaji !== r.name) {
+                // 見出しがローマ字になったので、副見出し側には元の名前を出す
+                romajiEl.textContent = r.name;
+                romajiEl.style.display = 'block';
+            }
+            renderAvatar(document.getElementById('profileAvatar'), r);
+            const subtitleEl = document.getElementById('reporterSubtitle');
+            if (r.mediaOutlet) {
+                subtitleEl.innerHTML = '<a href="/en/gegen_press_media_profile.html?name=' + encodeURIComponent(r.mediaOutlet) + '" style="color:inherit; text-decoration:underline;">' + escapeHtml(r.mediaOutlet) + '</a>' +
+                    '<img id="reporterMediaIcon" style="display:none; width:1em; height:1em; margin-left:5px; border-radius:3px; object-fit:cover; vertical-align:middle;" alt="">';
+                if (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.media && GegenPressAPI.media.getByName) {
+                    GegenPressAPI.media.getByName(r.mediaOutlet).then(function (mres) {
+                        if (mres && mres.success && mres.media && mres.media.logo) {
+                            const iconEl = document.getElementById('reporterMediaIcon');
+                            if (iconEl) {
+                                iconEl.src = mres.media.logo;
+                                iconEl.style.display = 'inline-block';
+                            }
+                        }
+                    }).catch(function () {});
+                }
+            } else if (r.bio) {
+                subtitleEl.textContent = r.bio;
+            }
+
+            const typeBadge = document.getElementById('reporterTypeBadge');
+            if (r.reporterType) {
+                typeBadge.textContent = r.reporterType + (r.beatClub ? '（' + r.beatClub + '）' : '');
+                typeBadge.style.display = 'inline-block';
+            }
+
+            const postBtn = document.getElementById('postAsReporterBtn');
+            if (currentReporter.id) {
+                postBtn.href = '/gegen_press_write_article.html?authorId=' + encodeURIComponent(currentReporter.id);
+                postBtn.style.display = 'inline-block';
+            }
+
+            if (r.trustScore != null) {
+                document.getElementById('scoreNumber').textContent = r.trustScore;
+            }
+
+            // 専門分野タグ
+            if (Array.isArray(r.expertise) && r.expertise.length > 0) {
+                const tagsHtml = r.expertise
+                    .map(t => `<span class="tag">${escapeHtml(t)}</span>`)
+                    .join(' ');
+                document.getElementById('expertiseTags').innerHTML =
+                    `<div>${tagsHtml}</div>`;
+            }
+
+            // SNS（実際に設定されているXのハンドルがある場合のみ表示）
+            if (r.twitterHandle) {
+                const twLink = document.getElementById('headerTwitterLink');
+                twLink.href = 'https://x.com/' + encodeURIComponent(String(r.twitterHandle).replace(/^@/, ''));
+                twLink.textContent = '@' + String(r.twitterHandle).replace(/^@/, '');
+                twLink.style.display = 'inline-block';
+            }
+        }
+
+        // -------- ニュース一覧の反映 --------
+        function renderArticles(articles) {
+            const container = document.getElementById('articlesList');
+            if (!articles || articles.length === 0) {
+                container.innerHTML = '<p style="color:#999;font-size:14px;padding:20px 0;">まだニュースがありません。</p>';
+                return;
+            }
+            container.innerHTML = articles.map(a => `
+                <div class="article-card" data-article-id="${escapeHtml(a.id)}" style="cursor:pointer;">
+                    <div class="article-header">
+                        <div>
+                            <div class="article-title">${escapeHtml(a.title)}</div>
+                            <div class="article-time">${formatDate(a.createdAt)}</div>
+                        </div>
+                        <div class="article-rating">${(a.averageRating || 0).toFixed(1)}</div>
+                    </div>
+                    <div class="article-preview">${escapeHtml(a.description || '')}</div>
+                    <div class="article-meta">
+                        <span>Views: ${a.views || 0}</span>
+                        <span>Comments: ${a.commentsCount || 0}</span>
+                    </div>
+                </div>
+            `).join('');
+            container.querySelectorAll('[data-article-id]').forEach(el => {
+                el.addEventListener('click', () => {
+                    window.location.href = '/en/gegen_press_article_detail.html?id=' + encodeURIComponent(el.getAttribute('data-article-id'));
+                });
+            });
+
+            // サイドバー：直近の投稿（最大5件）
+            const sideWrap = document.getElementById('sidebarRecentArticles');
+            if (sideWrap) {
+                const recent = articles.slice().sort((a, b) => {
+                    const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                    const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                    return tb - ta;
+                }).slice(0, 5);
+                sideWrap.innerHTML = recent.map(a =>
+                    '<a href="/en/gegen_press_article_detail.html?id=' + encodeURIComponent(a.id) + '" style="display:block; font-size:12px; color:#1d3557; text-decoration:none; padding:7px 0; border-bottom:1px solid #f0f0f0;">' + escapeHtml(a.title) + '</a>'
+                ).join('') || '<p style="color:#999; font-size:12px; padding:8px 0;">まだ投稿がありません。</p>';
+            }
+        }
+
+        // -------- レビュー一覧の反映 --------
+        let allReviewsCache = [];
+        let reviewsExpanded = false;
+        let myReviewVotes = {};
+
+        function reviewCardHtml(rv) {
+            const net = (rv.likes || 0) - (rv.dislikes || 0);
+            const myVote = myReviewVotes[rv.id];
+            return `
+                <div class="review-card" data-review-id="${escapeHtml(rv.id)}">
+                    <div class="review-header">
+                        <div class="review-author">${escapeHtml(rv.username || 'Anonymous user')}</div>
+                    </div>
+                    <div class="review-date">${formatDate(rv.createdAt)}</div>
+                    <div class="review-content">${escapeHtml(rv.comment || '')}</div>
+                    <div class="review-helpful" style="display:flex; gap:10px; align-items:center;">
+                        <button class="review-vote-btn" data-vote="like" style="background:none; border:1px solid ${myVote === 'like' ? '#e63946' : '#ccc'}; color:${myVote === 'like' ? '#e63946' : '#666'}; padding:4px 10px; font-size:12px; cursor:pointer;">👍 Like ${rv.likes || 0}</button>
+                        <button class="review-vote-btn" data-vote="dislike" style="background:none; border:1px solid ${myVote === 'dislike' ? '#1d3557' : '#ccc'}; color:${myVote === 'dislike' ? '#1d3557' : '#666'}; padding:4px 10px; font-size:12px; cursor:pointer;">👎 Meh ${rv.dislikes || 0}</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderReviews(reviews) {
+            allReviewsCache = reviews || [];
+            const container = document.getElementById('reviewsList');
+            const showAllBtn = document.getElementById('reviewsShowAllBtn');
+            if (allReviewsCache.length === 0) {
+                container.innerHTML = '<p style="color:#999;font-size:14px;padding:20px 0;">まだレビューがありません。最初のレビューを投稿してみましょう。</p>';
+                showAllBtn.style.display = 'none';
+                return;
+            }
+            // 評価が良いもの（いいね - うーん）順。同点は新しい順
+            const sorted = allReviewsCache.slice().sort((a, b) => {
+                const netA = (a.likes || 0) - (a.dislikes || 0);
+                const netB = (b.likes || 0) - (b.dislikes || 0);
+                if (netB !== netA) return netB - netA;
+                const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                return tb - ta;
+            });
+            const visible = reviewsExpanded ? sorted : sorted.slice(0, 5);
+            container.innerHTML = visible.map(reviewCardHtml).join('');
+            showAllBtn.style.display = (!reviewsExpanded && sorted.length > 5) ? 'inline-block' : 'none';
+            showAllBtn.textContent = 'See all (' + sorted.length + ')';
+
+            container.querySelectorAll('.review-vote-btn').forEach(btn => {
+                btn.addEventListener('click', async function () {
+                    const card = this.closest('[data-review-id]');
+                    const reviewId = card.getAttribute('data-review-id');
+                    const type = this.getAttribute('data-vote');
+                    let user = null;
+                    try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+                    if (!user) { alert('You must be logged in to vote'); return; }
+                    const res = await GegenPressAPI.reviews.vote(reviewId, type);
+                    if (res && res.success) {
+                        try {
+                            const rres = await GegenPressAPI.reporters.getReviews(currentReporter.id);
+                            if (rres && rres.success) {
+                                const vres = await GegenPressAPI.reviews.getMyVotes(rres.reviews.map(r => r.id));
+                                myReviewVotes = (vres && vres.votes) || {};
+                                renderReviews(rres.reviews);
+                            }
+                        } catch (e) {}
+                    } else {
+                        alert((res && res.message) || 'Failed to vote');
+                    }
+                });
+            });
+        }
+
+        document.getElementById('reviewsShowAllBtn').addEventListener('click', function () {
+            reviewsExpanded = true;
+            renderReviews(allReviewsCache);
+        });
+
+        // レビュー投稿フォーム（星評価なし・ログイン必須）
+        async function initReviewForm() {
+            if (!API_AVAILABLE || !currentReporter.id) return;
+            const form = document.getElementById('reviewForm');
+            form.style.display = 'block';
+            const noteEl = document.getElementById('reviewLoginNote');
+            const submitBtn = document.getElementById('reviewSubmitBtn');
+            const textEl = document.getElementById('reviewText');
+
+            let user = null;
+            try { user = await GegenPressAPI._currentUser(); } catch (e) {}
+            if (!user) {
+                noteEl.style.display = 'block';
+                textEl.disabled = true;
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                return;
+            }
+            submitBtn.addEventListener('click', async function () {
+                const text = (textEl.value || '').trim();
+                if (!text) { alert('Please enter a comment'); return; }
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Posting...';
+                const res = await GegenPressAPI.reviews.create(currentReporter.id, text, null);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Post Review';
+                if (res && res.success) {
+                    textEl.value = '';
+                    try {
+                        const rres = await GegenPressAPI.reporters.getReviews(currentReporter.id);
+                        if (rres && rres.success) renderReviews(rres.reviews);
+                    } catch (e) {}
+                } else {
+                    alert((res && res.message) || 'Failed to post review');
+                }
+            });
+        }
+        initReviewForm();
+
+        // この記者の記事に使われているハッシュタグをまとめて表示
+        function renderReporterHashtags() {
+            const wrap = document.getElementById('reporterHashtags');
+            const tags = currentReporter.hashtags || [];
+            if (tags.length === 0) {
+                wrap.innerHTML = '<p style="color:#999; font-size:12.5px;">まだハッシュタグがありません。</p>';
+                return;
+            }
+            wrap.innerHTML = tags.map(t =>
+                '<a href="/gegen_press_hashtag.html?tag=' + encodeURIComponent(t) + '" style="background:#eef4ff; color:#1d3557; font-size:12px; font-weight:bold; padding:5px 12px; border-radius:14px; text-decoration:none;">#' + escapeHtml(t) + '</a>'
+            ).join('');
+        }
+
+
+        // -------- 統合ローダー --------
+        async function loadReporterPage() {
+            // API未接続、または ?id= が無い場合はデモ表示のまま
+            if (!API_AVAILABLE || !currentReporter.id) {
+                renderAvatar(document.getElementById('profileAvatar'), currentReporter);
+                applyOwnerUI();
+                return;
+            }
+
+            // 記者情報
+            try {
+                const res = await GegenPressAPI.reporters.getById(currentReporter.id);
+                if (res && res.success && res.reporter) {
+                    currentReporter = { ...currentReporter, ...res.reporter };
+                    renderReporterHeader(currentReporter);
+                }
+            } catch (e) {
+                console.warn('Failed to fetch reporter info:', e);
+            }
+
+            // 実際の記事評価から算出したスコア（直接評価ではなく、記事の★評価の平均）
+            try {
+                const sres = await GegenPressAPI.ratings.getComputedReporterScore(currentReporter.id);
+                if (sres && sres.success) {
+                    const score = Math.round((sres.average / 5) * 100);
+                    document.getElementById('scoreNumber').textContent = score;
+                    document.getElementById('statAverageRating').textContent = sres.count > 0 ? sres.average.toFixed(1) : '-';
+                    document.getElementById('statArticleCount').textContent = sres.articlesCount || 0;
+                }
+            } catch (e) {
+                console.warn('Failed to compute rating score:', e);
+            }
+
+            // ニュース一覧
+            try {
+                const res = await GegenPressAPI.reporters.getArticles(currentReporter.id, { limit: 10 });
+                if (res && res.success) {
+                    renderArticles(res.articles);
+                    const count = (res.articles || []).length;
+                    document.getElementById('statArticleCount').textContent = count;
+                }
+            } catch (e) {
+                console.warn('Failed to fetch news list:', e);
+            }
+
+            renderReporterHashtags();
+
+            // レビュー一覧
+            try {
+                const res = await GegenPressAPI.reporters.getReviews(currentReporter.id);
+                if (res && res.success) {
+                    try {
+                        const vres = await GegenPressAPI.reviews.getMyVotes(res.reviews.map(r => r.id));
+                        myReviewVotes = (vres && vres.votes) || {};
+                    } catch (e) {}
+                    renderReviews(res.reviews);
+                }
+            } catch (e) {
+                console.warn('Failed to fetch reviews:', e);
+            }
+
+            applyOwnerUI();
+        }
+
+        // 編集ボタン・バッジの表示判定
+        function applyOwnerUI() {
+            const isOwner = DEMO_SHOW_EDIT ||
+                (currentReporter.createdBy && currentReporter.createdBy === currentUserId) ||
+                (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.isAdminUid(currentUserId));
+            if (isOwner) {
+                document.getElementById('editReporterBtn').style.display = 'inline-block';
+                if (DEMO_SHOW_EDIT || currentReporter.source === 'user') {
+                    document.getElementById('creatorBadge').style.display = 'flex';
+                }
+            }
+            // アイコン設定ボタン: ログイン中なら表示（保存可否は最終的にサーバー側ルールが判定）
+            if (API_AVAILABLE && currentUserId && currentReporter.id) {
+                document.getElementById('setIconBtn').style.display = 'inline-block';
+                document.getElementById('iconUrlToggle').style.display = 'block';
+            }
+        }
+
+        // ============ アイコン画像の設定（Firestoreに小さく埋め込み保存） ============
+        const setIconBtn = document.getElementById('setIconBtn');
+        const iconFileInput = document.getElementById('iconFileInput');
+        if (setIconBtn && iconFileInput) {
+            setIconBtn.addEventListener('click', () => iconFileInput.click());
+            iconFileInput.addEventListener('change', async function () {
+                const file = this.files && this.files[0];
+                this.value = '';
+                if (!file) return;
+                if (!file.type || file.type.indexOf('image/') !== 0) {
+                    alert('Please select an image file');
+                    return;
+                }
+                setIconBtn.disabled = true;
+                setIconBtn.textContent = 'Processing...';
+                try {
+                    const dataUrl = await fileToSquareJpeg(file, 256);
+                    if (!dataUrl) throw new Error('Failed to convert the image');
+                    const res = await GegenPressAPI.reporters.update(currentReporter.id, { profileImage: dataUrl });
+                    if (res && res.success) {
+                        currentReporter.profileImage = dataUrl;
+                        renderAvatar(document.getElementById('profileAvatar'), currentReporter);
+                        alert('Icon set');
+                    } else {
+                        alert((res && res.message && String(res.message).indexOf('permission') >= 0)
+                            ? 'You don\'t have permission to change this reporter\'s icon (only the person who added it or an admin can).'
+                            : ((res && res.message) || 'Failed to save icon'));
+                    }
+                } catch (e) {
+                    alert('アイコンの設定中にエラーが発生しました: ' + (e.message || e));
+                }
+                setIconBtn.disabled = false;
+                setIconBtn.textContent = 'Set icon';
+            });
+        }
+
+        document.getElementById('iconUrlToggle').addEventListener('click', function () {
+            const row = document.getElementById('iconUrlRow');
+            row.style.display = (row.style.display === 'none') ? 'block' : 'none';
+        });
+        document.getElementById('iconUrlApply').addEventListener('click', async function () {
+            const url = document.getElementById('iconUrlInput').value.trim();
+            if (!url || !/^https?:\/\//.test(url)) { alert('Please enter an image URL starting with http(s)://'); return; }
+            this.disabled = true;
+            this.textContent = 'Setting...';
+            try {
+                const res = await GegenPressAPI.reporters.update(currentReporter.id, { profileImage: url });
+                if (res && res.success) {
+                    currentReporter.profileImage = url;
+                    renderAvatar(document.getElementById('profileAvatar'), currentReporter);
+                    document.getElementById('iconUrlRow').style.display = 'none';
+                    alert('Icon set');
+                } else {
+                    alert((res && res.message) || 'Failed to save icon');
+                }
+            } catch (e) {
+                alert('アイコンの設定中にエラーが発生しました: ' + (e.message || e));
+            }
+            this.disabled = false;
+            this.textContent = 'Set';
+        });
+        function fileToSquareJpeg(file, size) {
+            return new Promise(function (resolve, reject) {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('Could not load the file'));
+                reader.onload = function () {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error('Could not be loaded as an image'));
+                    img.onload = function () {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = size; canvas.height = size;
+                            const ctx = canvas.getContext('2d');
+                            // 中央を正方形に切り出して縮小（cover）
+                            const s = Math.min(img.width, img.height);
+                            const sx = (img.width - s) / 2;
+                            const sy = (img.height - s) / 2;
+                            ctx.drawImage(img, sx, sy, s, s, 0, 0, size, size);
+                            // 品質を段階的に下げて 100KB 以下を目指す
+                            let q = 0.85;
+                            let out = canvas.toDataURL('image/jpeg', q);
+                            while (out.length > 140000 && q > 0.4) { // dataURLはbase64で約1.37倍
+                                q -= 0.1;
+                                out = canvas.toDataURL('image/jpeg', q);
+                            }
+                            if (out.length > 200000) {
+                                reject(new Error('Image is too large. Please try another one.'));
+                                return;
+                            }
+                            resolve(out);
+                        } catch (e) { reject(e); }
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function revealPageContent() {
+            const loading = document.getElementById('pageLoadingIndicator');
+            const wrap = document.getElementById('pageContentWrap');
+            if (loading) loading.style.display = 'none';
+            if (wrap) wrap.style.opacity = '1';
+        }
+        loadReporterPage().finally(revealPageContent);
+        loadRelatedReporters();
+
+        // ============ 関連する記者（専門分野の重なりで判定） ============
+        async function loadRelatedReporters() {
+            if (!API_AVAILABLE || !currentReporter.id) return;
+            try {
+                // 表示中の記者の専門分野を取得
+                const meRes = await GegenPressAPI.reporters.getById(currentReporter.id);
+                if (!meRes || !meRes.success) return;
+                const myExpertise = (meRes.reporter.expertise || []);
+                if (myExpertise.length === 0) return;
+
+                const allRes = await GegenPressAPI.reporters.getAll();
+                if (!allRes || !allRes.success) return;
+
+                // 専門分野の重なり数でスコアリング
+                const scored = (allRes.reporters || [])
+                    .filter(r => r.id !== currentReporter.id)
+                    .map(r => {
+                        const overlap = (r.expertise || []).filter(e => myExpertise.includes(e)).length;
+                        return { r, overlap };
+                    })
+                    .filter(x => x.overlap > 0)
+                    .sort((a, b) => b.overlap - a.overlap || (b.r.trustScore || 0) - (a.r.trustScore || 0))
+                    .slice(0, 4);
+
+                if (scored.length === 0) return;
+
+                const grid = document.getElementById('sidebarRelatedReporters');
+                grid.innerHTML = scored.map(x => {
+                    const r = x.r;
+                    const g = avatarColor(r.name);
+                    const avatar = r.profileImage
+                        ? '<img src="' + esc(r.profileImage) + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
+                        : escapeHtml(getInitials(r.name));
+                    const avatarBg = r.profileImage ? '' : ('background: ' + g[0] + ';');
+                    return (
+                        '<div class="related-reporter-card" data-id="' + escapeHtml(r.id) + '" style="display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid #f0f0f0; cursor:pointer;">' +
+                            '<div style="width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#fff; overflow:hidden; ' + avatarBg + '">' + avatar + '</div>' +
+                            '<div style="min-width:0;">' +
+                                '<div style="font-size:12px; font-weight:bold; color:#1d3557;">' + escapeHtml(r.name) + '</div>' +
+                            '</div>' +
+                        '</div>'
+                    );
+                }).join('');
+                grid.querySelectorAll('.related-reporter-card').forEach(el => {
+                    el.addEventListener('click', () => {
+                        window.location.href = '/en/gegen_press_reporter_profile.html?id=' + encodeURIComponent(el.getAttribute('data-id'));
+                    });
+                });
+                document.getElementById('sidebarRelatedReportersBox').style.display = 'block';
+            } catch (e) {
+                console.warn('Failed to load related reporters:', e);
+            }
+        }
+
+        // モーダルの開閉
+        const editModal = document.getElementById('editModal');
+        const editSelectedTags = new Set();
+        let editHashtags = [];
+
+        function normalizeEditTag(raw) {
+            return String(raw || '').trim().replace(/^#+/, '').replace(/\s+/g, '');
+        }
+        function renderEditHashtagChips() {
+            const wrap = document.getElementById('editHashtagChips');
+            wrap.innerHTML = editHashtags.map((t, i) =>
+                '<span style="display:inline-flex; align-items:center; gap:5px; background:#eef4ff; color:#1d3557; font-size:12px; font-weight:bold; padding:4px 10px; border-radius:14px;">#' + escapeHtml(t) + '<span data-i="' + i + '" style="cursor:pointer; color:#888;">×</span></span>'
+            ).join('');
+            wrap.querySelectorAll('[data-i]').forEach(el => {
+                el.addEventListener('click', function () {
+                    editHashtags.splice(Number(this.getAttribute('data-i')), 1);
+                    renderEditHashtagChips();
+                });
+            });
+        }
+        const editHashtagInput = document.getElementById('editHashtagInput');
+        editHashtagInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                const t = normalizeEditTag(this.value);
+                this.value = '';
+                if (t && !editHashtags.some(x => x.toLowerCase() === t.toLowerCase())) {
+                    editHashtags.push(t);
+                    renderEditHashtagChips();
+                }
+            }
+        });
+
+        // 国籍セレクトの初期化（あいうえお順、国旗つき）
+        function populateNationalitySelect() {
+            const sel = document.getElementById('editNationality');
+            if (typeof GegenPressClubsData === 'undefined') return;
+            const collator = (typeof Intl !== 'undefined') ? new Intl.Collator('ja') : null;
+            const list = GegenPressClubsData.NATIONALITIES.slice();
+            if (collator) list.sort((a, b) => collator.compare(a.name, b.name));
+            else list.sort((a, b) => a.name.localeCompare(b.name));
+            sel.innerHTML = '<option value="">選択してください</option>' +
+                list.map(n => '<option value="' + escapeHtml(n.name) + '">' + (n.flag ? n.flag + ' ' : '') + escapeHtml(n.name) + '</option>').join('');
+        }
+        populateNationalitySelect();
+
+        // =========================================================
+        // 所属メディアの入力補完（登録済みメディアから選べる。無ければ自由入力のまま）
+        // =========================================================
+        let allMediaList = [];
+        async function loadMediaListForSuggest() {
+            if (typeof GegenPressAPI === 'undefined' || !GegenPressAPI.media || !GegenPressAPI.media.getAll) return;
+            try {
+                const res = await GegenPressAPI.media.getAll();
+                if (res && res.success) allMediaList = (res.media || []).map(m => m.name || m.id).filter(Boolean);
+            } catch (e) { console.warn('Failed to load media list:', e); }
+        }
+        loadMediaListForSuggest();
+
+        const editMediaInput = document.getElementById('editMedia');
+        const editMediaSuggest = document.getElementById('editMediaSuggest');
+        function renderMediaSuggest(query) {
+            const nq = String(query || '').trim().toLowerCase();
+            const list = nq
+                ? allMediaList.filter(m => m.toLowerCase().indexOf(nq) >= 0).slice(0, 8)
+                : allMediaList.slice(0, 8);
+            if (list.length === 0) { editMediaSuggest.style.display = 'none'; editMediaSuggest.innerHTML = ''; return; }
+            editMediaSuggest.innerHTML = list.map(m =>
+                '<div class="item" data-name="' + escapeHtml(m) + '">' + escapeHtml(m) + '</div>'
+            ).join('');
+            editMediaSuggest.style.display = 'block';
+            editMediaSuggest.querySelectorAll('[data-name]').forEach(el => {
+                el.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    editMediaInput.value = this.getAttribute('data-name');
+                    editMediaSuggest.style.display = 'none';
+                });
+            });
+        }
+        editMediaInput.addEventListener('input', function () { renderMediaSuggest(this.value); });
+        editMediaInput.addEventListener('focus', function () { renderMediaSuggest(this.value); });
+        editMediaInput.addEventListener('blur', function () {
+            setTimeout(() => { editMediaSuggest.style.display = 'none'; }, 150);
+        });
+
+        document.getElementById('editReporterBtn').addEventListener('click', function() {
+            // 現在の値をフォームに反映
+            document.getElementById('editName').value = currentReporter.name || '';
+            document.getElementById('editMedia').value = currentReporter.mediaOutlet || '';
+            document.getElementById('editTwitter').value = currentReporter.twitterHandle || '';
+            document.getElementById('editNationality').value = currentReporter.nationality || '';
+            document.getElementById('editBio').value = currentReporter.bio || '';
+            editHashtags = (currentReporter.hashtags || []).slice();
+            renderEditHashtagChips();
+
+            // 専門分野タグの選択状態を反映
+            editSelectedTags.clear();
+            document.querySelectorAll('.modal-tag').forEach(tag => {
+                const v = tag.getAttribute('data-value');
+                if ((currentReporter.expertise || []).includes(v)) {
+                    tag.classList.add('selected');
+                    editSelectedTags.add(v);
+                } else {
+                    tag.classList.remove('selected');
+                }
+            });
+
+            editModal.classList.add('show');
+        });
+
+        function closeModal() { editModal.classList.remove('show'); }
+        document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+        document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+        editModal.addEventListener('click', function(e) {
+            if (e.target === editModal) closeModal();
+        });
+
+        // タグ選択
+        document.querySelectorAll('.modal-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                const v = this.getAttribute('data-value');
+                if (editSelectedTags.has(v)) {
+                    editSelectedTags.delete(v);
+                    this.classList.remove('selected');
+                } else {
+                    editSelectedTags.add(v);
+                    this.classList.add('selected');
+                }
+            });
+        });
+
+        // 保存
+        document.getElementById('modalSaveBtn').addEventListener('click', async function() {
+            const name = document.getElementById('editName').value.trim();
+            if (!name) {
+                alert('Reporter name is required.');
+                return;
+            }
+
+            const updateData = {
+                name: name,
+                mediaOutlet: document.getElementById('editMedia').value.trim() || null,
+                twitterHandle: document.getElementById('editTwitter').value.trim() || null,
+                expertise: Array.from(editSelectedTags),
+                nationality: document.getElementById('editNationality').value || null,
+                bio: document.getElementById('editBio').value.trim() || '',
+                hashtags: editHashtags,
+            };
+
+            const saveBtn = this;
+
+            // 本番モード
+            if (API_AVAILABLE && currentReporter.id) {
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+                try {
+                    const res = await GegenPressAPI.reporters.update(currentReporter.id, updateData);
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save Changes';
+                    if (res && res.success) {
+                        applyUpdateToPage(updateData);
+                        closeModal();
+                        alert('Reporter info updated.');
+                    } else {
+                        alert((res && res.message) || 'Failed to update.');
+                    }
+                } catch (e) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save Changes';
+                    alert('A network error occurred.');
+                }
+                return;
+            }
+
+            // デモモード: 画面に即反映
+            applyUpdateToPage(updateData);
+            closeModal();
+            alert('(Demo) Reporter info updated. In production this is saved via the API.');
+        });
+
+        // 編集内容を画面に反映
+        function applyUpdateToPage(data) {
+            currentReporter = { ...currentReporter, ...data };
+            document.getElementById('reporterNameHeading').textContent = data.name;
+            if (data.mediaOutlet) {
+                document.getElementById('reporterSubtitle').textContent = data.mediaOutlet;
+            }
+        }
+    </script>
+    <script>
+        // ===== サイドバー（ハンバーガーメニュー。全ページ共通） =====
+        (function () {
+            var toggle = document.getElementById('gpSidebarToggle');
+            var closeBtn = document.getElementById('gpSidebarClose');
+            var sidebar = document.getElementById('gpSidebar');
+            var overlay = document.getElementById('gpSidebarOverlay');
+            if (!toggle || !sidebar) return;
+            function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('open'); }
+            function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+            toggle.addEventListener('click', openSidebar);
+            closeBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // 検索サジェスト（「もしかして」：よく使われるハッシュタグを頻度順で候補表示）
+            var input = document.getElementById('gpSidebarSearch');
+            var suggestBox = document.getElementById('gpSidebarSuggest');
+            var popularTags = null, tagsPromise = null;
+            function normalize(s) { return (s || '').trim().toLowerCase().replace(/^#+/, ''); }
+            function ensureTags() {
+                if (popularTags) return Promise.resolve(popularTags);
+                if (!tagsPromise) {
+                    tagsPromise = (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.articles && GegenPressAPI.articles.getPopularTags)
+                        ? GegenPressAPI.articles.getPopularTags().then(function (res) { popularTags = (res && res.success) ? res.tags : []; return popularTags; })
+                        : Promise.resolve([]);
+                }
+                return tagsPromise;
+            }
+            function goSearch(q) { window.location.href = '/gegen_press_search.html?q=' + encodeURIComponent(q); }
+            function renderSuggestions(matches) {
+                if (!matches.length) { suggestBox.style.display = 'none'; suggestBox.innerHTML = ''; return; }
+                suggestBox.innerHTML = matches.map(function (m) {
+                    var safe = String(m.tag).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    return '<div class="item" data-tag="' + safe + '">#' + safe + '</div>';
+                }).join('');
+                suggestBox.style.display = 'block';
+                Array.prototype.forEach.call(suggestBox.querySelectorAll('.item'), function (el) {
+                    el.addEventListener('mousedown', function (e) {
+                        e.preventDefault();
+                        goSearch(this.getAttribute('data-tag'));
+                    });
+                });
+            }
+            if (input) {
+                input.addEventListener('input', function () {
+                    var raw = normalize(this.value);
+                    if (!raw) { suggestBox.style.display = 'none'; return; }
+                    ensureTags().then(function (tags) {
+                        renderSuggestions(tags.filter(function (t) { return normalize(t.tag).indexOf(raw) >= 0; }).slice(0, 6));
+                    });
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        var q = this.value.trim();
+                        if (q) goSearch(q);
+                    }
+                });
+                input.addEventListener('blur', function () { setTimeout(function () { suggestBox.style.display = 'none'; }, 150); });
+            }
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var link = document.getElementById('langSwitchLink');
+            if (!link) return;
+            var page = location.pathname.split('/').pop();
+            link.href = '/' + page + location.search;
+        })();
+    </script>
+</body>
+</html>

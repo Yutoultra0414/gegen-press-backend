@@ -1270,7 +1270,7 @@
                     <div class="info-value" id="sideAuthorScore">96/100</div>
                 </div>
                 <div class="info-item">
-                    <a href="/gegen_press_reporter_profile.html" id="sideAuthorLink" style="color: #e63946; text-decoration: none; font-weight: bold;">プロフィールを見る →</a>
+                    <a href="/en/gegen_press_reporter_profile.html" id="sideAuthorLink" style="color: #e63946; text-decoration: none; font-weight: bold;">プロフィールを見る →</a>
                 </div>
             </div>
 
@@ -1916,7 +1916,7 @@
                     // ==== 通常のニュース記事: 従来通り「Reporter」情報を表示 ====
                     document.getElementById('authorName').textContent = a.authorName || '';
                     document.getElementById('authorSection').onclick = function () {
-                        window.location.href = '/gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
+                        window.location.href = '/en/gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
                     };
                     // Reporterの実際のアイコン画像 · Xハンドルが設定されていれば取得する（無ければ略称バッジ · 共有ボタン非表示のまま）
                     if (a.authorId && typeof GegenPressAPI !== 'undefined') {
@@ -1950,7 +1950,7 @@
                         }).catch(function () {});
                     }
                     document.getElementById('sideAuthorBoxTitle').textContent = 'Reporter';
-                    document.getElementById('sideAuthorLink').href = '/gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
+                    document.getElementById('sideAuthorLink').href = '/en/gegen_press_reporter_profile.html?id=' + encodeURIComponent(a.authorId);
                     document.getElementById('sideAuthorLink').style.display = '';
                     document.getElementById('sideAuthorName').textContent = a.authorName || '';
                     document.getElementById('sideAuthorOutletRow').style.display = '';
