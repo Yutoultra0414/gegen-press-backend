@@ -1091,6 +1091,7 @@
                     <div class="author-info">
                         <h3 id="authorName">Fabrizio Romano</h3>
                         <p id="authorHandle">@FabrizioRomano</p>
+                        <p id="authorMediaOutlet" style="display:none; font-size:11.5px; color:#888; margin-top:1px;"></p>
                     </div>
                 </div>
                 <a id="postedByLink" href="#" style="display:none; font-size:11px; color:#888; text-decoration:none; margin:-6px 0 4px 2px;">投稿: <span id="postedByName"></span></a>
@@ -1920,6 +1921,11 @@
                                 }
                                 const reporterHandle = rres.reporter.twitterHandle
                                     ? String(rres.reporter.twitterHandle).replace(/^@/, '').trim() : '';
+                                if (rres.reporter.mediaOutlet) {
+                                    const outletEl = document.getElementById('authorMediaOutlet');
+                                    outletEl.textContent = rres.reporter.mediaOutlet;
+                                    outletEl.style.display = 'block';
+                                }
                                 if (reporterHandle) {
                                     currentAuthorHandle = reporterHandle;
                                     updateShareButtonVisibility();
