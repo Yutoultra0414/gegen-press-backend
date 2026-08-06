@@ -617,6 +617,21 @@
                     <textarea class="form-textarea" id="articleContent" style="min-height:480px; max-height:75vh; overflow-y:auto; line-height:1.8;" placeholder="ニュースの本文を入力してください"></textarea>
                 </div>
 
+                <!-- 英語版（管理人のみ表示・必須） -->
+                <div class="form-group" id="englishFieldsGroup" style="display:none; background:#f0f7ff; border:1px solid #cfe3fb; border-radius:8px; padding:16px 18px;">
+                    <label class="form-label" style="margin-bottom:4px;">English version <span class="required-badge">必須（管理人のみ）</span></label>
+                    <p class="form-hint">英語版サイト（/en/）に表示される内容です。日本語の直訳でなく、内容が伝わる自然な英語で入力してください。</p>
+
+                    <label class="form-label" style="margin-top:12px;">English Title</label>
+                    <input type="text" class="form-input" id="articleTitleEn" placeholder="e.g. Manchester City Announce Major Squad Overhaul" maxlength="120">
+
+                    <label class="form-label" style="margin-top:12px;">English Summary</label>
+                    <textarea class="form-textarea" id="articleDescEn" style="min-height:70px;" placeholder="1-2 sentence summary in English" maxlength="220"></textarea>
+
+                    <label class="form-label" style="margin-top:12px;">English Body</label>
+                    <textarea class="form-textarea" id="articleContentEn" style="min-height:300px; line-height:1.8;" placeholder="Full article body in English"></textarea>
+                </div>
+
                 <!-- 報道日時 -->
                 <div class="form-group">
                     <label class="form-label">報道日 <span class="required-badge">必須</span></label>
@@ -724,6 +739,7 @@
         const authorSuggest = document.getElementById('authorSuggest');
         const authorSelectedChip = document.getElementById('authorSelectedChip');
         let currentUserObj = null;
+        let isAdminUser = false;
         let myReporters = []; // 自分が追加した記者 or 全記者（後述の方針）
 
         // 日本語・英語（ローマ字）どちらでも検索できるよう正規化する（カナ半角化はしていないので、
@@ -896,6 +912,10 @@
                 return;
             }
             currentUserObj = user;
+            isAdminUser = typeof GegenPressAPI !== 'undefined' && GegenPressAPI.isAdminUid && GegenPressAPI.isAdminUid(user.uid);
+            if (isAdminUser) {
+                document.getElementById('englishFieldsGroup').style.display = 'block';
+            }
 
             // 記者候補を読み込む（全記者から検索して選べるようにする）
             try {
@@ -947,6 +967,9 @@
             document.getElementById('articleTitle').value = editingArticle.title || '';
             document.getElementById('articleDesc').value = editingArticle.description || '';
             document.getElementById('articleContent').value = editingArticle.content || '';
+            document.getElementById('articleTitleEn').value = editingArticle.title_en || '';
+            document.getElementById('articleDescEn').value = editingArticle.description_en || '';
+            document.getElementById('articleContentEn').value = editingArticle.content_en || '';
             document.getElementById('sourceUrl').value = editingArticle.sourceUrl || '';
             if (editingArticle.authorId) selectAuthor(editingArticle.authorId);
 
@@ -1205,6 +1228,9 @@
             const title = document.getElementById('articleTitle').value.trim();
             const desc = document.getElementById('articleDesc').value.trim();
             const content = document.getElementById('articleContent').value.trim();
+            const titleEn = document.getElementById('articleTitleEn').value.trim();
+            const descEn = document.getElementById('articleDescEn').value.trim();
+            const contentEn = document.getElementById('articleContentEn').value.trim();
             const authorId = authorSelect.value;
             const reportedDate = document.getElementById('reportedDate').value;
             const reportedTime = document.getElementById('reportedTime').value;
@@ -1223,6 +1249,11 @@
             if (selectedCategories.size === 0) { alert('サブカテゴリを1つ以上選択してください'); return; }
             if (!desc) { alert('概要を入力してください'); return; }
             if (!content) { alert('本文を入力してください'); return; }
+            if (isAdminUser) {
+                if (!titleEn) { alert('English Title を入力してください'); return; }
+                if (!descEn) { alert('English Summary を入力してください'); return; }
+                if (!contentEn) { alert('English Body を入力してください'); return; }
+            }
 
             // 報道日時（時刻が未入力の場合は00:00扱い。「日にちだけ」の比較用途では十分です）
             const reportedAtDate = new Date(reportedDate + 'T' + (reportedTime || '00:00') + ':00');
@@ -1253,6 +1284,9 @@
                     title: title,
                     description: desc,
                     content: content,
+                    title_en: titleEn || null,
+                    description_en: descEn || null,
+                    content_en: contentEn || null,
                     category: categoriesArray[0], // 既存のリーグ別グルーピングとの互換用（先頭のサブカテゴリ）
                     categories: categoriesArray,
                     reportedAt: reportedAtDate,
@@ -1283,6 +1317,9 @@
                 title: title,
                 description: desc,
                 content: content,
+                title_en: titleEn || null,
+                description_en: descEn || null,
+                content_en: contentEn || null,
                 category: categoriesArray[0], // 既存のリーグ別グルーピングとの互換用（先頭のサブカテゴリ）
                 categories: categoriesArray,
                 reportedAt: reportedAtDate,
