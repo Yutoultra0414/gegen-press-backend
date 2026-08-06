@@ -93,12 +93,16 @@ module.exports = async function handler(req, res) {
                 const d = fsValue(fields, 'description') || fsValue(fields, 'content');
                 if (t) title = t;
                 if (d) description = String(d).slice(0, 120);
-                // Firestore側にBase64データURI(data:image/...)で保存されている画像は、
-                // og:imageとして使えない(SNSのクローラーはURLを別途取得しに行く仕様のため)。
-                // その場合はサイトロゴにフォールバックする。
-                // 記事ごとの画像は使わず、常にサイト共通のOG画像(og-image.png)を使う。
-                // (以前は記事のimageフィールドを使おうとしていたが、Base64データURIだったりして
-                //  安定しなかったため、一律で共通画像にすることにした)
+                // 記事自体の画像(image)があれば優先して使う。
+                // ただし、Firestore側にBase64データURI(data:image/...)で保存されている画像は
+                // og:imageとして使えない(SNSのクローラーはURLを別途取得しに行く仕様のため)ので、
+                // その場合のみサイト共通のog-image.pngにフォールバックする。
+                // ※ 現状、記事投稿フォームがサムネイルをBase64で保存する作りのままなので、
+                //    ほとんどの記事は当面ロゴにフォールバックし続けます。投稿フォーム側を
+                //    Firebase Storageへのアップロードに変更した記事から、順次このカードにも
+                //    実際のサムネイルが出るようになります。
+                const img = fsValue(fields, 'image');
+                if (img && !String(img).startsWith('data:')) image = img;
             }
             // 404などでも致命的エラーにはせず、デフォルトのメタ情報のままページ自体は返す
         } catch (e) {
