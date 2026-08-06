@@ -1914,6 +1914,7 @@
                     wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">Failed to load.</div>';
                     return;
                 }
+                res.players.forEach(p => { if (p.nameRomaji) p.name = p.nameRomaji; });
                 const list = res.players.filter(p => p.transferStatus && (p.fromClub || p.toClub));
                 if (list.length === 0) {
                     wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">No transfer info registered yet.</div>';
@@ -1980,6 +1981,7 @@
                     wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">No players registered yet. You can add one from "Players".</div>';
                     return;
                 }
+                res.players.forEach(p => { if (p.nameRomaji) p.name = p.nameRomaji; });
                 const withRecentViews = res.players.map(p => Object.assign({}, p, { _recentViews: sumRecentViews(p, 7) }));
                 const anyViews = withRecentViews.some(p => p._recentViews > 0);
                 // 閲覧数データがまだ無い（運用したてで7日以内の閲覧が0)場合は、
@@ -2033,6 +2035,7 @@
                     wrap.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">No reporters registered yet.</div>';
                     return;
                 }
+                res.ranking.forEach(r => { if (r.nameRomaji) r.name = r.nameRomaji; });
                 const withScores = await Promise.all(res.ranking.map(async (r) => {
                     try {
                         const sres = await GegenPressAPI.ratings.getComputedReporterScore(r.id);

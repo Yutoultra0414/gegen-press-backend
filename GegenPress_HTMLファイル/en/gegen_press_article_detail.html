@@ -1922,6 +1922,9 @@
                     if (a.authorId && typeof GegenPressAPI !== 'undefined') {
                         GegenPressAPI.reporters.getById(a.authorId).then(function (rres) {
                             if (rres && rres.success && rres.reporter) {
+                                if (rres.reporter.nameRomaji) {
+                                    document.getElementById('authorName').textContent = rres.reporter.nameRomaji;
+                                }
                                 if (rres.reporter.profileImage) {
                                     const avatarEl = document.getElementById('authorAvatar');
                                     avatarEl.style.background = 'none';
