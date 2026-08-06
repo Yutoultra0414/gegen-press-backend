@@ -599,6 +599,11 @@
                         <div class="thumb-drop-label" id="thumbDropLabel">クリックして画像を選択</div>
                     </div>
                     <input type="file" id="thumbInput" accept="image/*" style="display:none;">
+                    <button type="button" id="thumbUrlToggle" style="background:none; border:none; color:#457b9d; font-size:11.5px; text-decoration:underline; cursor:pointer; padding:6px 0 0; display:block;">画像のURLを直接指定する</button>
+                    <div id="thumbUrlRow" style="display:none; margin-top:6px;">
+                        <input type="text" class="form-input" id="thumbUrlInput" placeholder="https://... の画像URL" style="margin-bottom:6px;">
+                        <button type="button" class="check-btn" id="thumbUrlApply">この画像を使う</button>
+                    </div>
                     <div class="thumb-required-note" id="thumbRequiredNote" style="display:none;">サムネイル画像を設定してください</div>
                     <p class="focal-hint" id="focalHint" style="display:none;">画像をクリック（またはドラッグ）すると、一覧などで表示される際に中心にしたい部分を指定できます。</p>
                 </div>
@@ -952,6 +957,21 @@
                 reader.readAsDataURL(file);
             });
         }
+
+        document.getElementById('thumbUrlToggle').addEventListener('click', function () {
+            const row = document.getElementById('thumbUrlRow');
+            row.style.display = (row.style.display === 'none') ? 'block' : 'none';
+        });
+        document.getElementById('thumbUrlApply').addEventListener('click', function () {
+            const url = document.getElementById('thumbUrlInput').value.trim();
+            if (!url || !/^https?:\/\//.test(url)) { alert('http(s):// から始まる画像のURLを入力してください'); return; }
+            thumbDataUrl = url;
+            thumbFocal = { x: 50, y: 50 };
+            renderThumbPicker();
+            document.getElementById('thumbRequiredNote').style.display = 'none';
+            document.getElementById('focalHint').style.display = 'block';
+            document.getElementById('thumbUrlRow').style.display = 'none';
+        });
 
         // 送信
         let lastCreatedId = null;

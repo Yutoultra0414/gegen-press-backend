@@ -346,6 +346,11 @@
                         <div class="logo-drop-label" id="logoDropLabel">クリックして画像を選択</div>
                     </div>
                     <input type="file" id="logoInput" accept="image/*" style="display:none;">
+                    <button type="button" id="logoUrlToggle" style="background:none; border:none; color:#457b9d; font-size:11.5px; text-decoration:underline; cursor:pointer; padding:6px 0 0; display:block;">画像のURLを直接指定する</button>
+                    <div id="logoUrlRow" style="display:none; margin-top:6px;">
+                        <input type="text" class="form-input" id="logoUrlInput" placeholder="https://... の画像URL" style="margin-bottom:6px;">
+                        <button type="button" class="check-btn" id="logoUrlApply">この画像を使う</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -476,6 +481,20 @@
                 alert('画像の処理に失敗しました: ' + (e.message || e));
                 document.getElementById('logoDropLabel').textContent = 'クリックして画像を選択';
             }
+        });
+
+        document.getElementById('logoUrlToggle').addEventListener('click', function () {
+            const row = document.getElementById('logoUrlRow');
+            row.style.display = (row.style.display === 'none') ? 'block' : 'none';
+        });
+        document.getElementById('logoUrlApply').addEventListener('click', function () {
+            const url = document.getElementById('logoUrlInput').value.trim();
+            if (!url || !/^https?:\/\//.test(url)) { alert('http(s):// から始まる画像のURLを入力してください'); return; }
+            // URL指定の場合は圧縮・トリミングをせず、そのままそのURLを使う
+            logoDataUrl = url;
+            logoDrop.classList.add('has-image');
+            logoDrop.innerHTML = '<img src="' + url + '" alt="">';
+            document.getElementById('logoUrlRow').style.display = 'none';
         });
 
         document.getElementById('mediaForm').addEventListener('submit', async function (e) {

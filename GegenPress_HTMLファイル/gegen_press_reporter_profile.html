@@ -1250,6 +1250,11 @@
             <div class="avatar-col">
                 <button type="button" id="setIconBtn" style="display:none;">アイコンを設定</button>
                 <input type="file" id="iconFileInput" accept="image/*" style="display:none;">
+                <button type="button" id="iconUrlToggle" style="display:none; background:none; border:none; color:#457b9d; font-size:10.5px; text-decoration:underline; cursor:pointer; padding:4px 0 0;">URLで指定</button>
+                <div id="iconUrlRow" style="display:none; margin-top:4px; width:140px;">
+                    <input type="text" class="modal-input" id="iconUrlInput" placeholder="https://..." style="font-size:11px; padding:6px 8px; margin-bottom:4px;">
+                    <button type="button" id="iconUrlApply" style="width:100%; font-size:11px; padding:5px; background:#e63946; color:#fff; border:none; border-radius:4px; cursor:pointer;">設定</button>
+                </div>
                 <div class="profile-avatar profile-avatar-compact" id="profileAvatar">F</div>
             </div>
             <div class="profile-info profile-info-compact">
@@ -1443,9 +1448,10 @@
                 <label class="modal-label">記者名</label>
                 <input type="text" class="modal-input" id="editName" placeholder="記者名">
             </div>
-            <div class="modal-group">
+            <div class="modal-group" style="position:relative;">
                 <label class="modal-label">所属メディア</label>
-                <input type="text" class="modal-input" id="editMedia" placeholder="所属メディア">
+                <input type="text" class="modal-input" id="editMedia" placeholder="所属メディアを入力（登録済みメディアの候補が出ます）" autocomplete="off">
+                <div id="editMediaSuggest" class="gp-search-suggest" style="left:0; right:0;"></div>
             </div>
             <div class="modal-group">
                 <label class="modal-label">X (Twitter) ハンドル</label>
@@ -1621,7 +1627,19 @@
             renderAvatar(document.getElementById('profileAvatar'), r);
             const subtitleEl = document.getElementById('reporterSubtitle');
             if (r.mediaOutlet) {
-                subtitleEl.innerHTML = '<a href="gegen_press_media_profile.html?name=' + encodeURIComponent(r.mediaOutlet) + '" style="color:inherit; text-decoration:underline;">' + escapeHtml(r.mediaOutlet) + '</a>';
+                subtitleEl.innerHTML = '<a href="gegen_press_media_profile.html?name=' + encodeURIComponent(r.mediaOutlet) + '" style="color:inherit; text-decoration:underline;">' + escapeHtml(r.mediaOutlet) + '</a>' +
+                    '<img id="reporterMediaIcon" style="display:none; width:1em; height:1em; margin-left:5px; border-radius:3px; object-fit:cover; vertical-align:middle;" alt="">';
+                if (typeof GegenPressAPI !== 'undefined' && GegenPressAPI.media && GegenPressAPI.media.getByName) {
+                    GegenPressAPI.media.getByName(r.mediaOutlet).then(function (mres) {
+                        if (mres && mres.success && mres.media && mres.media.logo) {
+                            const iconEl = document.getElementById('reporterMediaIcon');
+                            if (iconEl) {
+                                iconEl.src = mres.media.logo;
+                                iconEl.style.display = 'inline-block';
+                            }
+                        }
+                    }).catch(function () {});
+                }
             } else if (r.bio) {
                 subtitleEl.textContent = r.bio;
             }
@@ -1910,6 +1928,7 @@
             // アイコン設定ボタン: ログイン中なら表示（保存可否は最終的にサーバー側ルールが判定）
             if (API_AVAILABLE && currentUserId && currentReporter.id) {
                 document.getElementById('setIconBtn').style.display = 'inline-block';
+                document.getElementById('iconUrlToggle').style.display = 'block';
             }
         }
 
@@ -1949,7 +1968,31 @@
             });
         }
 
-        // 画像ファイルを正方形にトリミングして小さなJPEG(dataURL)に変換
+        document.getElementById('iconUrlToggle').addEventListener('click', function () {
+            const row = document.getElementById('iconUrlRow');
+            row.style.display = (row.style.display === 'none') ? 'block' : 'none';
+        });
+        document.getElementById('iconUrlApply').addEventListener('click', async function () {
+            const url = document.getElementById('iconUrlInput').value.trim();
+            if (!url || !/^https?:\/\//.test(url)) { alert('http(s):// から始まる画像のURLを入力してください'); return; }
+            this.disabled = true;
+            this.textContent = '設定中...';
+            try {
+                const res = await GegenPressAPI.reporters.update(currentReporter.id, { profileImage: url });
+                if (res && res.success) {
+                    currentReporter.profileImage = url;
+                    renderAvatar(document.getElementById('profileAvatar'), currentReporter);
+                    document.getElementById('iconUrlRow').style.display = 'none';
+                    alert('アイコンを設定しました');
+                } else {
+                    alert((res && res.message) || 'アイコンの保存に失敗しました');
+                }
+            } catch (e) {
+                alert('アイコンの設定中にエラーが発生しました: ' + (e.message || e));
+            }
+            this.disabled = false;
+            this.textContent = '設定';
+        });
         function fileToSquareJpeg(file, size) {
             return new Promise(function (resolve, reject) {
                 const reader = new FileReader();
@@ -2095,6 +2138,45 @@
                 list.map(n => '<option value="' + escapeHtml(n.name) + '">' + (n.flag ? n.flag + ' ' : '') + escapeHtml(n.name) + '</option>').join('');
         }
         populateNationalitySelect();
+
+        // =========================================================
+        // 所属メディアの入力補完（登録済みメディアから選べる。無ければ自由入力のまま）
+        // =========================================================
+        let allMediaList = [];
+        async function loadMediaListForSuggest() {
+            if (typeof GegenPressAPI === 'undefined' || !GegenPressAPI.media || !GegenPressAPI.media.getAll) return;
+            try {
+                const res = await GegenPressAPI.media.getAll();
+                if (res && res.success) allMediaList = (res.media || []).map(m => m.name || m.id).filter(Boolean);
+            } catch (e) { console.warn('メディア一覧の読み込みに失敗:', e); }
+        }
+        loadMediaListForSuggest();
+
+        const editMediaInput = document.getElementById('editMedia');
+        const editMediaSuggest = document.getElementById('editMediaSuggest');
+        function renderMediaSuggest(query) {
+            const nq = String(query || '').trim().toLowerCase();
+            const list = nq
+                ? allMediaList.filter(m => m.toLowerCase().indexOf(nq) >= 0).slice(0, 8)
+                : allMediaList.slice(0, 8);
+            if (list.length === 0) { editMediaSuggest.style.display = 'none'; editMediaSuggest.innerHTML = ''; return; }
+            editMediaSuggest.innerHTML = list.map(m =>
+                '<div class="item" data-name="' + escapeHtml(m) + '">' + escapeHtml(m) + '</div>'
+            ).join('');
+            editMediaSuggest.style.display = 'block';
+            editMediaSuggest.querySelectorAll('[data-name]').forEach(el => {
+                el.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    editMediaInput.value = this.getAttribute('data-name');
+                    editMediaSuggest.style.display = 'none';
+                });
+            });
+        }
+        editMediaInput.addEventListener('input', function () { renderMediaSuggest(this.value); });
+        editMediaInput.addEventListener('focus', function () { renderMediaSuggest(this.value); });
+        editMediaInput.addEventListener('blur', function () {
+            setTimeout(() => { editMediaSuggest.style.display = 'none'; }, 150);
+        });
 
         document.getElementById('editReporterBtn').addEventListener('click', function() {
             // 現在の値をフォームに反映

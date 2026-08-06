@@ -414,8 +414,13 @@
                 <div class="btn-row" id="ownActionsRow" style="display:none;">
                     <button class="btn btn-red" id="setMyIconBtn">アイコンを設定</button>
                     <input type="file" id="myIconFile" accept="image/*" style="display:none;">
+                    <button type="button" id="myIconUrlToggle" class="btn btn-white" style="text-decoration:underline;">URLで指定</button>
                     <button class="btn btn-white" id="editProfileBtn">プロフィールを編集</button>
                     <button class="btn btn-white" id="logoutBtn">ログアウト</button>
+                </div>
+                <div id="myIconUrlRow" style="display:none; margin-top:8px; max-width:260px;">
+                    <input type="text" class="form-input" id="myIconUrlInput" placeholder="https://... の画像URL" style="margin-bottom:6px;">
+                    <button type="button" class="btn btn-red" id="myIconUrlApply">この画像を使う</button>
                 </div>
             </div>
 
@@ -640,6 +645,30 @@
                 alert('アイコンの設定中にエラーが発生しました: ' + (e.message || e));
             }
             btn.disabled = false; btn.textContent = 'アイコンを設定';
+        });
+
+        document.getElementById('myIconUrlToggle').addEventListener('click', function () {
+            const row = document.getElementById('myIconUrlRow');
+            row.style.display = (row.style.display === 'none') ? 'block' : 'none';
+        });
+        document.getElementById('myIconUrlApply').addEventListener('click', async function () {
+            const url = document.getElementById('myIconUrlInput').value.trim();
+            if (!url || !/^https?:\/\//.test(url)) { alert('http(s):// から始まる画像のURLを入力してください'); return; }
+            if (!myUid) return;
+            this.disabled = true; this.textContent = '設定中...';
+            try {
+                const res = await GegenPressAPI.users.update(myUid, { profileImage: url });
+                if (res && res.success) {
+                    renderMyAvatar(url, null);
+                    document.getElementById('myIconUrlRow').style.display = 'none';
+                    alert('アイコンを設定しました');
+                } else {
+                    alert((res && res.message) || 'アイコンの保存に失敗しました');
+                }
+            } catch (e) {
+                alert('アイコンの設定中にエラーが発生しました: ' + (e.message || e));
+            }
+            this.disabled = false; this.textContent = 'この画像を使う';
         });
 
         document.getElementById('editProfileBtn').addEventListener('click', () => {

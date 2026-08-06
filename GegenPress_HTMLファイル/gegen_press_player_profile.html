@@ -468,6 +468,11 @@
                 <div id="photoCredit" style="display:none; font-size:9.5px; color:rgba(255,255,255,0.7); text-align:center; margin-top:4px; max-width:110px; line-height:1.4;"></div>
                 <button id="setIconBtn">アイコンを設定</button>
                 <input type="file" id="iconFileInput" accept="image/*" style="display:none;">
+                <button type="button" id="iconUrlToggle" style="display:none; background:none; border:none; color:#fff; text-decoration:underline; font-size:10.5px; cursor:pointer; margin-top:4px;">URLで指定</button>
+                <div id="iconUrlRow" style="display:none; margin-top:4px; max-width:180px;">
+                    <input type="text" class="form-input" id="iconUrlInput" placeholder="https://..." style="margin-bottom:4px; font-size:11px;">
+                    <button type="button" id="iconUrlApply" style="width:100%; background:#e63946; color:#fff; border:none; border-radius:6px; padding:6px; font-size:11px; font-weight:bold; cursor:pointer;">設定</button>
+                </div>
             </div>
             <div class="profile-info">
                 <h1 id="playerName">読み込み中...</h1>
@@ -670,6 +675,7 @@
             let user = null;
             try { user = await GegenPressAPI._currentUser(); } catch (e) {}
             if (user) document.getElementById('setIconBtn').style.display = 'inline-block';
+            if (user) document.getElementById('iconUrlToggle').style.display = 'inline-block';
             // 編集リンク（登録した本人 or 管理者のみ表示。最終判断はサーバー側のルールに委ねます）
             const isOwnerOrAdmin = user && ((p.createdBy && p.createdBy === user.uid) || GegenPressAPI.isAdminUid(user.uid));
             if (isOwnerOrAdmin) {
@@ -763,6 +769,31 @@
                 alert('アイコンの設定中にエラーが発生しました: ' + (e.message || e));
             }
             btn.disabled = false; btn.textContent = 'アイコンを設定';
+        });
+
+        document.getElementById('iconUrlToggle').addEventListener('click', function () {
+            const row = document.getElementById('iconUrlRow');
+            row.style.display = (row.style.display === 'none') ? 'block' : 'none';
+        });
+        document.getElementById('iconUrlApply').addEventListener('click', async function () {
+            const url = document.getElementById('iconUrlInput').value.trim();
+            if (!url || !/^https?:\/\//.test(url)) { alert('http(s):// から始まる画像のURLを入力してください'); return; }
+            if (!currentPlayer) return;
+            this.disabled = true; this.textContent = '設定中...';
+            try {
+                const res = await GegenPressAPI.players.update(currentPlayer.id, { profileImage: url });
+                if (res && res.success) {
+                    currentPlayer.profileImage = url;
+                    renderAvatar(currentPlayer);
+                    document.getElementById('iconUrlRow').style.display = 'none';
+                    alert('アイコンを設定しました');
+                } else {
+                    alert((res && res.message) || 'アイコンの保存に失敗しました');
+                }
+            } catch (e) {
+                alert('アイコンの設定中にエラーが発生しました: ' + (e.message || e));
+            }
+            this.disabled = false; this.textContent = '設定';
         });
 
         loadPlayer();

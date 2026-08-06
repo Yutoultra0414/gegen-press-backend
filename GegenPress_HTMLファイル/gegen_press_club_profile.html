@@ -381,6 +381,11 @@
                 <div class="club-badges" id="clubBadges"></div>
                 <button id="setClubLogoBtn" style="display:none; margin-top:8px; background:rgba(255,255,255,0.9); color:#1d3557; border:none; border-radius:6px; padding:5px 12px; font-size:11px; font-weight:bold; cursor:pointer;">ロゴ画像を設定</button>
                 <input type="file" id="clubLogoInput" accept="image/*" style="display:none;">
+                <button type="button" id="clubLogoUrlToggle" style="display:none; background:none; border:none; color:#fff; text-decoration:underline; font-size:10.5px; cursor:pointer; margin-top:4px;">URLで指定</button>
+                <div id="clubLogoUrlRow" style="display:none; margin-top:4px; max-width:260px;">
+                    <input type="text" class="form-input" id="clubLogoUrlInput" placeholder="https://..." style="margin-bottom:4px;">
+                    <button type="button" id="clubLogoUrlApply" style="background:rgba(255,255,255,0.9); color:#1d3557; border:none; border-radius:6px; padding:5px 12px; font-size:11px; font-weight:bold; cursor:pointer;">設定</button>
+                </div>
             </div>
         </div>
     </section>
@@ -489,6 +494,7 @@
                 try { user = await GegenPressAPI._currentUser(); } catch (e) {}
                 if (user && GegenPressAPI.isAdminUid(user.uid)) {
                     document.getElementById('setClubLogoBtn').style.display = 'inline-block';
+                    document.getElementById('clubLogoUrlToggle').style.display = 'inline-block';
                     const badgesEl = document.getElementById('clubBadges');
                     badgesEl.innerHTML += '<a href="gegen_press_club_import.html?edit=' + encodeURIComponent(clubIdParam) + '" ' +
                         'style="background:rgba(255,255,255,0.9); color:#1d3557; border-radius:2px; padding:3px 10px; font-size:11px; font-weight:bold; text-decoration:none;">クラブ情報を編集</a>';
@@ -554,6 +560,7 @@
             let user = null;
             try { user = await GegenPressAPI._currentUser(); } catch (e) {}
             if (user && GegenPressAPI.isAdminUid(user.uid)) document.getElementById('setClubLogoBtn').style.display = 'inline-block';
+                    document.getElementById('clubLogoUrlToggle').style.display = 'inline-block';
         }
         loadClubLogo();
 
@@ -584,6 +591,34 @@
                 alert('ロゴの設定中にエラーが発生しました: ' + (e.message || e));
             }
             btn.disabled = false; btn.textContent = 'ロゴ画像を設定';
+        });
+
+        document.getElementById('clubLogoUrlToggle').addEventListener('click', function () {
+            const row = document.getElementById('clubLogoUrlRow');
+            row.style.display = (row.style.display === 'none') ? 'block' : 'none';
+        });
+        document.getElementById('clubLogoUrlApply').addEventListener('click', async function () {
+            const url = document.getElementById('clubLogoUrlInput').value.trim();
+            if (!url || !/^https?:\/\//.test(url)) { alert('http(s):// から始まる画像のURLを入力してください'); return; }
+            if (!clubName && !clubIdParam) return;
+            this.disabled = true; this.textContent = '設定中...';
+            try {
+                const res = clubIdParam
+                    ? await GegenPressAPI.clubs.saveFull(clubIdParam, { logo: url })
+                    : await GegenPressAPI.clubs.setLogo(clubName, url);
+                if (res && res.success) {
+                    const badgeEl = document.getElementById('clubBadgeLg');
+                    badgeEl.style.background = '#fff';
+                    badgeEl.innerHTML = '<img src="' + url + '" alt="" style="width:100%;height:100%;object-fit:contain;padding:6px;box-sizing:border-box;border-radius:8px;">';
+                    document.getElementById('clubLogoUrlRow').style.display = 'none';
+                    alert('ロゴを設定しました。');
+                } else {
+                    alert((res && res.message) || 'ロゴの保存に失敗しました。');
+                }
+            } catch (e) {
+                alert('ロゴの設定中にエラーが発生しました: ' + (e.message || e));
+            }
+            this.disabled = false; this.textContent = '設定';
         });
 
         async function loadClubData() {
