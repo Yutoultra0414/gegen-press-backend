@@ -622,7 +622,7 @@
 
                 <!-- 英語版（管理人のみ表示・必須） -->
                 <div class="form-group" id="englishFieldsGroup" style="display:none; background:#f0f7ff; border:1px solid #cfe3fb; border-radius:8px; padding:16px 18px;">
-                    <label class="form-label" style="margin-bottom:4px;">English version <span class="required-badge">必須（管理人のみ）</span></label>
+                    <label class="form-label" style="margin-bottom:4px;">English version <span class="optional-badge">任意（管理人のみ）</span></label>
                     <p class="form-hint">英語版サイト（/en/）に表示される内容です。日本語の直訳でなく、内容が伝わる自然な英語で入力してください。</p>
 
                     <label class="form-label" style="margin-top:12px;">English Title</label>
@@ -1016,11 +1016,6 @@
             if (selectedCategories.size === 0) { alert('サブカテゴリを選択してください'); return; }
             if (!desc) { alert('概要を入力してください'); return; }
             if (!content) { alert('本文を入力してください'); return; }
-            if (isAdminUser) {
-                if (!titleEn) { alert('English Title を入力してください'); return; }
-                if (!descEn) { alert('English Summary を入力してください'); return; }
-                if (!contentEn) { alert('English Body を入力してください'); return; }
-            }
 
             const subcategory = Array.from(selectedCategories)[0];
             const submitBtn = document.getElementById('submitBtn');
