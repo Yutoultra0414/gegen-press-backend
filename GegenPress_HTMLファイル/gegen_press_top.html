@@ -1259,6 +1259,7 @@
             </div>
         </nav>
         <div class="gp-actions">
+            <a href="#" id="langSwitchLink" class="gp-mypage" style="background:#1d3557;" title="View this page in English">EN</a>
             <a href="gegen_press_user_profile.html" class="gp-mypage"><span class="gp-en">MY PAGE</span><span class="gp-jp">マイページ</span></a>
             <button id="gpSidebarToggle" class="gp-hamburger" aria-label="メニューを開く" type="button">
                 <span></span><span></span><span></span>
@@ -2256,6 +2257,15 @@
                 });
                 input.addEventListener('blur', function () { setTimeout(function () { suggestBox.style.display = 'none'; }, 150); });
             }
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var link = document.getElementById('langSwitchLink');
+            if (!link) return;
+            var page = location.pathname.split('/').pop();
+            link.href = '/en/' + page + location.search;
         })();
     </script>
 </body>
